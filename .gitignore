@@ -27,3 +27,13 @@ dist-ssr
 
 # host secrets — this repo is PUBLIC
 deploy/.env
+
+# agent orchestration artefacts — plans are prompts, not project files
+.claude/plans/
+.claude/worktrees/
+.claude/PLAN.md
+.claude/AGENT.md
+
+# test output
+playwright-report/
+test-results/
