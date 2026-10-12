@@ -1,0 +1,230 @@
+/*
+ * AmiticIA v2 — tokens and base type for the market pages (/br, later /it and /en).
+ * See DESIGN.md. Every rule here is scoped to .site-v2 (or html:has(.site-v2)), so the
+ * legacy pages (/ and /k) keep their :root theme untouched.
+ */
+
+/* One font file: Plus Jakarta Sans variable, latin subset only (self-hosted). */
+@font-face {
+  font-family: "Plus Jakarta Sans Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 800;
+  src: url("@fontsource-variable/plus-jakarta-sans/files/plus-jakarta-sans-latin-wght-normal.woff2")
+    format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
+    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+.site-v2 {
+  /* shadcn names, redefined with the v2 palette */
+  --background: 226 45% 5%;
+  --foreground: 220 33% 97%;
+  --card: 224 38% 8%;
+  --card-foreground: 220 33% 97%;
+  --popover: 223 33% 11%;
+  --popover-foreground: 220 33% 97%;
+  --muted: 223 33% 11%;
+  --muted-foreground: 219 18% 70%;
+  --border: 222 25% 16%;
+  --input: 222 25% 16%;
+  --ring: 195 100% 60%;
+  --primary: 195 100% 60%;
+  --primary-foreground: 226 45% 5%;
+
+  /* v2 additions */
+  --surface: 224 38% 8%;
+  --surface-raised: 223 33% 11%;
+  --subtle-foreground: 220 13% 56%;
+  --brand-cyan: 195 100% 60%;
+  --brand-violet: 265 70% 70%;
+  --wahub: 243 85% 68%;
+  --wahub-2: 268 75% 62%;
+  --patricia: 22 85% 70%;
+  --whatsapp: 142 70% 49%;
+  --whatsapp-foreground: 150 80% 6%;
+  --focus-ring: 195 100% 60%;
+  --gradient-brand: linear-gradient(120deg, hsl(195 100% 60%), hsl(265 70% 70%));
+  --hairline: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 160ms;
+  --dur-base: 280ms;
+  --dur-slow: 600ms;
+  --gutter: 20px;
+  --section-y: 72px;
+  /* height the mobile sticky WhatsApp bar takes; the page reserves it */
+  --sticky-bar-h: calc(76px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Base text. :where() keeps specificity at zero so utilities on the same element
+ * (e.g. portalled menus that also carry .site-v2) still win. */
+:where(.site-v2) {
+  color: hsl(var(--foreground));
+  font-family: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* The page shell (SiteLayout's root). */
+.site-v2.v2-page {
+  min-height: 100vh;
+  background-color: hsl(var(--background));
+  overflow-x: clip;
+}
+
+@media (min-width: 768px) {
+  .site-v2 {
+    --gutter: 32px;
+    --section-y: 120px;
+  }
+}
+
+/* Page background behind overscroll and the sticky bar on v2 pages. */
+html:has(.site-v2),
+html:has(.site-v2) body {
+  background-color: hsl(226 45% 5%);
+}
+
+/* ---------- Type ---------- */
+.site-v2 h1,
+.site-v2 h2,
+.site-v2 h3 {
+  text-wrap: balance;
+}
+
+.site-v2 p,
+.site-v2 li {
+  text-wrap: pretty;
+}
+
+.site-v2 .v2-h1 {
+  font-size: clamp(36px, calc(1rem + 4.8vw), 64px);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.site-v2 .v2-h2 {
+  font-size: clamp(28px, calc(0.75rem + 3.2vw), 44px);
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.site-v2 .v2-h3 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.site-v2 .v2-lead {
+  font-size: 18px;
+  font-weight: 450;
+  line-height: 1.55;
+  color: hsl(var(--muted-foreground));
+}
+
+.site-v2 .v2-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+
+.site-v2 .v2-eyebrow::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 9999px;
+  background: var(--eyebrow-dot, var(--gradient-brand));
+  box-shadow: 0 0 12px 1px hsl(var(--brand-cyan) / 0.45);
+}
+
+@media (min-width: 768px) {
+  .site-v2 .v2-h3 {
+    font-size: 24px;
+  }
+
+  .site-v2 .v2-lead {
+    font-size: 20px;
+  }
+}
+
+/* ---------- Layout ---------- */
+.site-v2 .v2-container {
+  width: 100%;
+  max-width: calc(1200px + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.site-v2 .v2-section {
+  padding-block: var(--section-y);
+}
+
+.site-v2 .v2-anchor {
+  scroll-margin-top: 80px;
+}
+
+/* ---------- Focus ---------- */
+.site-v2 :focus-visible {
+  outline: 2px solid hsl(var(--focus-ring));
+  outline-offset: 2px;
+}
+
+/* ---------- Below-the-fold reveals (DESIGN.md rule 4) ----------
+ * Hidden only when JS runs (html.js, set by an inline script in index.html). Until the app
+ * has mounted (html.v2-ready) a CSS animation forces everything visible after 2.5 s, so a
+ * bundle that fails to load never hides content. After mount, Reveal shows each block as it
+ * scrolls into view. */
+html.js .site-v2 [data-reveal]:not([data-revealed]) {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+html.js:not(.v2-ready) .site-v2 [data-reveal]:not([data-revealed]) {
+  animation: v2-reveal-fallback 1ms linear 2.5s forwards;
+}
+
+html.js .site-v2 [data-reveal] {
+  transition:
+    opacity var(--dur-slow) var(--ease),
+    transform var(--dur-slow) var(--ease);
+}
+
+@keyframes v2-reveal-fallback {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Reduced motion (DESIGN.md rule 5) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html.js .site-v2 [data-reveal],
+  html.js .site-v2 [data-reveal]:not([data-revealed]) {
+    opacity: 1;
+    transform: none;
+    animation: none;
+    transition: none;
+  }
+
+  .site-v2 *,
+  .site-v2 *::before,
+  .site-v2 *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

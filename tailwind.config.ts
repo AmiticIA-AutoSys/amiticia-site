@@ -59,6 +59,20 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // v2 market pages (src/site/**): values live on .site-v2 in src/site/styles/site.css
+        surface: "hsl(var(--surface) / <alpha-value>)",
+        "surface-raised": "hsl(var(--surface-raised) / <alpha-value>)",
+        "subtle-foreground": "hsl(var(--subtle-foreground) / <alpha-value>)",
+        "brand-cyan": "hsl(var(--brand-cyan) / <alpha-value>)",
+        "brand-violet": "hsl(var(--brand-violet) / <alpha-value>)",
+        wahub: "hsl(var(--wahub) / <alpha-value>)",
+        "wahub-2": "hsl(var(--wahub-2) / <alpha-value>)",
+        patricia: "hsl(var(--patricia) / <alpha-value>)",
+        whatsapp: "hsl(var(--whatsapp) / <alpha-value>)",
+        "whatsapp-foreground": "hsl(var(--whatsapp-foreground) / <alpha-value>)",
+      },
+      fontFamily: {
+        display: ["'Plus Jakarta Sans Variable'", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
