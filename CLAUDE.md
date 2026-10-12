@@ -45,6 +45,19 @@ deploy/             # THE deployed compose (+ .env.example) — the VPS runs it 
   deploy.yml        # CI/CD: build → push to ghcr.io → SSH deploy
 ```
 
+## Conformance and dispatch
+
+> **Conformance:** `qgat` -- n/a (TODO-RATIFY): static marketing SPA with no business logic to ratchet; unit tests run in pre-commit and Playwright E2E against the real Docker image in pre-push.
+>
+> **Conformance:** `srev` -- n/a (TODO-RATIFY): no backend, no secrets and no customer data in the bundle; the public-repo leak risk (people and client names in the working docs) is handled by keeping `HANDOFF.md`, `brief.md` and `copy-br.md` in `.git/info/exclude`.
+>
+> **Conformance:** `disp` -- n/a (TODO-RATIFY): npm outlier without the pnpm dispatch script; the coordinator dispatches by hand (below).
+
+**Manual dispatch** (same contract as `standards.md#worktree-dispatch`): write
+`.claude/plans/<slug>.md`, then `git worktree add .claude/worktrees/<slug> -b agent/<slug> <base>`,
+copy the plan to `<worktree>/.claude/PLAN.md`, run `npm ci` there, and give each parallel worker its
+own `E2E_PORT`. There is no database to allocate.
+
 ## Behavioral probes
 
 This repo has no tests at all, and for a one-page marketing SPA that is a
