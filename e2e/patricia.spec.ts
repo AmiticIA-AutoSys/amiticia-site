@@ -45,6 +45,7 @@ test.describe("/br/patricia", () => {
   test("the chat plays once and then the case card assembles", async ({ page }) => {
     await page.goto("/br/patricia", { waitUntil: "networkidle" });
     const card = page.locator("[data-briefing]");
+    await card.scrollIntoViewIfNeeded();
     await expect(card).toHaveAttribute("data-phase", "done", { timeout: 15_000 });
     await expect(card.getByText("Apartamento financiado", { exact: true })).toBeVisible();
   });
