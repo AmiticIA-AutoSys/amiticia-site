@@ -39,6 +39,8 @@ for url in /br /br/wahub /br/patricia / "$asset" /og/br-home.jpg /k /k/data/x /k
   header "$url" | grep -qi '^x-robots-tag: noindex, nofollow$'; check "X-Robots-Tag on ${url}" $?
 done
 check "/br answers 200" "$([ "$(status /br)" = 200 ]; echo $?)"
+check "/ redirects to /br (no legacy page in the preview)" "$([ "$(status /)" = 302 ]; echo $?)"
+check "the / redirect is relative (no internal :3000 leaks)" "$(header / | grep -qi '^location: /br$'; echo $?)"
 check "/k answers 404" "$([ "$(status /k)" = 404 ]; echo $?)"
 check "/k/data/x answers 404" "$([ "$(status /k/data/x)" = 404 ]; echo $?)"
 check "/k/api/x answers 404" "$([ "$(status /k/api/x)" = 404 ]; echo $?)"
