@@ -1,0 +1,43 @@
+# Preview stack for amiticia.cc: a throwaway copy of the site that Flavio and Andre open on their
+# phones BEFORE anything changes on amiticia.cc. Lives on the Hostinger VPS in
+# /opt/amiticia/amiticia-site-preview (a checkout of this repo, branch v2-br), compose project
+# `amiticia-site-preview`.
+#
+# What it is
+#   web     nginx serving the site image built locally with SITE_URL=<tunnel url> and
+#           SITE_NOINDEX=1 (so canonical/og URLs point at the tunnel and every page is noindex).
+#           No ports published, no Traefik labels, NOT on network_public: production cannot see
+#           it and it cannot see production. It has no /k area.
+#   tunnel  a Cloudflare quick tunnel (random https://*.trycloudflare.com URL, no account, no DNS
+#           change, no Traefik router). The URL changes every time the tunnel starts.
+#
+# How to run it (the coordinator runs these; the scripts print each step)
+#   1. scripts/preview-tunnel.sh        starts only `tunnel` on the VPS (no web yet), prints the URL
+#   2. scripts/preview-deploy.sh <url>  builds the image with that URL, ships it, starts `web`
+#   Order matters: the image bakes the tunnel URL into og:image/canonical, so the tunnel
+#   starts first. Restarting the tunnel gives a new URL: run preview-deploy.sh again.
+#   Tear down:  ssh hostinger 'cd /opt/amiticia/amiticia-site-preview/deploy/preview && docker compose down'
+#
+# Why a quick tunnel: it needs no DNS or Traefik change, so nothing near production is touched,
+# and `down` removes every trace. The link is public to anyone holding the URL: it is
+# unguessable but not a secret, and the pages are noindex.
+#
+# Image tag: cloudflared 2026.10.0 is the latest stable release at the time of writing
+# (Docker Hub, same digest as :latest on 2026-10-13). Pinned so the preview does not change
+# behaviour under us; bump it deliberately.
+name: amiticia-site-preview
+
+services:
+  web:
+    image: amiticia-site-preview:local
+    pull_policy: never
+    restart: unless-stopped
+    mem_limit: 128m
+    volumes:
+      - ./nginx.preview.conf:/etc/nginx/conf.d/default.conf:ro
+
+  tunnel:
+    image: cloudflare/cloudflared:2026.10.0
+    restart: unless-stopped
+    mem_limit: 128m
+    command: tunnel --no-autoupdate --url http://web:3000
