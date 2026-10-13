@@ -16,7 +16,8 @@ test.describe("prerendered HTML (no JS)", () => {
       expect(html).toMatch(/<html lang="pt-BR"/);
       expect(html).toContain(`<title>${p.title}</title>`);
       expect(html).toContain(`<meta property="og:title" content="${p.title}" />`);
-      expect(html).toMatch(/<meta property="og:image" content="https:\/\/amiticia\.cc\/[^"]+"/);
+      expect(html).toMatch(/<meta property="og:image" content="https:\/\/amiticia\.cc\/og\/br-[a-z]+\.jpg" \/>/);
+      expect(html).toContain('<meta property="og:image:width" content="1200" />');
       expect(html).toContain(`<link rel="canonical" href="https://amiticia.cc${p.path}" />`);
       expect(html).toMatch(new RegExp(`<h1[^>]*>${p.h1}</h1>`));
       expect(html).toContain(`href="${waHref(p.message)}"`);
