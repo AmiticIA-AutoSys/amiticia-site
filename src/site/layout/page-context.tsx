@@ -7,6 +7,8 @@ import { whatsappHrefFor } from "../whatsapp";
 export interface SitePage {
   market: MarketId;
   page: PageId;
+  /** This page's path, e.g. /br/wahub (the language switcher links to the same page elsewhere). */
+  path?: string;
   copy: MarketCopy;
   /** wa.me link with this page's pre-filled message; every WhatsApp button on the page uses it. */
   whatsappHref: string;
@@ -19,10 +21,12 @@ const SitePageContext = createContext<SitePage | null>(null);
 export const SitePageProvider = ({
   market,
   page,
+  path,
   children,
 }: {
   market: MarketId;
   page: PageId;
+  path?: string;
   children: ReactNode;
 }) => {
   const value = useMemo<SitePage>(() => {
@@ -30,11 +34,12 @@ export const SitePageProvider = ({
     return {
       market,
       page,
+      path,
       copy,
       whatsappHref: whatsappHrefFor(market, page),
       stickyCta: copy[page].stickyCta,
     };
-  }, [market, page]);
+  }, [market, page, path]);
   return <SitePageContext.Provider value={value}>{children}</SitePageContext.Provider>;
 };
 

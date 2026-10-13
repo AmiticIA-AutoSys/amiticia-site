@@ -23,15 +23,15 @@ h1 { font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; text-wrap: ba
 .hairline { position: absolute; inset: 0; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06); pointer-events: none; }
 `;
 
-const page = (fontUrl, css, body) =>
-  `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><style>${BASE_CSS(fontUrl)}${css}</style></head><body>${body}<div class="hairline"></div></body></html>`;
+const page = (fontUrl, css, body, lang = "pt-BR") =>
+  `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><style>${BASE_CSS(fontUrl)}${css}</style></head><body>${body}<div class="hairline"></div></body></html>`;
 
 const logo = (logoUrl) => `<img class="logo" src="${logoUrl}" alt="AmiticIA">`;
 
 const GRADIENT = "linear-gradient(120deg, #33CCFF, #A78BFA)";
 
-/** Home: company-level, brand gradient glow, the two product names as tinted chips. */
-export const homeTemplate = ({ fontUrl, logoUrl, h1, eyebrow, chips }) =>
+/** Home: company-level, brand gradient glow, the market's product names as tinted chips. Longer titles (it) step down to 80px to stay on two lines. */
+export const homeTemplate = ({ lang, fontUrl, logoUrl, h1, eyebrow, chips }) =>
   page(
     fontUrl,
     `
@@ -39,17 +39,18 @@ export const homeTemplate = ({ fontUrl, logoUrl, h1, eyebrow, chips }) =>
 .g2 { right: -240px; bottom: -340px; width: 900px; height: 900px; background: radial-gradient(closest-side, rgba(167,139,250,.32), transparent); }
 .main { position: absolute; left: 72px; top: 190px; width: 1056px; }
 .eyebrow { color: transparent; background: ${GRADIENT}; -webkit-background-clip: text; background-clip: text; font-size: 24px; text-transform: none; letter-spacing: 0; font-weight: 700; margin-bottom: 28px; }
-h1 { font-size: 92px; letter-spacing: -0.035em; line-height: 1.04; }
+h1 { font-size: ${h1.length > 36 ? 80 : 92}px; letter-spacing: -0.035em; line-height: 1.04; }
 .chips { position: absolute; left: 72px; bottom: 60px; display: flex; gap: 16px; }
 .chip { display: inline-flex; align-items: center; gap: 12px; height: 56px; padding: 0 26px 0 22px; border-radius: 9999px; font-size: 24px; font-weight: 700; background: #121826; box-shadow: inset 0 0 0 1px rgba(255,255,255,.10); }
 `,
     `<div class="glow g1"></div><div class="glow g2"></div>${logo(logoUrl)}
 <div class="main"><div class="eyebrow">${esc(eyebrow)}</div><h1>${esc(h1)}</h1></div>
 <div class="chips">${chips.map((c) => `<span class="chip"><i class="dot" style="background:${c.tint}"></i>${esc(c.name)}</span>`).join("")}</div>`,
+    lang,
   );
 
 /** WaHub: indigo→violet glow, real inbox screenshot crop in a rounded frame bleeding off the corner. */
-export const wahubTemplate = ({ fontUrl, logoUrl, h1, eyebrow, shotUrl }) =>
+export const wahubTemplate = ({ lang, fontUrl, logoUrl, h1, eyebrow, shotUrl }) =>
   page(
     fontUrl,
     `
@@ -69,10 +70,11 @@ h1 { font-size: 54px; line-height: 1.08; }
     `<div class="glow g1"></div><div class="glow g2"></div>${logo(logoUrl)}
 <div class="main"><div class="eyebrow"><i class="dot"></i>${esc(eyebrow)}</div><h1>${esc(h1)}</h1></div>
 <div class="frame"><img src="${shotUrl}" alt=""></div>`,
+    lang,
   );
 
 /** Patrícia: warm peach glow, coded "Caso organizado" briefing card. */
-export const patriciaTemplate = ({ fontUrl, logoUrl, h1, eyebrow }) =>
+export const patriciaTemplate = ({ lang, fontUrl, logoUrl, h1, eyebrow }) =>
   page(
     fontUrl,
     `
@@ -107,4 +109,5 @@ h1 { font-size: 54px; line-height: 1.08; }
   <div class="row"><div class="label">Resposta pronta</div><div class="value">Aguardando a sua aprovação</div></div>
   <div class="actions"><span class="btn primary">Enviar</span><span class="btn ghost">Editar</span></div>
 </div>`,
+    lang,
   );

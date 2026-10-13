@@ -2,7 +2,7 @@
  * Typed shape of the copy of one market. Each page has its own file per market
  * (copy/<market>/<page>.ts) so page work never collides; this file is the contract.
  */
-export type PageId = "home" | "wahub" | "patricia";
+export type PageId = "home" | "wahub" | "patricia" | "unavailable";
 
 export interface MetaCopy {
   title: string;
@@ -179,9 +179,26 @@ export interface PatriciaCopy {
   closing: ClosingCopy;
 }
 
+/**
+ * The page a market shows at a product's path when the product is not sold there
+ * (e.g. /it/patricia). `{product}` in any string is replaced by the product's name.
+ */
+export interface UnavailableCopy {
+  meta: MetaCopy;
+  whatsappMessage: string;
+  stickyCta: string;
+  eyebrow: string;
+  title: string;
+  body: string;
+  /** Link back to the market's home. */
+  homeCta: string;
+}
+
 export interface MarketCopy {
   common: CommonCopy;
   home: HomeCopy;
   wahub: WahubCopy;
-  patricia: PatriciaCopy;
+  /** Only in markets that sell Patrícia (products.ts). */
+  patricia?: PatriciaCopy;
+  unavailable: UnavailableCopy;
 }

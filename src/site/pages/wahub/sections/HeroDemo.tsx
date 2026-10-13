@@ -6,7 +6,8 @@ import { IPhone17ProMax } from "@/components/kit/cult/iphone-frame";
 import { LiveChat } from "@/components/kit/originkit/live-chat";
 import { SquigglyArrow } from "@/components/kit/cult/squiggle-arrow";
 import { TextureOverlay } from "@/components/kit/cult/texture-overlay";
-import { heroChat, heroLead } from "../demo";
+import type { MarketId } from "../../../markets";
+import { wahubDemoFor, type WahubDemo } from "../demo";
 
 /* WhatsApp dark palette: the phone screen imitates the app, so these colours are the app's,
  * not site tokens. Outgoing teal is WhatsApp's own bubble, never an action colour. */
@@ -30,7 +31,7 @@ html.js:not(.v2-ready) [data-lead-card][data-state="hidden"]{animation:wahub-lea
 @keyframes wahub-lead-fallback{to{opacity:1;transform:none}}
 @media (prefers-reduced-motion: reduce){html.js [data-lead-card][data-state="hidden"]{opacity:1;transform:none;animation:none}}`;
 
-const ChatHeader = () => (
+const ChatHeader = ({ heroChat }: Pick<WahubDemo, "heroChat">) => (
   <div className="flex items-center gap-2.5 px-3 pb-2.5 pt-1" style={{ background: wa.bar, color: wa.text }}>
     <ChevronLeft className="h-5 w-5 shrink-0 opacity-80" aria-hidden="true" />
     <span
@@ -48,7 +49,7 @@ const ChatHeader = () => (
   </div>
 );
 
-const ChatComposer = () => (
+const ChatComposer = ({ heroChat }: Pick<WahubDemo, "heroChat">) => (
   <div className="flex items-center gap-2 px-2.5 pb-7 pt-2" style={{ background: wa.wallpaper }}>
     <span className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-full px-3" style={{ background: wa.bar }}>
       <Plus className="h-4 w-4 shrink-0" style={{ color: wa.meta }} aria-hidden="true" />
@@ -62,7 +63,11 @@ const ChatComposer = () => (
   </div>
 );
 
-export const LeadCard = ({ shown, className }: { shown: boolean; className?: string }) => (
+export const LeadCard = ({
+  shown,
+  heroLead,
+  className,
+}: { shown: boolean; className?: string } & Pick<WahubDemo, "heroLead">) => (
   <div
     data-lead-card=""
     data-testid="wahub-lead-card"
@@ -107,7 +112,8 @@ export const LeadCard = ({ shown, className }: { shown: boolean; className?: str
  * when it ends, the qualified lead pops out beside the phone. Decorative (aria-hidden): the
  * copy beside it says the same in words.
  */
-export const HeroDemo = ({ className }: { className?: string }) => {
+export const HeroDemo = ({ market, className }: { market: MarketId; className?: string }) => {
+  const { heroChat, heroLead } = wahubDemoFor(market);
   const reduceMotion = useReducedMotion();
   const [shown, setShown] = useState(false);
   const onComplete = useCallback(() => setShown(true), []);
@@ -149,7 +155,7 @@ export const HeroDemo = ({ className }: { className?: string }) => {
           className="p-0"
           screenClassName="!bg-[#0B141A]"
         >
-          <ChatHeader />
+          <ChatHeader heroChat={heroChat} />
           <LiveChat
             messages={heroChat.messages}
             staggerSeconds={1.05}
@@ -159,7 +165,7 @@ export const HeroDemo = ({ className }: { className?: string }) => {
             receivedBubbleClassName="!max-w-[82%] !rounded-[10px] !rounded-tl-[3px] !px-2.5 !py-1.5 !text-[12.5px] !leading-snug !text-[#E9EDEF] !bg-[#202C33] shadow-sm"
             timeClassName="!text-[10px] !opacity-100 text-[#C4D0D6]"
           />
-          <ChatComposer />
+          <ChatComposer heroChat={heroChat} />
         </IPhone17ProMax>
       </div>
 
@@ -176,6 +182,7 @@ export const HeroDemo = ({ className }: { className?: string }) => {
       />
       <LeadCard
         shown={shown}
+        heroLead={heroLead}
         className="absolute bottom-0 right-0 z-10 sm:right-[6%] lg:bottom-[14%] lg:right-0"
       />
     </div>

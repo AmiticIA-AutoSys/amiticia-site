@@ -19,7 +19,7 @@ const navLinkClass =
 
 // VISUAL: skiper40 animated nav links + skiper41 progressive blur (kit) replace the plain links/blur.
 export const SiteHeader = () => {
-  const { market, copy } = useSitePage();
+  const { market, path, copy } = useSitePage();
   const { nav, headerCta, whatsappIconLabel, homeLinkLabel, languageSwitcherLabel } = copy.common;
   const [scrolled, setScrolled] = useState(false);
 
@@ -70,7 +70,7 @@ export const SiteHeader = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          <LanguageSwitcher market={market} label={languageSwitcherLabel} />
+          <LanguageSwitcher market={market} path={path} label={languageSwitcherLabel} />
           <WhatsAppButton placement="header" className="hidden md:inline-flex">
             {headerCta}
           </WhatsAppButton>

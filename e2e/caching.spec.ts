@@ -26,7 +26,7 @@ test.describe("Cache-Control", () => {
     expect(res.headers()["cache-control"]).toContain("max-age=31536000");
   });
 
-  for (const url of ["/og/br-home.jpg", "/og/br-wahub.jpg", "/og/br-patricia.jpg", "/robots.txt", "/og-image.png"]) {
+  for (const url of ["/og/br-home.jpg", "/og/br-wahub.jpg", "/og/br-patricia.jpg", "/og/it-home.jpg", "/og/it-wahub.jpg", "/robots.txt", "/og-image.png"]) {
     test(`${url} is cached for an hour`, async ({ request }) => {
       const res = await request.get(url);
       expect(res.status()).toBe(200);

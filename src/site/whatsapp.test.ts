@@ -27,3 +27,18 @@ describe("whatsappHref", () => {
     );
   });
 });
+
+const IT_NUMBER = "393926044070";
+
+describe("whatsappHrefFor in the it market", () => {
+  it("uses Flavio's Italian number", () => {
+    expect(markets.it.whatsappNumber).toBe(IT_NUMBER);
+  });
+
+  it.each([
+    ["home", "Ciao Flavio, ho visto il sito AmiticIA e vorrei parlare di un progetto."],
+    ["wahub", "Ciao Flavio, ho visto WaHub sul sito AmiticIA e vorrei saperne di più."],
+  ] as const)("carries the %s message in Italian", (page, text) => {
+    expect(whatsappHrefFor("it", page)).toBe(`https://wa.me/${IT_NUMBER}?text=${encodeURIComponent(text)}`);
+  });
+});

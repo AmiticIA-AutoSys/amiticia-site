@@ -1,8 +1,10 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { brCopy } from "../../../copy/br";
-import { tourTabs } from "../demo";
+import { wahubDemoFor } from "../demo";
 import { ProductTour } from "./ProductTour";
+
+const { tourTabs } = wahubDemoFor("br");
 
 const alts = brCopy.wahub.screenshots;
 
@@ -15,7 +17,7 @@ const panelOf = (tab: HTMLElement) => {
 
 describe("WaHub product tour", () => {
   it("opens on Conversas with the inbox screenshot", () => {
-    render(<ProductTour alts={alts} />);
+    render(<ProductTour market="br" alts={alts} />);
     const tab = screen.getByRole("tab", { name: tourTabs.inbox });
     expect(tab).toHaveAttribute("aria-selected", "true");
     const img = within(panelOf(tab)).getByAltText(alts.inbox);
@@ -26,7 +28,7 @@ describe("WaHub product tour", () => {
   });
 
   it("switches the visible screenshot with the tabs and keeps aria-selected right", () => {
-    render(<ProductTour alts={alts} />);
+    render(<ProductTour market="br" alts={alts} />);
     const inbox = screen.getByRole("tab", { name: tourTabs.inbox });
     const pipeline = screen.getByRole("tab", { name: tourTabs.pipeline });
     const leads = screen.getByRole("tab", { name: tourTabs.leads });
@@ -43,7 +45,7 @@ describe("WaHub product tour", () => {
   });
 
   it("serves a legible crop below 640 px through <picture> sources", () => {
-    render(<ProductTour alts={alts} />);
+    render(<ProductTour market="br" alts={alts} />);
     const tab = screen.getByRole("tab", { name: tourTabs.inbox });
     const source = panelOf(tab).querySelector("picture > source");
     expect(source).toHaveAttribute("media", "(max-width: 639px)");

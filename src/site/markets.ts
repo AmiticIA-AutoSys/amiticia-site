@@ -32,8 +32,8 @@ export const markets: Record<MarketId, Market> = {
     lang: "it-IT",
     ogLocale: "it_IT",
     label: "Italiano",
-    whatsappNumber: "",
-    live: false,
+    whatsappNumber: "393926044070",
+    live: true,
   },
   en: {
     id: "en",
@@ -50,3 +50,10 @@ export const liveMarkets = (): Market[] => Object.values(markets).filter((m) => 
 /** Markets a visitor on `current` could switch to. Empty while only one market is live. */
 export const alternateMarkets = (current: MarketId): Market[] =>
   liveMarkets().filter((m) => m.id !== current);
+
+/** The entry of `market` in a per-market table (demo data, screenshots). Throws when it is missing. */
+export const forMarket = <T>(table: Partial<Record<MarketId, T>>, market: MarketId, what: string): T => {
+  const value = table[market];
+  if (value === undefined) throw new Error(`No ${what} for market "${market}"`);
+  return value;
+};

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { brPages } from "./fixtures";
+import { sitePages } from "./fixtures";
 
 test.skip(({ isMobile }) => !isMobile, "360 px checks");
 
@@ -30,7 +30,7 @@ const reachableWhatsApp = (page: Page) =>
       .map((a) => a.dataset.placement ?? a.textContent?.trim());
   });
 
-for (const p of brPages) {
+for (const p of sitePages) {
   test(`${p.path} fits 360 px: no horizontal overflow, every control inside the viewport`, async ({ page }) => {
     await page.goto(p.path, { waitUntil: "networkidle" });
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);

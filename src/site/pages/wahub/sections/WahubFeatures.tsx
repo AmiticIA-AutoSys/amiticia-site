@@ -12,13 +12,15 @@ import { cn } from "@/lib/utils";
 import type { WahubCopy } from "../../../copy/types";
 import { Reveal, Section } from "../../../layout/primitives";
 import { LeadIn } from "../../../layout/blocks";
-import { shots, type Shot } from "../screenshots";
+import type { MarketId } from "../../../markets";
+import { shotsFor, type Shots } from "../screenshots";
 import { ProductTour } from "./ProductTour";
 
 const APP_BG = "#040613";
 
 interface Crop {
-  shot: Shot;
+  /** Which of the market's screenshots (screenshots.ts). */
+  shot: keyof Shots;
   sizes: string;
   /** Placement of the image inside the crop window (phones vary it from the tour above). */
   img: string;
@@ -48,7 +50,7 @@ const tiles: Tile[] = [
     side: true,
     // The conversation list (owner, status, history per conversation): the tour shows the thread.
     crop: {
-      shot: shots.list,
+      shot: "list",
       sizes: "376px",
       img: "left-1/2 top-0 h-auto w-full max-w-[376px] -translate-x-1/2",
       frame: "h-[280px] w-full max-w-[376px] self-center lg:mt-0 lg:h-[300px] lg:w-[376px] lg:shrink-0 lg:self-end",
@@ -58,7 +60,7 @@ const tiles: Tile[] = [
     icon: Bot,
     place: "lg:col-start-3 lg:row-span-2 lg:row-start-1",
     crop: {
-      shot: shots.panel,
+      shot: "panel",
       sizes: "(min-width: 1024px) 284px, 284px",
       img: "inset-0 h-full w-full object-cover object-[50%_0%]",
       frame: "h-[300px] lg:h-full lg:min-h-[340px]",
@@ -68,7 +70,7 @@ const tiles: Tile[] = [
     icon: SquareKanban,
     place: "lg:col-span-2 lg:col-start-1 lg:row-start-3",
     crop: {
-      shot: shots.pipeline,
+      shot: "pipeline",
       sizes: "(min-width: 1024px) 900px, 900px",
       img: "inset-0 h-full w-full object-cover object-[60%_0%] lg:object-[0%_0%]",
       frame: "h-[300px] md:h-[260px]",
@@ -86,17 +88,17 @@ const IconTile = ({ icon: Icon }: { icon: LucideIcon }) => (
   </span>
 );
 
-const CropFrame = ({ crop }: { crop: Crop }) => (
+const CropFrame = ({ crop, shots }: { crop: Crop; shots: Shots }) => (
   <div
     className={cn("relative mt-6 overflow-hidden rounded-t-[14px] border border-b-0 border-border", crop.frame)}
     style={{ backgroundColor: APP_BG }}
   >
     <img
-      src={crop.shot.src}
-      srcSet={crop.shot.srcSet}
+      src={shots[crop.shot].src}
+      srcSet={shots[crop.shot].srcSet}
       sizes={crop.sizes}
-      width={crop.shot.width}
-      height={crop.shot.height}
+      width={shots[crop.shot].width}
+      height={shots[crop.shot].height}
       alt=""
       loading="lazy"
       decoding="async"
@@ -109,13 +111,21 @@ const CropFrame = ({ crop }: { crop: Crop }) => (
   </div>
 );
 
-export const WahubFeatures = ({ copy, alts }: { copy: WahubCopy["features"]; alts: WahubCopy["screenshots"] }) => (
+export const WahubFeatures = ({
+  market,
+  copy,
+  alts,
+}: {
+  market: MarketId;
+  copy: WahubCopy["features"];
+  alts: WahubCopy["screenshots"];
+}) => (
   <Section className="border-t border-border/60">
     <Reveal>
       <h2 className="v2-h2">{copy.title}</h2>
     </Reveal>
     <Reveal className="mt-10 md:mt-14">
-      <ProductTour alts={alts} />
+      <ProductTour market={market} alts={alts} />
     </Reveal>
     <ul className="mt-10 grid gap-4 md:mt-14 md:grid-flow-dense md:grid-cols-2 lg:grid-cols-3 lg:gap-5">
       {copy.items.map((item, i) => {
@@ -140,7 +150,7 @@ export const WahubFeatures = ({ copy, alts }: { copy: WahubCopy["features"]; alt
                 <LeadIn {...item} />
               </p>
             </div>
-            {tile.crop && <CropFrame crop={tile.crop} />}
+            {tile.crop && <CropFrame crop={tile.crop} shots={shotsFor(market)} />}
           </Reveal>
         );
       })}

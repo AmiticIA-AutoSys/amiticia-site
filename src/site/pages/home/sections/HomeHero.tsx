@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { ArrowDown } from "lucide-react";
 import { TextureOverlay } from "@/components/kit/cult/texture-overlay";
 import type { HomeCopy } from "../../../copy/types";
+import type { MarketId } from "../../../markets";
 import { Container } from "../../../layout/primitives";
 import { WhatsAppButton } from "../../../layout/WhatsAppButton";
 import { secondaryButtonClass } from "../../../layout/blocks";
@@ -25,7 +26,7 @@ const titleStyle: CSSProperties = {
 };
 
 // Above the fold: never animated from opacity 0 (DESIGN.md rule 3).
-export const HomeHero = ({ copy }: { copy: HomeCopy["hero"] }) => (
+export const HomeHero = ({ market, copy }: { market: MarketId; copy: HomeCopy["hero"] }) => (
   <section className="relative -mt-16 overflow-hidden pb-16 pt-[96px] md:-mt-[72px] md:pb-28 md:pt-[148px] lg:pt-[136px]">
     <div
       aria-hidden="true"
@@ -69,7 +70,7 @@ export const HomeHero = ({ copy }: { copy: HomeCopy["hero"] }) => (
             </a>
           </div>
         </div>
-        <HeroIllustration />
+        <HeroIllustration market={market} />
       </div>
     </Container>
   </section>

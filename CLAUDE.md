@@ -7,7 +7,9 @@ This file provides guidance to Claude Code when working with this repository.
 Marketing website for **amiticia.cc**: a Vite + React SPA served by nginx in Docker, behind
 Traefik on the Hostinger VPS. Two generations live side by side:
 
-- **v2 market pages**: `/br`, `/br/wahub`, `/br/patricia` (later `/it`, `/en`). They are
+- **v2 market pages**: `/br`, `/br/wahub`, `/br/patricia`, `/it`, `/it/wahub` (later `/en`). A product
+  not sold in a market still gets its path there, as a noindex "not available" page
+  (`/it/patricia`), so the language switcher never leads to a 404. They are
   prerendered to static HTML at build time and hydrated in the browser. Design rules and tokens are
   in `DESIGN.md`, with tokens scoped to `.site-v2`. Copy lives in `src/site/copy/<market>/` and
   changes only with the product owner's approval.
@@ -55,11 +57,11 @@ act on the VPS: coordinator only (see Preview stack).
 src/
   site/              v2 market pages: everything new lives here
     markets.ts products.ts routes.tsx meta.ts whatsapp.ts analytics.ts
-    copy/<market>/   approved page copy, one file per page
+    copy/<market>/   approved page copy, one file per page (it: translated from br, reviewed by Flavio)
     layout/          header, footer, sticky WhatsApp bar, buttons, primitives
     pages/<page>/    page component + sections/
     styles/site.css  .site-v2 tokens and base styles
-    assets/          v2 images (WaHub screenshots: fictitious demo data)
+    assets/          v2 images (WaHub screenshots per market, wahub/ and wahub/it/: fictitious demo data)
   components/kit/    adapted third-party components (Cult UI, Skiper UI, OriginKit): keep attribution headers
   components/ui/     shadcn primitives
   pages/ components/ legacy pages and their components
@@ -151,7 +153,9 @@ from production:
   holding it can open the site; it is unguessable but not a secret.
 - **Indexing:** every page is noindex (meta tag and `X-Robots-Tag`), `robots.txt` disallows all,
   and `/k` answers 404.
-- **v2 only:** `/` redirects to `/br`, so the bare preview URL never shows the legacy landing.
+- **v2 only, by language:** `/` answers a 302 to `/it` or `/br`, picked from the first Italian or
+  Portuguese entry in `Accept-Language`; any other language goes to `/it` until `/en` exists. The
+  bare preview URL never shows the legacy landing. Production `/` still serves the legacy page.
 
 To bring it up:
 

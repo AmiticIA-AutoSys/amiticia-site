@@ -2,15 +2,16 @@
 import type { ComponentType } from "react";
 import { Route, Routes } from "react-router-dom";
 import { liveMarkets, markets, type MarketId } from "./markets";
-import { productPath, productsFor } from "./products";
+import { productPath, products, productsFor, type ProductId } from "./products";
 import type { PageId } from "./copy/types";
-import { copyFor } from "./copy";
+import { copyFor, fillProduct } from "./copy";
 import { ogImageFor, type PageMeta } from "./meta";
 import { SitePageProvider } from "./layout/page-context";
 import { SiteLayout } from "./layout/SiteLayout";
 import { HomePage } from "./pages/home/HomePage";
 import { WahubPage } from "./pages/wahub/WahubPage";
 import { PatriciaPage } from "./pages/patricia/PatriciaPage";
+import { UnavailablePage } from "./pages/unavailable/UnavailablePage";
 
 export interface SiteRoute {
   path: string;
@@ -20,26 +21,28 @@ export interface SiteRoute {
   meta: PageMeta;
 }
 
-const pageComponents: Record<PageId, ComponentType> = {
+const pageComponents: Record<Exclude<PageId, "unavailable">, ComponentType> = {
   home: HomePage,
   wahub: WahubPage,
   patricia: PatriciaPage,
 };
 
-const metaOf = (market: MarketId, page: PageId, path: string): PageMeta => {
+const metaOf = (market: MarketId, page: PageId, path: string, product?: ProductId): PageMeta => {
+  const fill = (s: string) => (product ? fillProduct(s, products[product].name) : s);
   const { title, description } = copyFor(market)[page].meta;
   return {
-    title,
-    description,
+    title: fill(title),
+    description: fill(description),
     path,
     ogImage: ogImageFor(market, page),
-    ogImageAlt: title,
+    ogImageAlt: fill(title),
     lang: markets[market].lang,
     ogLocale: markets[market].ogLocale,
+    ...(page === "unavailable" && { noindex: true }),
   };
 };
 
-const route = (market: MarketId, page: PageId, path: string): SiteRoute => ({
+const route = (market: MarketId, page: Exclude<PageId, "unavailable">, path: string): SiteRoute => ({
   path,
   market,
   page,
@@ -47,11 +50,31 @@ const route = (market: MarketId, page: PageId, path: string): SiteRoute => ({
   meta: metaOf(market, page, path),
 });
 
-/** The single list of market routes: used by the app router and by the prerender. */
-export const siteRoutes: SiteRoute[] = liveMarkets().flatMap((m) => [
-  route(m.id, "home", `/${m.id}`),
-  ...productsFor(m.id).map((p) => route(m.id, p.id, productPath(m.id, p.id))),
-]);
+/** A product's path in a market that does not sell it: says so and links to that market's home. */
+const unavailableRoute = (market: MarketId, product: ProductId): SiteRoute => {
+  const path = productPath(market, product);
+  return {
+    path,
+    market,
+    page: "unavailable",
+    Page: () => <UnavailablePage productId={product} />,
+    meta: metaOf(market, "unavailable", path, product),
+  };
+};
+
+/**
+ * The single list of market routes: used by the app router and by the prerender. Every product
+ * path exists in every live market, so swapping the market prefix never leads to a 404.
+ */
+export const siteRoutes: SiteRoute[] = liveMarkets().flatMap((m) => {
+  const sold = productsFor(m.id).map((p) => p.id);
+  return [
+    route(m.id, "home", `/${m.id}`),
+    ...(Object.keys(products) as ProductId[]).map((id) =>
+      sold.includes(id) ? route(m.id, id, productPath(m.id, id)) : unavailableRoute(m.id, id),
+    ),
+  ];
+});
 
 export const prerenderPaths: string[] = siteRoutes.map((r) => r.path);
 
@@ -62,7 +85,7 @@ export const metaFor = (path: string): PageMeta | undefined => {
 };
 
 const element = (r: SiteRoute) => (
-  <SitePageProvider market={r.market} page={r.page}>
+  <SitePageProvider market={r.market} page={r.page} path={r.path}>
     <SiteLayout meta={r.meta}>
       <r.Page />
     </SiteLayout>
