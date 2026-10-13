@@ -50,3 +50,12 @@ for (const p of brPages) {
     }
   });
 }
+
+test("the sticky bar steps aside while the hero button is fully on screen, and returns below it", async ({ page }) => {
+  await page.goto("/br/wahub", { waitUntil: "networkidle" });
+  const sticky = page.locator('a[data-placement="sticky"]');
+  await expect(page.locator('a[data-placement="hero"]')).toBeInViewport({ ratio: 1 });
+  await expect(sticky).toBeHidden();
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight / 2));
+  await expect(sticky).toBeVisible();
+});

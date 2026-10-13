@@ -13,7 +13,7 @@ export const WahubHero = ({ copy }: { copy: WahubCopy }) => {
   const { copy: marketCopy } = useSitePage();
   const proof = fillClaim(copy.liveSince);
   return (
-    <section className="relative overflow-hidden pb-16 pt-10 md:pb-24 md:pt-20">
+    <section className="relative -mt-16 overflow-hidden pb-16 pt-[104px] md:-mt-[72px] md:pb-24 md:pt-[152px]">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-[-25%] h-[560px] w-[900px] max-w-[160vw] -translate-x-1/2 rounded-full opacity-60 blur-3xl"
