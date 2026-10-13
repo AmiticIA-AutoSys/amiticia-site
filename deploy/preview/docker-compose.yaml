@@ -11,7 +11,8 @@
 #   tunnel  a Cloudflare quick tunnel (random https://*.trycloudflare.com URL, no account, no DNS
 #           change, no Traefik router). The URL changes every time the tunnel starts.
 #
-# How to run it (the coordinator runs these; the scripts print each step)
+# How to run it (the coordinator runs these; the scripts print each step). Both first sync the VPS
+# checkout with the local v2-br commit through a git bundle (scripts/preview-sync.sh): no GitHub push.
 #   1. scripts/preview-tunnel.sh        starts only `tunnel` on the VPS (no web yet), prints the URL
 #   2. scripts/preview-deploy.sh <url>  builds the image with that URL, ships it, starts `web`
 #   Order matters: the image bakes the tunnel URL into og:image/canonical, so the tunnel
