@@ -79,6 +79,8 @@ describe("Patrícia hero briefing card", () => {
     for (const msg of briefing.chat) expect(html).toContain(msg.text);
     for (const field of briefing.fields) expect(html).toContain(field.value);
     expect(html).toContain(briefing.reply);
+    // Inline CSS must reach the browser raw, or hydration fails (#418) and the selectors break.
+    for (const css of html.match(/<style[^>]*>[^<]*<\/style>/g) ?? []) expect(css).not.toMatch(/&quot;|&#x27;|&lt;|&gt;/);
   });
 });
 
