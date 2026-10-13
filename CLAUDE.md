@@ -5,7 +5,7 @@ This file provides guidance to Claude Code when working with this repository.
 ## What This Is
 
 Marketing website for **amiticia.cc**: a Vite + React SPA served by nginx in Docker, behind
-Traefik on the Hostinger VPS. Two generations live side by side:
+Traefik on the Hostinger VPS.
 
 - **v2 market pages**: `/br`, `/br/wahub`, `/br/patricia`, `/it`, `/it/wahub` (later `/en`). A product
   not sold in a market still gets its path there, as a noindex "not available" page
@@ -13,12 +13,11 @@ Traefik on the Hostinger VPS. Two generations live side by side:
   prerendered to static HTML at build time and hydrated in the browser. Design rules and tokens are
   in `DESIGN.md`, with tokens scoped to `.site-v2`. Copy lives in `src/site/copy/<market>/` and
   changes only with the product owner's approval.
-- **Legacy pages**: `/` (the old one-page landing) and `/k` (knowledge area behind Traefik
-  BasicAuth). They stay exactly as they are until v2 is validated; `e2e/legacy.spec.ts` guards `/`
-  pixel by pixel.
-
-Status: v2 lives on branch `v2-br` and is not on amiticia.cc; `main` is what is live. Phones see v2
-through the preview stack (see Deployment).
+- **Bare domain `/`**: nginx answers a 302 to `/it` or `/br`, picked from the first Italian or
+  Portuguese entry in `Accept-Language`; any other language goes to `/it` until `/en` exists
+  (`e2e/root.spec.ts`). The old one-page landing is no longer served.
+- **Legacy `/k`**: knowledge area behind Traefik BasicAuth, served by the legacy SPA shell
+  (`e2e/knowledge.spec.ts`).
 
 ## Tech Stack
 
@@ -43,8 +42,7 @@ npm run og         # regenerate the share images public/og/br-*.jpg (rerun and c
 bash scripts/e2e-preview-nginx.sh   # check the preview stack's nginx: noindex, no /k, robots.txt
 ```
 
-Parallel worktrees must use different `E2E_PORT` values. Update the legacy `/` screenshot baseline
-only from a known-good image: `npx playwright test e2e/legacy.spec.ts --update-snapshots`.
+Parallel worktrees must use different `E2E_PORT` values.
 
 `npm run build` reads two build-time variables (Docker build args of the same name): `SITE_URL`, the
 origin of canonical and og URLs (default `https://amiticia.cc`), and `SITE_NOINDEX=1`, which marks
@@ -69,7 +67,7 @@ src/
                      loaded on demand so /br never downloads them
   entry-server.tsx   SSR entry used by the prerender
 public/og/           share images, 1200×630 JPEG ≤ 180 KB (WhatsApp drops bigger ones)
-e2e/                 Playwright specs + the legacy screenshot baseline
+e2e/                 Playwright specs
 scripts/             prerender, e2e-preview, og/ (share images), preview-* (VPS preview stack)
 deploy/              production compose: the VPS checkout deploys from here
 deploy/preview/      throwaway preview stack (quick tunnel, noindex): see Preview stack
@@ -84,7 +82,7 @@ Red → Green → Refactor. Which test proves which kind of change:
 |---|---|
 | Registries, WhatsApp links, analytics, meta/head builders, copy rules (pending claims), share-image size | vitest unit |
 | Component behaviour (clicks tracked, tabs, chat final frame, reduced motion) | vitest + Testing Library |
-| Prerendered HTML, routing, nginx headers, hydration, mobile overflow, CTA visibility, axe, legacy look | Playwright against the Docker image (`npm run e2e`) |
+| Prerendered HTML, routing, nginx headers, hydration, mobile overflow, CTA visibility, root redirect, axe | Playwright against the Docker image (`npm run e2e`) |
 | Visual quality | build → screenshot at 360/390/768/1280/1440 → critique loop (`standards/skills/frontend-design`) |
 
 **Pre-commit stack** (husky): `pre-commit` runs `typecheck`, `lint`, `test`; `commit-msg` runs
@@ -108,40 +106,39 @@ own `E2E_PORT`. There is no database to allocate.
 | Probe | Tool | Allowed target |
 |---|---|---|
 | Each `/br` page renders from prerendered HTML, hydrates with no console errors, and every WhatsApp button carries its page's message | Playwright (`npm run e2e`, unattended) | the local Docker image |
-| The legacy `/` and `/k` still render as before | Playwright (`npm run e2e`, unattended) | the local Docker image |
+| `/` redirects by browser language and `/k` still renders | Playwright (`npm run e2e`, unattended) | the local Docker image |
 | The pages look right on a real phone and the WhatsApp buttons open the pre-filled chat | a person on a phone (attended) | the preview tunnel URL |
 | The WhatsApp link preview shows the page's image and title | attended: paste the link in a WhatsApp chat (third party) | the preview tunnel URL |
 
-Run them at the merge/release boundary, not in the commit gate. ⚠️ Never probe `amiticia.cc`
-before v2 ships: it also fronts co-hosted paths owned by other repos (see below).
+Run them at the merge/release boundary, not in the commit gate. ⚠️ Probe `amiticia.cc` read-only
+(GET the market pages): it also fronts co-hosted paths owned by other repos (see below).
 
 ## Deployment
 
-- **Production.** Push to `main` → GitHub Actions builds `ghcr.io/eusoubrasileiro/amitic-ai-core`
-  (`:latest` and `:sha-<short>`) → SSH deploy. The VPS deploys from
-  `/opt/amiticia/amiticia-site/deploy/docker-compose.yaml`, a checkout of this repo
+- **Production.** Push to `main` → GitHub Actions builds `ghcr.io/amiticia-autosys/amiticia-site`
+  (`:latest` and `:sha-<short>`) → SSH deploy: `git pull --ff-only` in
+  `/opt/amiticia/amiticia-site`, then `docker compose pull && up -d` from its `deploy/`
   (`standards/deployment.md`). The compose has `pull_policy: always`: **any push to `main` ships.**
-- ⚠️ **Issue #1.** On `main`, the workflow still `cd`s into `/root/amiticia-site`, which no longer
-  exists: CI builds the image but the deploy step fails. The live version got there by a manual
-  deploy. Fixed on `v2-br` (`614fd1a`); the fix ships when `v2-br` merges to `main`.
+  The image name is written in both the workflow and the compose file: change them together.
+  Builds from before the 2026-10-13 rename stay at `ghcr.io/eusoubrasileiro/amitic-ai-core`, for
+  rollback only.
 - **Caching** (`nginx.conf`): HTML is never cached, because it names the hashed bundles. Other
   files from `public/` are cached for an hour, and `/assets/` is immutable for a year.
 - **Manual deploy** (escape hatch):
   ```bash
   ssh hostinger
-  cd /opt/amiticia/amiticia-site && git fetch origin && git reset --hard origin/main
+  cd /opt/amiticia/amiticia-site && git pull --ff-only
   cd deploy && docker compose pull && docker compose up -d
   ```
-- **Rollback**: pin `image:` to `:sha-<short>` in the VPS checkout's compose, then `docker compose up -d`.
+- **Rollback**: pin `image:` to `:sha-<short>` in `deploy/docker-compose.yaml`, then
+  `docker compose up -d`. Commit the pin, or the next deploy undoes it.
 - **`/k` BasicAuth** comes from `deploy/.env` on the VPS (`AMITICIA_K_BASICAUTH`, chmod 600), never
   from git: this repo is **public**. Regenerate with
   `htpasswd -nbB andre '<password>' | sed -e 's/\$/\$\$/g'`.
-- `amiticia-site.yml` at the repo root is the pre-2026-08-31 reference copy, superseded by
-  `deploy/docker-compose.yaml`. Do not use it.
 - Required GitHub secrets: `SSH_HOST` (Hostinger IP), `SSH_USER` (`root`), `SSH_KEY` (deploy key).
   `GITHUB_TOKEN` handles the ghcr.io push.
 
-### Preview stack (before anything changes on amiticia.cc)
+### Preview stack (phones see a branch before it merges)
 
 The preview stack is a throwaway copy of the site for phones. It runs on the same VPS, isolated
 from production:
@@ -153,9 +150,8 @@ from production:
   holding it can open the site; it is unguessable but not a secret.
 - **Indexing:** every page is noindex (meta tag and `X-Robots-Tag`), `robots.txt` disallows all,
   and `/k` answers 404.
-- **v2 only, by language:** `/` answers a 302 to `/it` or `/br`, picked from the first Italian or
-  Portuguese entry in `Accept-Language`; any other language goes to `/it` until `/en` exists. The
-  bare preview URL never shows the legacy landing. Production `/` still serves the legacy page.
+- **`/` by language:** the same 302 to `/it` or `/br` as production; the `Accept-Language` maps in
+  both nginx files must stay identical.
 
 To bring it up:
 
@@ -175,8 +171,10 @@ Tear down with
 
 ### Gotchas
 
-- **Repo name mismatch**: git origin is `eusoubrasileiro/amitic-ai-core.git`, not `amiticia-site`.
-  The ghcr.io image name follows the repo name.
+- **Renamed 2026-10-13** from `eusoubrasileiro/amitic-ai-core` to `AmiticIA-AutoSys/amiticia-site`.
+  GitHub redirects the old URL; creating any repo at the old name would break that redirect.
+- **Public repo, free CI.** Public repos run Actions for free; private ones draw on the org's
+  limited minutes. Make this repo private and the deploy pipeline starts costing.
 - **`vite.config.ts` `preview.allowedHosts`** only matters for `npm run preview`; production is nginx.
 - **Never commit** `mcp-logs.txt`, `wa-logs.txt`, or the working docs listed in `.git/info/exclude`.
 
@@ -190,7 +188,7 @@ domínio usando **containers próprios** com label Traefik `PathPrefix(/<slug>)`
 |---|---|---|
 | `/pibconfins` | Tesouraria PIB Confins (dashboard financeiro da igreja) | `side-projects/pibconfins-site/` |
 
-Rotas deste SPA: `/`, `/k`, `/br/*` (e no futuro `/it/*`, `/en/*`). Ao adicionar uma nova rota,
+Rotas deste SPA: `/` (redirect), `/k`, `/br/*`, `/it/*` (e no futuro `/en/*`). Ao adicionar uma nova rota,
 confirmar antes que o path não conflita com nenhum co-hospedado.
 
 ## Parent Context

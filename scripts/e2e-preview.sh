@@ -2,7 +2,7 @@
 # Builds the production Docker image, serves it on 127.0.0.1:${E2E_PORT:-4310}, runs Playwright
 # against it and always removes the container. The image tag and container name derive from the
 # checkout folder, so parallel worktrees (each with its own E2E_PORT) never collide.
-# Extra arguments go to `playwright test` (e.g. `npm run e2e -- --project=mobile e2e/legacy.spec.ts`).
+# Extra arguments go to `playwright test` (e.g. `npm run e2e -- --project=mobile e2e/root.spec.ts`).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
