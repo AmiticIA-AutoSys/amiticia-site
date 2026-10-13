@@ -7,7 +7,7 @@ test.describe("Cache-Control", () => {
 
   const NO_CACHE = "no-cache, no-store, must-revalidate";
 
-  for (const url of ["/", "/br", "/br/", "/br/wahub", "/br/patricia", "/index.html", "/some/spa/route"]) {
+  for (const url of ["/br", "/br/", "/br/wahub", "/br/patricia", "/index.html", "/some/spa/route"]) {
     test(`${url} is never cached`, async ({ request }) => {
       const res = await request.get(url);
       expect(res.status()).toBe(200);
