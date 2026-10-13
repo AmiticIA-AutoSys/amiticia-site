@@ -2,8 +2,9 @@ import { useMemo } from "react";
 import { BrowserWindow } from "@/components/kit/cult/mock-browser-window";
 import { DirectionAwareTabs, type Tab } from "@/components/kit/cult/direction-aware-tabs";
 import type { WahubCopy } from "../../../copy/types";
-import { shots, type Shot } from "../screenshots";
-import { tourTabs } from "../demo";
+import { shotsFor, type Shot } from "../screenshots";
+import type { MarketId } from "../../../markets";
+import { wahubDemoFor } from "../demo";
 
 /** The app's own background colour, so a short screen continues seamlessly inside the frame. */
 const APP_BG = "#040613";
@@ -52,7 +53,9 @@ const TourImage = ({ wide, narrow, narrowSizes, wideFit, alt }: TourScreen) => (
  * Product tour at the top of "O que tem dentro": a browser window with the real screens behind
  * "Conversas / Funil / Leads". Each viewport downloads one image per tab, lazily.
  */
-export const ProductTour = ({ alts }: { alts: WahubCopy["screenshots"] }) => {
+export const ProductTour = ({ market, alts }: { market: MarketId; alts: WahubCopy["screenshots"] }) => {
+  const shots = shotsFor(market);
+  const { tourTabs } = wahubDemoFor(market);
   const tabs = useMemo<Tab[]>(
     () => [
       {
@@ -90,7 +93,7 @@ export const ProductTour = ({ alts }: { alts: WahubCopy["screenshots"] }) => {
         ),
       },
     ],
-    [alts],
+    [alts, shots, tourTabs],
   );
 
   return (

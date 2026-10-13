@@ -10,7 +10,7 @@ import { HeroDemo } from "./HeroDemo";
 
 /** Text left, phone right from lg; stacked and centred below. Text is never animated (rule 3). */
 export const WahubHero = ({ copy }: { copy: WahubCopy }) => {
-  const { copy: marketCopy } = useSitePage();
+  const { market, copy: marketCopy } = useSitePage();
   const proof = fillClaim(copy.liveSince);
   return (
     <section className="relative -mt-16 overflow-hidden pb-20 pt-[104px] md:-mt-[72px] md:pb-28 md:pt-[144px] lg:pb-24 lg:pt-[128px]">
@@ -38,7 +38,7 @@ export const WahubHero = ({ copy }: { copy: WahubCopy }) => {
           </div>
           {proof && <p className="mt-6 max-w-2xl text-[15px] text-muted-foreground">{proof}</p>}
         </div>
-        <HeroDemo />
+        <HeroDemo market={market} />
       </Container>
     </section>
   );

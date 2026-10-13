@@ -1,7 +1,7 @@
 import { act, render, screen } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { heroChat, heroLead } from "../demo";
+import { wahubDemoFor } from "../demo";
 
 const { mockReducedMotion } = vi.hoisted(() => ({ mockReducedMotion: vi.fn().mockReturnValue(false) }));
 
@@ -11,6 +11,8 @@ vi.mock("motion/react", async (orig) => {
 });
 
 import { HeroDemo } from "./HeroDemo";
+
+const { heroChat, heroLead } = wahubDemoFor("br");
 
 const leadCard = () => screen.getByTestId("wahub-lead-card");
 
@@ -32,7 +34,7 @@ describe("WaHub hero demo (phone chat → lead card)", () => {
   });
 
   it("server HTML carries the final chat frame and the lead card", () => {
-    const html = renderToString(<HeroDemo />);
+    const html = renderToString(<HeroDemo market="br" />);
     for (const m of heroChat.messages) expect(html).toContain(m.text);
     expect(html).toContain(heroLead.badge);
     expect(html).toContain(heroLead.name);
@@ -40,7 +42,7 @@ describe("WaHub hero demo (phone chat → lead card)", () => {
 
   it("keeps the lead card hidden while the chat plays and shows it once the chat completes", () => {
     vi.useFakeTimers();
-    render(<HeroDemo />);
+    render(<HeroDemo market="br" />);
     expect(leadCard()).toHaveAttribute("data-state", "hidden");
     act(() => {
       vi.advanceTimersByTime(2000);
@@ -54,7 +56,7 @@ describe("WaHub hero demo (phone chat → lead card)", () => {
 
   it("with reduced motion shows the final frame and the lead card at once", () => {
     mockReducedMotion.mockReturnValue(true);
-    render(<HeroDemo />);
+    render(<HeroDemo market="br" />);
     for (const m of heroChat.messages) expect(screen.getByText(m.text)).toBeInTheDocument();
     expect(leadCard()).toHaveAttribute("data-state", "shown");
   });

@@ -7,13 +7,13 @@ import { WahubPricing } from "./sections/WahubPricing";
 import { WahubClosing } from "./sections/WahubClosing";
 
 export const WahubPage = ({ copy: injected }: { copy?: WahubCopy }) => {
-  const { copy: marketCopy } = useSitePage();
+  const { market, copy: marketCopy } = useSitePage();
   const copy = injected ?? marketCopy.wahub;
   return (
     <>
       <WahubHero copy={copy} />
       <WahubHowItWorks copy={copy.howItWorks} />
-      <WahubFeatures copy={copy.features} alts={copy.screenshots} />
+      <WahubFeatures market={market} copy={copy.features} alts={copy.screenshots} />
       <WahubPricing copy={copy} />
       <WahubClosing copy={copy.closing} />
     </>

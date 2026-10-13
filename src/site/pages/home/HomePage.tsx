@@ -13,7 +13,7 @@ export const HomePage = ({ copy: injected }: { copy?: HomeCopy }) => {
   const copy = injected ?? marketCopy.home;
   return (
     <>
-      <HomeHero copy={copy.hero} />
+      <HomeHero market={market} copy={copy.hero} />
       <ProductsSection copy={copy.products} market={market} />
       <BenefitsSection copy={copy.benefits} />
       <CustomSection copy={copy.custom} />
