@@ -5,7 +5,7 @@ import { liveMarkets, markets, type MarketId } from "./markets";
 import { productPath, productsFor } from "./products";
 import type { PageId } from "./copy/types";
 import { copyFor } from "./copy";
-import { DEFAULT_OG_IMAGE, type PageMeta } from "./meta";
+import { ogImageFor, type PageMeta } from "./meta";
 import { SitePageProvider } from "./layout/page-context";
 import { SiteLayout } from "./layout/SiteLayout";
 import { HomePage } from "./pages/home/HomePage";
@@ -32,7 +32,8 @@ const metaOf = (market: MarketId, page: PageId, path: string): PageMeta => {
     title,
     description,
     path,
-    ogImage: DEFAULT_OG_IMAGE,
+    ogImage: ogImageFor(market, page),
+    ogImageAlt: title,
     lang: markets[market].lang,
     ogLocale: markets[market].ogLocale,
   };

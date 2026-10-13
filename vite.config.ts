@@ -11,6 +11,10 @@ export default defineConfig(() => ({
   preview: {
     allowedHosts: ["amiticia.cc", "www.amiticia.cc", "localhost"],
   },
+  // Canonical and og: URLs are absolute; SITE_URL picks the origin (preview stacks use a tunnel URL).
+  define: {
+    __SITE_URL__: JSON.stringify(process.env.SITE_URL || "https://amiticia.cc"),
+  },
   plugins: [react()],
   resolve: {
     alias: {
