@@ -3,6 +3,22 @@
 import React from "react"
 import { cn } from "@/lib/utils"
 
+const GLOW_CSS = `@property --kit-glow-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes kit-glow-spin {
+  to {
+    --kit-glow-angle: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-glow-border] .kit-glow-layer {
+    animation: none !important;
+  }
+}`
+
 export interface GlowBorderProps {
   children: React.ReactNode
   className?: string
@@ -42,21 +58,8 @@ export function GlowBorder({
         padding: `${borderWidth}px`,
       }}
     >
-      <style>{`@property --kit-glow-angle {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-@keyframes kit-glow-spin {
-  to {
-    --kit-glow-angle: 360deg;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  [data-glow-border] .kit-glow-layer {
-    animation: none !important;
-  }
-}`}</style>
+      {/* dangerouslySetInnerHTML: React escapes text children, and a <style> is raw text in HTML */}
+      <style dangerouslySetInnerHTML={{ __html: GLOW_CSS }} />
 
       {glow > 0 && (
         <div
