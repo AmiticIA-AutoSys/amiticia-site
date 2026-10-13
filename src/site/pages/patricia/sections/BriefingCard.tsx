@@ -1,10 +1,9 @@
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { useReducedMotion } from "motion/react";
 import { ClipboardList, MessageSquareText, PenLine, Scale, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { LiveChat } from "@/components/kit/originkit/live-chat";
 import { briefing } from "../briefing";
-import { useMounted } from "../use-mounted";
 
 /**
  * Hero illustration (DESIGN.md "Briefing card"): a WhatsApp chat with the office's AI assistant
@@ -23,16 +22,13 @@ const wa = {
   bar: "bg-[hsl(203_22%_16%)]",
   received: "bg-[hsl(203_22%_16%)] text-[hsl(200_14%_92%)]",
   sent: "bg-[hsl(169_100%_18%)] text-[hsl(200_14%_95%)]",
-  status: "text-[hsl(200_12%_72%)]",
-  /* light enough for AA on both bubble colours */
-  time: "text-[hsl(170_20%_84%)]",
+  time: "text-[hsl(200_12%_72%)]",
 };
 
 const styles = `
 [data-briefing] [data-fill]{transition:opacity 520ms var(--ease),transform 520ms var(--ease);transition-delay:calc(var(--i,0) * 260ms + 200ms)}
 [data-briefing] [data-skeleton]{opacity:0;transition:opacity 300ms var(--ease);transition-delay:calc(var(--i,0) * 260ms + 200ms)}
 [data-briefing] [data-when="pending"]{display:none}
-html.js [data-static-chat] [data-chat-item]{opacity:0;animation:patricia-fill-fallback 0s linear 2.5s forwards}
 [data-briefing][data-phase="chat"] [data-fill],html.js [data-briefing][data-phase="ssr"] [data-fill]{opacity:0;transform:translateY(4px);transition:none}
 [data-briefing][data-phase="chat"] [data-skeleton],html.js [data-briefing][data-phase="ssr"] [data-skeleton]{opacity:1;transition:none}
 [data-briefing][data-phase="chat"] [data-when="pending"]{display:inline-flex}
@@ -42,56 +38,13 @@ html.js [data-briefing][data-phase="ssr"] [data-fill]{animation:patricia-fill-fa
 @media (prefers-reduced-motion: reduce){
   [data-briefing] [data-fill]{opacity:1!important;transform:none!important;animation:none!important}
   [data-briefing] [data-skeleton]{opacity:0!important}
-  html.js [data-static-chat] [data-chat-item]{opacity:1;animation:none}
 }`;
-
-const chatClass = cn("min-h-[300px] gap-2 px-3 pb-0 pt-4", wa.bg);
-const bubbleClass = "max-w-[86%] text-[13.5px] leading-snug";
-
-const ChatFooter = () => (
-  <div className="-mx-3 mt-3 flex items-center gap-2 px-3 pb-3">
-    <span className={cn("h-9 flex-1 rounded-full px-4 text-[13px] leading-9", wa.bar, wa.status)}>Mensagem</span>
-  </div>
-);
-
-/**
- * Server and first client render of the chat: its final frame, in the kit LiveChat's markup.
- * WORKAROUND: the kit LiveChat and GlowBorder put their CSS in <style>{text}</style>, which
- * React escapes on the server (" becomes &quot;), so hydrating them throws #418/#425 and React
- * re-renders the whole root. Until the kit injects that CSS raw, they mount only on the client.
- */
-const StaticChat = ({ footer }: { footer: ReactNode }) => (
-  <div data-static-chat="" className={cn("flex flex-col p-4", chatClass)}>
-    <div className="flex flex-1 flex-col gap-2">
-      {briefing.chat.map((msg, i) => {
-        const isMe = msg.sender === "me";
-        return (
-          <div key={i} data-chat-item="" className={cn("flex w-full flex-col", isMe ? "items-end" : "items-start")}>
-            <div
-              className={cn(
-                "break-words rounded-2xl px-3.5 py-2",
-                bubbleClass,
-                isMe ? cn("rounded-tr-sm", wa.sent) : cn("rounded-tl-sm", wa.received),
-              )}
-            >
-              <div>{msg.text}</div>
-              <div className={cn("mt-0.5 text-right text-[10px]", wa.time)}>{msg.time}</div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-    <div className="shrink-0">{footer}</div>
-  </div>
-);
-
 
 const order = (i: number) => ({ "--i": i }) as CSSProperties;
 
 export const BriefingCard = ({ className }: { className?: string }) => {
   const reduceMotion = useReducedMotion();
   const [phase, setPhase] = useState<Phase>("ssr");
-  const mounted = useMounted();
 
   useEffect(() => {
     setPhase((p) => (reduceMotion ? "done" : p === "ssr" ? "chat" : p));
@@ -101,7 +54,7 @@ export const BriefingCard = ({ className }: { className?: string }) => {
 
   return (
     <div data-briefing="" data-phase={phase} aria-hidden="true" className={cn("relative", className)}>
-      <style dangerouslySetInnerHTML={{ __html: styles }} />
+      <style>{styles}</style>
 
       {/* Chat: the client's phone, the office's AI assistant answering. */}
       <div className="relative w-[92%] overflow-hidden rounded-[20px] border border-white/[0.07] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.75)] sm:w-[330px]">
@@ -111,24 +64,24 @@ export const BriefingCard = ({ className }: { className?: string }) => {
           </span>
           <span className="min-w-0 leading-tight">
             <span className="block truncate text-[14px] font-semibold text-[hsl(200_14%_95%)]">{briefing.contact.name}</span>
-            <span className={cn("block truncate text-[12px]", wa.status)}>{briefing.contact.status}</span>
+            <span className={cn("block truncate text-[12px]", wa.time)}>{briefing.contact.status}</span>
           </span>
         </div>
-        {mounted ? (
-          <LiveChat
-            messages={briefing.chat}
-            play={!reduceMotion}
-            staggerSeconds={1.25}
-            onComplete={() => setPhase("done")}
-            className={cn(chatClass, "font-[inherit]")}
-            footer={<ChatFooter />}
-            receivedBubbleClassName={cn(bubbleClass, wa.received)}
-            sentBubbleClassName={cn(bubbleClass, wa.sent)}
-            timeClassName={cn("opacity-100", wa.time)}
-          />
-        ) : (
-          <StaticChat footer={<ChatFooter />} />
-        )}
+        <LiveChat
+          messages={briefing.chat}
+          play={!reduceMotion}
+          staggerSeconds={1.25}
+          onComplete={() => setPhase("done")}
+          className={cn("min-h-[300px] gap-2 px-3 pb-0 pt-4 font-[inherit]", wa.bg)}
+          footer={
+            <div className="-mx-3 mt-3 flex items-center gap-2 px-3 pb-3">
+              <span className={cn("h-9 flex-1 rounded-full px-4 text-[13px] leading-9", wa.bar, wa.time)}>Mensagem</span>
+            </div>
+          }
+          receivedBubbleClassName={cn("max-w-[86%] text-[13.5px] leading-snug", wa.received)}
+          sentBubbleClassName={cn("max-w-[86%] text-[13.5px] leading-snug", wa.sent)}
+          timeClassName={cn("opacity-100", wa.time)}
+        />
       </div>
 
       {/* The lawyer's side: the organized case and the decision. */}
