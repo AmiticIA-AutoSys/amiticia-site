@@ -6,7 +6,7 @@ export const home: HomeCopy = {
   meta: {
     title: "AmiticIA - Intelligenza e Automazione che Scalano",
     description:
-      "Abbiamo un prodotto pronto che mette l'IA a rispondere sul WhatsApp della tua azienda e costruiamo su misura ciò di cui la tua attività ha bisogno: agenti IA, dashboard e automazioni.",
+      "Abbiamo un prodotto pronto che integra l'IA per rispondere sul WhatsApp della tua azienda e costruiamo su misura ciò di cui la tua attività ha bisogno: agenti IA, dashboard e automazioni.",
   },
   whatsappMessage: "Ciao Flavio, ho visto il sito AmiticIA e vorrei parlare di un progetto.",
   stickyCta: "Contattaci",
@@ -14,7 +14,7 @@ export const home: HomeCopy = {
     title: "Intelligenza e Automazione che Scalano",
     leadHighlight: "Intelligenza Artificiale & Business Intelligence",
     leadRest:
-      " per il tuo problema. Abbiamo un prodotto pronto che mette l'IA a rispondere sul WhatsApp della tua azienda e costruiamo su misura ciò di cui la tua attività ha bisogno: agenti IA, dashboard che guidano le decisioni e automazioni che eliminano i compiti ripetitivi. Dalla diagnosi all'operatività, self-hosted o in cloud.",
+      " per il tuo problema. Abbiamo un prodotto pronto che integra l'IA per rispondere sul WhatsApp della tua azienda e costruiamo su misura ciò di cui la tua attività ha bisogno: agenti IA, dashboard che guidano le decisioni e automazioni che eliminano i compiti ripetitivi. Dalla diagnosi all'operatività, self-hosted o in cloud.",
     tagline: "Questo è Data & AI Ops in pratica.",
     primaryCta: "Parla con noi",
     secondaryCta: "Scopri il prodotto",
@@ -26,7 +26,7 @@ export const home: HomeCopy = {
         productId: "wahub",
         name: "WaHub",
         title: "Tutto il tuo team risponde sullo stesso numero WhatsApp",
-        body: "Un assistente IA risponde subito a ogni contatto, capisce cosa vuole la persona e consegna il lead organizzato al tuo team per vendere.",
+        body: "Un assistente IA risponde subito a ogni contatto, capisce cosa vuole la persona e passa il lead organizzato al tuo team per vendere.",
         cta: "Scopri WaHub",
       },
     ],
@@ -43,7 +43,7 @@ export const home: HomeCopy = {
   custom: {
     eyebrow: "Su misura",
     title: "Soluzioni su misura",
-    lead: "Quando il tuo problema non sta in un prodotto pronto, progettiamo e costruiamo noi la soluzione.",
+    lead: "Quando un prodotto pronto non basta, progettiamo e costruiamo noi la soluzione.",
     stack: {
       title: "Stack e infrastruttura che non ti lasciano a piedi",
       categories: ["Self-hosted e Cloud-Hybrid", "Dev & Data", "AI Engineering"],
