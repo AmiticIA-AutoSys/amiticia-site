@@ -7,7 +7,6 @@ import { LiveChat } from "@/components/kit/originkit/live-chat";
 import { SquigglyArrow } from "@/components/kit/cult/squiggle-arrow";
 import { TextureOverlay } from "@/components/kit/cult/texture-overlay";
 import { heroChat, heroLead } from "../demo";
-import { useHydrated } from "../use-hydrated";
 
 /* WhatsApp dark palette: the phone screen imitates the app, so these colours are the app's,
  * not site tokens. Outgoing teal is WhatsApp's own bubble, never an action colour. */
@@ -63,37 +62,6 @@ const ChatComposer = () => (
   </div>
 );
 
-const chatClass = "min-h-0 flex-1 gap-1.5 overflow-hidden px-2.5 py-2 [&>div]:min-h-0 [&>div]:justify-end";
-const bubble = "!max-w-[82%] !rounded-[10px] !px-2.5 !py-1.5 !text-[12.5px] !leading-snug !text-[#E9EDEF] shadow-sm";
-const sentBubble = `${bubble} !rounded-tr-[3px] !bg-[#005C4B]`;
-const receivedBubble = `${bubble} !rounded-tl-[3px] !bg-[#202C33]`;
-const timeClass = "!text-[10px] !opacity-100 text-[#8696A0]";
-
-/** Server / hydration twin of the kit LiveChat's final frame (same markup and classes, no <style>). */
-const StaticChat = () => (
-  <div data-live-chat="" data-phase="final" className={cn("flex flex-col gap-2 p-4 font-sans", chatClass)}>
-    <div className="flex flex-1 flex-col gap-2">
-      {heroChat.messages.map((msg, i) => {
-        const isMe = msg.sender === "me";
-        return (
-          <div key={i} className={cn("flex w-full flex-col", isMe ? "items-end" : "items-start")}>
-            <div
-              className={cn(
-                "max-w-[75%] break-words rounded-2xl px-3.5 py-2 text-sm",
-                isMe ? "rounded-tr-sm bg-primary text-primary-foreground" : "rounded-tl-sm bg-muted text-foreground",
-                isMe ? sentBubble : receivedBubble,
-              )}
-            >
-              <div>{msg.text}</div>
-              <div className={cn("mt-0.5 text-right text-[10px] opacity-70", timeClass)}>{msg.time}</div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  </div>
-);
-
 export const LeadCard = ({ shown, className }: { shown: boolean; className?: string }) => (
   <div
     data-lead-card=""
@@ -142,7 +110,6 @@ export const LeadCard = ({ shown, className }: { shown: boolean; className?: str
 export const HeroDemo = ({ className }: { className?: string }) => {
   const reduceMotion = useReducedMotion();
   const [shown, setShown] = useState(false);
-  const hydrated = useHydrated();
   const onComplete = useCallback(() => setShown(true), []);
 
   useEffect(() => {
@@ -183,19 +150,15 @@ export const HeroDemo = ({ className }: { className?: string }) => {
           screenClassName="!bg-[#0B141A]"
         >
           <ChatHeader />
-          {hydrated ? (
-            <LiveChat
-              messages={heroChat.messages}
-              staggerSeconds={1.05}
-              onComplete={onComplete}
-              className={chatClass}
-              sentBubbleClassName={sentBubble}
-              receivedBubbleClassName={receivedBubble}
-              timeClassName={timeClass}
-            />
-          ) : (
-            <StaticChat />
-          )}
+          <LiveChat
+            messages={heroChat.messages}
+            staggerSeconds={1.05}
+            onComplete={onComplete}
+            className="min-h-0 flex-1 gap-1.5 font-[inherit] overflow-hidden px-2.5 py-2 [&>div]:min-h-0 [&>div]:justify-end"
+            sentBubbleClassName="!max-w-[82%] !rounded-[10px] !rounded-tr-[3px] !px-2.5 !py-1.5 !text-[12.5px] !leading-snug !text-[#E9EDEF] !bg-[#005C4B] shadow-sm"
+            receivedBubbleClassName="!max-w-[82%] !rounded-[10px] !rounded-tl-[3px] !px-2.5 !py-1.5 !text-[12.5px] !leading-snug !text-[#E9EDEF] !bg-[#202C33] shadow-sm"
+            timeClassName="!text-[10px] !opacity-100 text-[#C4D0D6]"
+          />
           <ChatComposer />
         </IPhone17ProMax>
       </div>
