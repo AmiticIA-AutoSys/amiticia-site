@@ -151,6 +151,7 @@ from production:
   holding it can open the site; it is unguessable but not a secret.
 - **Indexing:** every page is noindex (meta tag and `X-Robots-Tag`), `robots.txt` disallows all,
   and `/k` answers 404.
+- **v2 only:** `/` redirects to `/br`, so the bare preview URL never shows the legacy landing.
 
 To bring it up:
 
