@@ -156,12 +156,14 @@ To bring it up:
 
 1. Commit on `v2-br`. No GitHub push is needed: both scripts call `scripts/preview-sync.sh`,
    which ships the local `v2-br` to the VPS checkout as a git bundle over ssh.
-2. Run `scripts/preview-tunnel.sh`. It starts the tunnel and prints its URL.
-3. Run `scripts/preview-deploy.sh <url>`. It builds the image locally with that URL baked into
-   canonical and og, ships it with `docker save | ssh … docker load`, and starts `web`.
+2. Run `scripts/preview-deploy.sh`. It builds the image locally with noindex, ships it with
+   `docker save | ssh … docker load`, and starts `web`. Rerun it after each commit.
+3. Run `scripts/preview-tunnel.sh`. It starts the tunnel if needed and prints its current URL.
 
-The URL changes whenever the tunnel container restarts, including after a VPS reboot. When that
-happens, rerun both scripts.
+The URL changes whenever the tunnel container restarts, including after a VPS reboot: rerun
+`scripts/preview-tunnel.sh` to read the new one. Nothing needs a rebuild, because
+`nginx.preview.conf` rewrites the baked `https://amiticia.cc` origin in HTML to the requested host,
+so canonical and og URLs follow the current tunnel.
 
 Tear down with
 `ssh hostinger 'cd /opt/amiticia/amiticia-site-preview/deploy/preview && docker compose down'`.
