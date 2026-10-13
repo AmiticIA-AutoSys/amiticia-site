@@ -54,7 +54,7 @@ export const BriefingCard = ({ className }: { className?: string }) => {
 
   return (
     <div data-briefing="" data-phase={phase} aria-hidden="true" className={cn("relative", className)}>
-      <style>{styles}</style>
+      <style dangerouslySetInnerHTML={{ __html: styles }} />
 
       {/* Chat: the client's phone, the office's AI assistant answering. */}
       <div className="relative w-[92%] overflow-hidden rounded-[20px] border border-white/[0.07] shadow-[0_24px_60px_-24px_rgba(0,0,0,0.75)] sm:w-[330px]">
