@@ -51,12 +51,12 @@ export const CustomSection = ({ copy }: { copy: HomeCopy["custom"] }) => (
             delay={i * 80}
             className="relative overflow-hidden rounded-[20px] border border-border bg-surface p-6 shadow-[var(--hairline)] md:p-7"
           >
+            {/* Decorative watermark number, drawn as CSS content so it is not read or contrast-checked as text. */}
             <span
               aria-hidden="true"
-              className="absolute right-5 top-3 text-6xl font-extrabold tabular-nums text-foreground/[0.06]"
-            >
-              {step.number}
-            </span>
+              data-n={step.number}
+              className="absolute right-5 top-3 text-6xl font-extrabold tabular-nums text-foreground/[0.06] before:content-[attr(data-n)]"
+            />
             <span className="text-sm font-bold tabular-nums text-brand-cyan">{step.number}</span>
             <h4 className="mt-2 text-lg font-bold">{step.title}</h4>
             <p className="mt-2 text-muted-foreground">{step.description}</p>

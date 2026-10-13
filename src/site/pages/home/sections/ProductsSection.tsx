@@ -6,7 +6,7 @@ import { productPath } from "../../../products";
 import { Reveal, Section } from "../../../layout/primitives";
 
 const tint = {
-  wahub: { from: "hsl(var(--wahub))", to: "hsl(var(--wahub-2))", text: "text-wahub" },
+  wahub: { from: "hsl(var(--wahub))", to: "hsl(var(--wahub-2))", text: "text-[hsl(243_90%_80%)]" },
   patricia: { from: "hsl(var(--patricia))", to: "hsl(22 85% 60%)", text: "text-patricia" },
 } as const;
 
