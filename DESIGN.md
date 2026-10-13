@@ -68,18 +68,22 @@ Real WaHub screenshots and coded illustrations carry that story; decoration neve
 ## Rules (non-negotiable)
 
 1. **Scope.** All tokens live on `.site-v2`. Never edit `:root` tokens in `src/index.css`: the
-   legacy `/` and `/k` pages must render exactly as before.
+   legacy `/` and `/k` pages must render exactly as before. Page-frame styles (min-height,
+   background, `overflow-x: clip`) live on `.site-v2.v2-page`; base text styles use
+   `:where(.site-v2)`; portalled content (menus, dialogs) carries the `site-v2` class.
 2. **WhatsApp green is reserved** for WhatsApp actions, always with the WhatsApp glyph and dark
    text (`--whatsapp-foreground`). Nothing else is green.
 3. **First screen works without JavaScript.** The prerendered HTML already shows the h1, the lead
    paragraph and a WhatsApp button. Hero text never starts at `opacity: 0`. Only decorative
    elements and below-the-fold sections animate.
-4. **Below-the-fold reveals** use `[data-reveal]` (hidden only under `html.js`, with a CSS fallback
-   that forces visibility after 2.5 s), so a failed bundle never hides content.
+4. **Below-the-fold reveals** use `[data-reveal]`: hidden only under `html.js` until the app marks
+   `html.v2-ready`, with a CSS fallback that forces visibility after 2.5 s if the bundle never
+   mounts, so a failed bundle never hides content.
 5. **Reduced motion** (`prefers-reduced-motion: reduce`): loops stop, reveals are instant, the chat
    animation shows its final frame.
 6. **Mobile first, 360 px is the floor.** Nothing crosses the viewport edge; every tap target is at
-   least 44×44 px; the sticky WhatsApp bar never covers content (the page reserves its height).
+   least 44×44 px; the sticky WhatsApp bar never covers content (the page reserves its height)
+   and steps aside while a hero or closing WhatsApp button is fully visible.
 7. **Contrast AA** at minimum: body text uses `--muted-foreground`, never lighter grays on
    `--background`. Visible focus ring: 2 px `--focus-ring`, 2 px offset.
 8. **Truth.** No client logos, testimonials, usage numbers or team photos. Product visuals are
