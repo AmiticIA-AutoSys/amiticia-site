@@ -4,6 +4,11 @@ import React, { useEffect, useMemo, useRef, useState } from "react"
 import { motion, MotionConfig, useReducedMotion } from "motion/react"
 import { cn } from "@/lib/utils"
 
+// Without JS the final frame stays visible; with JS, a 2.5 s fallback reveals it if the chat never starts.
+const FALLBACK_CSS = `html.js [data-live-chat][data-phase="ssr"] [data-chat-item]{opacity:0;animation:kit-live-chat-fallback 0s linear 2.5s forwards}
+@keyframes kit-live-chat-fallback{to{opacity:1}}
+@media (prefers-reduced-motion: reduce){html.js [data-live-chat][data-phase="ssr"] [data-chat-item]{opacity:1;animation:none}}`
+
 export type ChatMessage = {
   text: string
   sender: "me" | "them"
@@ -177,11 +182,10 @@ export function LiveChat({
         ref={containerRef}
         data-live-chat=""
         data-phase={phase}
-        className={cn("flex flex-col gap-2 p-4 font-sans", className)}
+        className={cn("flex flex-col gap-2 p-4", className)}
       >
-        <style>{`html.js [data-live-chat][data-phase="ssr"] [data-chat-item]{opacity:0;animation:kit-live-chat-fallback 0s linear 2.5s forwards}
-@keyframes kit-live-chat-fallback{to{opacity:1}}
-@media (prefers-reduced-motion: reduce){html.js [data-live-chat][data-phase="ssr"] [data-chat-item]{opacity:1;animation:none}}`}</style>
+        {/* dangerouslySetInnerHTML: React escapes text children, and a <style> is raw text in HTML */}
+        <style dangerouslySetInnerHTML={{ __html: FALLBACK_CSS }} />
 
         {header && <div className="shrink-0">{header}</div>}
 
