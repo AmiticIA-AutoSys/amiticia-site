@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "test": "vitest run",
+    "og": "node scripts/og/render.mjs",
     "e2e": "bash scripts/e2e-preview.sh",
     "preview": "vite preview",
     "start": "vite preview --port 3000 --host",
