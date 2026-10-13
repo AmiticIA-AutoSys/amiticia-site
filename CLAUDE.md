@@ -154,7 +154,8 @@ from production:
 
 To bring it up:
 
-1. Push `v2-br`: the VPS checkout resets to `origin/v2-br`.
+1. Commit on `v2-br`. No GitHub push is needed: both scripts call `scripts/preview-sync.sh`,
+   which ships the local `v2-br` to the VPS checkout as a git bundle over ssh.
 2. Run `scripts/preview-tunnel.sh`. It starts the tunnel and prints its URL.
 3. Run `scripts/preview-deploy.sh <url>`. It builds the image locally with that URL baked into
    canonical and og, ships it with `docker save | ssh … docker load`, and starts `web`.

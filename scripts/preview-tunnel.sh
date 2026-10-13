@@ -6,25 +6,17 @@
 set -euo pipefail
 
 REMOTE_DIR=/opt/amiticia/amiticia-site-preview
-PROD_DIR=/opt/amiticia/amiticia-site
+cd "$(dirname "$0")/.."
 
-echo "preview-tunnel: ensuring the checkout ${REMOTE_DIR} exists and is on v2-br"
+echo "preview-tunnel: syncing the VPS checkout with the local v2-br"
+bash scripts/preview-sync.sh
+
 echo "preview-tunnel: starting the tunnel service (compose project amiticia-site-preview)"
 echo "preview-tunnel: waiting up to 60 s for the tunnel URL"
-
-ssh hostinger bash -s -- "$REMOTE_DIR" "$PROD_DIR" <<'REMOTE'
+ssh hostinger bash -s -- "$REMOTE_DIR" <<'REMOTE'
 set -euo pipefail
-dir="$1"; prod="$2"
-if [ ! -d "$dir/.git" ]; then
-  # Same origin as the production checkout (read only), cloned into the preview folder.
-  git clone "$(git -C "$prod" remote get-url origin)" "$dir"
-fi
-cd "$dir"
-git fetch origin
-git checkout v2-br
-git reset --hard origin/v2-br
-cd deploy/preview
-# --no-deps: the web service does not exist yet (its image is shipped by preview-deploy.sh).
+cd "$1/deploy/preview"
+# --no-deps: the web service may not exist yet (its image is shipped by preview-deploy.sh).
 docker compose up -d --no-deps tunnel
 url=""
 for _ in $(seq 1 60); do
