@@ -89,7 +89,7 @@ export const HeroIllustration = ({ className }: { className?: string }) => {
       data-hero-illustration=""
       className={cn("relative mx-auto w-full max-w-[480px]", step >= 1 && "s1", step >= 2 && "s2", step >= 3 && "s3", className)}
     >
-      <style>{stageCss}</style>
+      <style dangerouslySetInnerHTML={{ __html: stageCss }} />
 
       {/* Flow 1 — WaHub: WhatsApp chat → qualified lead */}
       <div className={cn(cardClass, "w-[88%] overflow-hidden sm:w-[80%]")}>
