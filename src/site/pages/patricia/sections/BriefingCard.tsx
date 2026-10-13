@@ -80,7 +80,7 @@ export const BriefingCard = ({ className }: { className?: string }) => {
           }
           receivedBubbleClassName={cn("max-w-[86%] text-[13.5px] leading-snug", wa.received)}
           sentBubbleClassName={cn("max-w-[86%] text-[13.5px] leading-snug", wa.sent)}
-          timeClassName={cn("opacity-100", wa.time)}
+          timeClassName="opacity-100 text-[hsl(200_12%_82%)]"
         />
       </div>
 
