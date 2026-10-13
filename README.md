@@ -14,15 +14,10 @@ npm run dev
 npm run start
 ```
 
-### Running with Docker (Swarm only)
+### Deploying
 
-Copy amiticia-site.yml to your server and use Docker to deploy the application:
-
-```bash
-docker stack deploy -c amiticia-site.yml amiticia-site
-```
-
-Then `curl http://localhost:3000` works on the VPS
+Push to `main`: GitHub Actions builds the image and deploys it to the VPS from
+`deploy/docker-compose.yaml`. Details and the manual fallback are in `CLAUDE.md` → Deployment.
 
 ## What technologies are used for this project?
 

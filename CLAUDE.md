@@ -40,7 +40,7 @@ src/
 public/             # Static files served as-is
 Dockerfile          # Multi-stage: node builder → nginx runtime
 nginx.conf          # SPA fallback + asset caching, listens on :3000
-amiticia-site.yml   # Reference copy of the VPS compose file - NOT deployed (see below)
+deploy/             # THE deployed compose (+ .env.example) — the VPS runs it from /opt/amiticia/amiticia-site/deploy/
 .github/workflows/
   deploy.yml        # CI/CD: build → push to ghcr.io → SSH deploy
 ```
@@ -65,14 +65,14 @@ containers, not this build.
 
 ## Deployment
 
-**Fully automated.** Push to `main` → GitHub Actions builds a Docker image → pushes to `ghcr.io/eusoubrasileiro/amitic-ai-core:latest` → SSHes into the Hostinger VPS → `docker compose pull && up -d`. End-to-end takes ~2 min.
+**Fully automated.** Push to `main` → GitHub Actions builds the image → pushes `ghcr.io/amiticia-autosys/amiticia-site:latest` → SSHes into the Hostinger VPS → `git pull` in `/opt/amiticia/amiticia-site` → `docker compose pull && up -d` from `deploy/`. End-to-end takes ~2 min.
 
 ### How it works
 
 1. **Image build** (`Dockerfile`): multi-stage. Stage 1 `node:20-alpine` runs `npm ci && npm run build`. Stage 2 `nginx:alpine` copies `dist/` into `/usr/share/nginx/html` and serves it on port 3000 using `nginx.conf` (SPA fallback + immutable caching for `/assets/`).
-2. **Registry**: `ghcr.io/eusoubrasileiro/amitic-ai-core`. Tagged `:latest` and `:sha-<short>` per commit. Package is public so the VPS pulls without auth.
-3. **Compose on the VPS** (`/root/amiticia-site/amiticia-site.yml`): `image: ghcr.io/.../amitic-ai-core:latest`, `pull_policy: always`, `restart: unless-stopped`. Traefik labels unchanged — still routes `amiticia.cc` / `www.amiticia.cc` via `myresolver`, on the external `network_public` network.
-4. **CI/CD** (`.github/workflows/deploy.yml`): triggers on push to `main` or manual dispatch. Two jobs: `build-and-push` (uses `docker/build-push-action` with GHA cache) and `deploy` (uses `appleboy/ssh-action` to run `docker compose pull && up -d && docker image prune -f` on the VPS).
+2. **Registry**: `ghcr.io/amiticia-autosys/amiticia-site`, tagged `:latest` and `:sha-<short>` per commit. The VPS pulls with the same ghcr.io login as every other `amiticia-autosys` image. Builds from before the 2026-10-13 rename stay at `ghcr.io/eusoubrasileiro/amitic-ai-core` — rollback only.
+3. **Compose** (`deploy/docker-compose.yaml`): the deployed file. The VPS runs it from `/opt/amiticia/amiticia-site/deploy/`, a checkout of this repo, with `deploy/.env` (gitignored, chmod 600) holding `AMITICIA_K_BASICAUTH`. Change routing, volumes or labels here and push — never edit the VPS copy.
+4. **CI/CD** (`.github/workflows/deploy.yml`): triggers on push to `main` or manual dispatch. `build-and-push` (`docker/build-push-action`, GHA cache), then `deploy` (`appleboy/ssh-action`: `git pull --ff-only`, `docker compose pull && up -d`, `docker image prune -f`). The image name is written in both the workflow and the compose file — change them together.
 
 ### Required GitHub secrets
 
@@ -89,33 +89,17 @@ containers, not this build.
 If Actions is broken:
 ```bash
 ssh hostinger
-cd /root/amiticia-site
-docker compose -f amiticia-site.yml pull
-docker compose -f amiticia-site.yml up -d
+cd /opt/amiticia/amiticia-site && git pull --ff-only
+cd deploy && docker compose pull && docker compose up -d
 ```
 
-To roll back to a specific commit, edit the image tag in the VPS's `amiticia-site.yml` to `ghcr.io/.../amitic-ai-core:sha-<short>` and run the pull+up commands above.
-
-### ⚠️ The compose file in this repo is NOT the deployed one
-
-`amiticia-site.yml` here is a **reference copy**. The authoritative file is
-`/root/amiticia-site/amiticia-site.yml` on the VPS — CI never uploads ours, it only runs
-`docker compose pull && up -d` against the file already on the host.
-
-Two consequences:
-
-- **Never copy the repo file up verbatim.** Its BasicAuth credential is a placeholder
-  (`andre:$$REPLACE_ON_VPS`), so deploying it as-is would leave `/k` unauthenticated. This repo is
-  **public** — the real hash must never be committed. Regenerate with
-  `htpasswd -nbB andre '<password>' | sed -e 's/\$/\$\$/g'`.
-- **Changes to routing, volumes or labels must be made on the VPS**, then mirrored here by hand.
-  Verify the two agree with:
-  `diff <(ssh hostinger 'cat /root/amiticia-site/amiticia-site.yml') amiticia-site.yml`
-  — the credential line should be the only difference.
+To roll back, pin the image in `deploy/docker-compose.yaml` to `:sha-<short>` and run the pull + up above. Commit the pin, or the next deploy undoes it.
 
 ### Gotchas
 
-- **Repo name mismatch**: git origin is `eusoubrasileiro/amitic-ai-core.git`, not `amiticia-site`. Both names refer to the same repo. The ghcr.io image name follows the repo name.
+- **Public repo, free CI.** Public repos run Actions for free; private ones draw on the org's limited minutes, which is why the AmiticIA default is no GitHub CI (`standards/standards.md`). Make this repo private and the deploy pipeline starts costing.
+- **Public repo, so no secrets in git.** The `/k` BasicAuth hash lives only in the VPS's `deploy/.env`. Regenerate with `htpasswd -nbB andre '<password>' | sed -e 's/\$/\$\$/g'`.
+- **Renamed 2026-10-13** from `eusoubrasileiro/amitic-ai-core`. GitHub redirects the old URL; creating any repo at the old name would break that redirect.
 - **`vite.config.ts` `preview.allowedHosts`** is only used for `npm run preview` (local dev). Production serves via nginx, which doesn't care about host headers. Leaving it correct anyway is cheap insurance.
 - **Never commit** `mcp-logs.txt` or `wa-logs.txt` — local debug artifacts (already gitignored).
 

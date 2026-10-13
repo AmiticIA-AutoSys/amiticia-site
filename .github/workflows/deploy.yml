@@ -11,7 +11,8 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  # Must match the image in deploy/docker-compose.yaml.
+  IMAGE_NAME: amiticia-autosys/amiticia-site
 
 jobs:
   build-and-push:
@@ -66,7 +67,11 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             set -e
-            cd /root/amiticia-site
-            docker compose -f amiticia-site.yml pull
-            docker compose -f amiticia-site.yml up -d
+            # The VPS deploys from a checkout of this repo (standards/deployment.md).
+            # Pull it first so compose changes ship together with the image.
+            cd /opt/amiticia/amiticia-site
+            git pull --ff-only
+            cd deploy
+            docker compose pull
+            docker compose up -d
             docker image prune -f

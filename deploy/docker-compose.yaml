@@ -14,13 +14,13 @@
 # of the directory this file sits in.
 #
 ### Remember: docker compose version (non-swarm)
-### Use: `docker compose -f amiticia-site.yml up -d`
+### Use (from this directory): `docker compose pull && docker compose up -d`
 
 name: amiticia-site
 
 services:
   amiticia:
-    image: ghcr.io/eusoubrasileiro/amitic-ai-core:latest
+    image: ghcr.io/amiticia-autosys/amiticia-site:latest
     pull_policy: always
     restart: unless-stopped
     networks:
