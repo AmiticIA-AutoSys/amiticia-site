@@ -42,4 +42,14 @@ test.describe("/br home", () => {
     await expect(page.locator("section p.v2-lead").first()).toBeInViewport();
     await expect(page.locator('a[data-placement="hero"]')).toBeInViewport({ ratio: 1 });
   });
+
+  test("the sticky bar steps aside while the closing button is fully on screen", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "the sticky bar is mobile only");
+    await page.goto("/br", { waitUntil: "networkidle" });
+    const cta = page.locator('a[data-placement="cta"]');
+    await cta.scrollIntoViewIfNeeded();
+    await page.evaluate(() => window.scrollBy(0, -120));
+    await expect(cta).toBeInViewport({ ratio: 1 });
+    await expect(page.locator('a[data-placement="sticky"]')).toBeHidden();
+  });
 });
