@@ -23,4 +23,14 @@ test.describe("prerendered HTML (no JS)", () => {
       expect(html).toContain(`href="${waHref(p.message)}"`);
     });
   }
+
+  // A <style> is raw text: escaped CSS (&quot;…) breaks the selectors and fails hydration (#418).
+  for (const p of brPages) {
+    test(`${p.path} writes its inline CSS unescaped`, async ({ request }) => {
+      const html = await (await request.get(p.path)).text();
+      for (const css of html.match(/<style[^>]*>[\s\S]*?<\/style>/g) ?? []) {
+        expect(css).not.toMatch(/&(quot|#x27|#39|lt|gt|amp);/);
+      }
+    });
+  }
 });
