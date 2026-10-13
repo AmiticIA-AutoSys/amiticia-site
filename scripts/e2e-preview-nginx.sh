@@ -39,8 +39,20 @@ for url in /br /br/wahub /br/patricia / "$asset" /og/br-home.jpg /k /k/data/x /k
   header "$url" | grep -qi '^x-robots-tag: noindex, nofollow$'; check "X-Robots-Tag on ${url}" $?
 done
 check "/br answers 200" "$([ "$(status /br)" = 200 ]; echo $?)"
-check "/ redirects to /br (no legacy page in the preview)" "$([ "$(status /)" = 302 ]; echo $?)"
-check "the / redirect is relative (no internal :3000 leaks)" "$(header / | grep -qi '^location: /br$'; echo $?)"
+# The bare domain picks the market from the browser language (brief: only the bare entry detects).
+home_for() { curl -s -o /dev/null -D - -H "Accept-Language: $1" "$base/" | tr -d '\r' | grep -i '^location:' | cut -d' ' -f2; }
+check "/ answers 302 (no legacy page in the preview)" "$([ "$(status /)" = 302 ]; echo $?)"
+check "Italian browser → /it" "$([ "$(home_for 'it-IT,it;q=0.9,en;q=0.8')" = /it ]; echo $?)"
+check "Brazilian browser → /br" "$([ "$(home_for 'pt-BR,pt;q=0.9,en-US;q=0.8')" = /br ]; echo $?)"
+check "Portuguese (Portugal) browser → /br" "$([ "$(home_for 'pt-PT')" = /br ]; echo $?)"
+check "English first, Italian next → /it" "$([ "$(home_for 'en-US,en;q=0.9,it;q=0.8,pt;q=0.7')" = /it ]; echo $?)"
+check "English first, Portuguese next → /br" "$([ "$(home_for 'en-US,en;q=0.9,pt-BR;q=0.8,it;q=0.7')" = /br ]; echo $?)"
+check "upper-case tags work (IT-it)" "$([ "$(home_for 'IT-it')" = /it ]; echo $?)"
+check "other languages → /it until /en exists" "$([ "$(home_for 'de-DE,de;q=0.9')" = /it ]; echo $?)"
+check "no Accept-Language → /it" "$([ "$(curl -s -o /dev/null -D - "$base/" | tr -d '\r' | grep -i '^location:' | cut -d' ' -f2)" = /it ]; echo $?)"
+check "a tag that merely contains it/pt does not count (en-IT)" "$([ "$(home_for 'en-IT,pt;q=0.5')" = /br ]; echo $?)"
+check "the / redirect varies by language and is never cached" "$(header / | grep -qi '^vary: accept-language$' && header / | grep -qi '^cache-control: no-store$'; echo $?)"
+check "/it and its pages answer 200" "$([ "$(status /it)$(status /it/wahub)$(status /it/patricia)" = 200200200 ]; echo $?)"
 check "/k answers 404" "$([ "$(status /k)" = 404 ]; echo $?)"
 check "/k/data/x answers 404" "$([ "$(status /k/data/x)" = 404 ]; echo $?)"
 check "/k/api/x answers 404" "$([ "$(status /k/api/x)" = 404 ]; echo $?)"
