@@ -1,4 +1,4 @@
-# Preview stack for amiticia.cc: a throwaway copy of the site that Flavio and Andre open on their
+# Preview stack for amiticia.cc: a throwaway copy of the site that the product owners open on their
 # phones BEFORE anything changes on amiticia.cc. Lives on the Hostinger VPS in
 # /opt/amiticia/amiticia-site-preview (a checkout of this repo, branch v2-br), compose project
 # `amiticia-site-preview`.

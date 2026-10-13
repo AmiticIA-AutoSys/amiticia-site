@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-// The live site keeps serving the legacy pages until Flavio and André validate /br.
+// The live site keeps serving the legacy pages until the product owners validate /br.
 test.describe("legacy pages are untouched", () => {
   test("/ still shows the old hero and navigation", async ({ page, isMobile }) => {
     await page.goto("/", { waitUntil: "networkidle" });
