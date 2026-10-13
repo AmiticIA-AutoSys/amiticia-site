@@ -11,3 +11,8 @@ CLAUDE.md
 README.md
 .DS_Store
 bun.lockb
+dist-ssr
+.claude
+.husky
+playwright-report
+test-results

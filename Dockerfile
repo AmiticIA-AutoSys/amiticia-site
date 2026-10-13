@@ -1,8 +1,13 @@
-FROM node:20-alpine AS builder
+FROM node:24-alpine AS builder
 WORKDIR /app
+# No git in the image: skip installing the husky hooks during npm ci.
+ENV HUSKY=0
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+# Optional cookieless analytics: when both are set, the prerender adds the Umami tag.
+ARG UMAMI_SCRIPT_URL
+ARG UMAMI_WEBSITE_ID
 RUN npm run build
 
 FROM nginx:alpine
