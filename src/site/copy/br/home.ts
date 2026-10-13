@@ -53,7 +53,7 @@ export const home: HomeCopy = {
       title: "Stack & Infra que não te deixa na mão",
       categories: ["Self-hosted e Cloud-Hybrid", "Dev & Data", "AI Engineering"],
       description:
-        "LLMs de mercado, RAG, vetores, avaliação de respostas, observabilidade, segurança e escala. Nós priorizamos modelo certo para o seu caso e arquitetura sob medida.",
+        "LLMs de mercado, RAG, vetores, avaliação de respostas, observabilidade, segurança e escala. Nós priorizamos o modelo certo para o seu caso e arquitetura sob medida.",
     },
     process: {
       title: "Como trabalhamos",
