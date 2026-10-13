@@ -1,38 +1,30 @@
 import { lazy, Suspense } from "react";
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import NotFound from "./pages/NotFound";
 import { siteRouteElements } from "./site/routes";
 import { routerFuture } from "./site/router-future";
 
-// Legacy pages are never prerendered: load them on demand so the market pages stay light.
+// Legacy pages and their providers are never prerendered: load them on demand so the market
+// pages stay light. LegacyLayout wraps them in the providers only they use.
+const LegacyLayout = lazy(() => import("./legacy/LegacyLayout"));
 const Index = lazy(() => import("./pages/Index"));
 const Knowledge = lazy(() => import("./pages/Knowledge"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
-const queryClient = new QueryClient();
-
-/** Providers and routes, without a router: the browser wraps it in BrowserRouter, the prerender in StaticRouter. */
+/** Routes, without a router: the browser wraps it in BrowserRouter, the prerender in StaticRouter. */
 export const AppShell = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <Suspense fallback={null}>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/k" element={<Knowledge />} />
-          <Route path="/k/article/:articleSlug" element={<Knowledge />} />
-          <Route path="/k/:slug" element={<Knowledge />} />
-          {siteRouteElements}
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Suspense>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <Suspense fallback={null}>
+    <Routes>
+      {siteRouteElements}
+      <Route element={<LegacyLayout />}>
+        <Route path="/" element={<Index />} />
+        <Route path="/k" element={<Knowledge />} />
+        <Route path="/k/article/:articleSlug" element={<Knowledge />} />
+        <Route path="/k/:slug" element={<Knowledge />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
+  </Suspense>
 );
 
 const App = () => (
