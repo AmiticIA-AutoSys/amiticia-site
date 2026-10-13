@@ -30,6 +30,10 @@ const assets = await fs.readdir(path.join(dist, "assets"));
 const font = assets.find((f) => /^plus-jakarta-sans-latin-wght-normal-.*\.woff2$/.test(f));
 if (!font) fail("latin Plus Jakarta Sans woff2 not found in dist/assets");
 
+// SITE_URL sets the origin of canonical/og URLs; SITE_NOINDEX=1 marks every page noindex (preview stacks).
+const siteUrl = (process.env.SITE_URL || "https://amiticia.cc").replace(/\/+$/, "");
+const noindex = process.env.SITE_NOINDEX === "1";
+
 const escapeAttr = (v) => v.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 const { UMAMI_SCRIPT_URL, UMAMI_WEBSITE_ID } = process.env;
 const umami =
@@ -44,7 +48,7 @@ for (const url of prerenderPaths) {
   if (!appHtml.includes("<h1")) fail(`${url} rendered without an <h1>`);
 
   const head = [
-    headHtml(meta),
+    headHtml(meta, { siteUrl, noindex }),
     `<link rel="preload" href="/assets/${font}" as="font" type="font/woff2" crossorigin />`,
     umami,
   ]
