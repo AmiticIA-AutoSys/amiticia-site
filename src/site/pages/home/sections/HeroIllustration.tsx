@@ -58,7 +58,7 @@ const ChatHeader = ({ initial, name, sub, tint }: { initial: string; name: strin
 
 const received = "bg-surface text-foreground/95 text-[13px] leading-snug";
 const sent = "bg-[hsl(243_45%_26%)] text-foreground text-[13px] leading-snug";
-const time = "text-[10px] opacity-100 text-foreground/75";
+const time = "text-[10px] opacity-100 text-[hsl(225_30%_80%)]";
 
 /**
  * Server and hydration frame of the chat: the kit LiveChat's final frame, same classes. The kit
@@ -197,7 +197,7 @@ export const HeroIllustration = ({ className }: { className?: string }) => {
             </span>
             <div className="max-w-full rounded-2xl rounded-tl-sm bg-surface px-3.5 py-2 text-[13px] leading-snug text-foreground/95">
               {patriciaDemo.message}
-              <span className="mt-0.5 flex items-center justify-end gap-1 text-[10px] text-foreground/70">
+              <span className="mt-0.5 flex items-center justify-end gap-1 text-[10px] text-[hsl(225_30%_80%)]">
                 {patriciaDemo.time}
                 <CheckCheck className="h-3 w-3" />
               </span>
