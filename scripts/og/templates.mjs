@@ -102,8 +102,8 @@ h1 { font-size: 54px; line-height: 1.08; }
 <div class="main"><div class="eyebrow"><i class="dot"></i>${esc(eyebrow)}</div><h1>${esc(h1)}</h1></div>
 <div class="card">
   <div class="card-head"><span class="card-title">Caso organizado</span><span class="badge">Para o advogado</span></div>
-  <div class="row"><div class="label">Envolvidos</div><div class="value">Mãe, pai e dois filhos</div></div>
-  <div class="row"><div class="label">Fato central</div><div class="value">Pedido de guarda e pensão</div></div>
+  <div class="row"><div class="label">Envolvidos</div><div class="value">Cliente, ex-marido e dois filhos</div></div>
+  <div class="row"><div class="label">Fato central</div><div class="value">Dúvidas sobre a separação</div></div>
   <div class="row"><div class="label">Resposta pronta</div><div class="value">Aguardando a sua aprovação</div></div>
   <div class="actions"><span class="btn primary">Enviar</span><span class="btn ghost">Editar</span></div>
 </div>`,
