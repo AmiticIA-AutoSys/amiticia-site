@@ -36,7 +36,7 @@ const PatriciaPreview = () => (
       {patriciaDemo.case.title}
     </span>
     <dl className="mt-3 space-y-1.5 text-[12px] leading-snug">
-      {patriciaDemo.case.fields.slice(0, 2).map(([label, value]) => (
+      {patriciaDemo.case.fields.slice(0, 1).map(([label, value]) => (
         <div key={label} className="flex justify-between gap-3">
           <dt className="text-subtle-foreground">{label}</dt>
           <dd className="text-right font-medium text-foreground/90">{value}</dd>

@@ -106,12 +106,20 @@ export const HeroIllustration = ({ className }: { className?: string }) => {
       </div>
 
       <SquigglyArrow
-        width={92}
-        height={46}
+        width={96}
+        height={48}
         strokeWidth={2}
         direction="right"
         variant="smooth"
-        className="absolute right-[6%] top-[92px] hidden rotate-[28deg] text-[hsl(243_90%_80%)] opacity-70 lg:block"
+        className="absolute left-[4%] top-[248px] hidden rotate-[18deg] text-[hsl(243_90%_80%)] opacity-80 lg:block"
+      />
+      <SquigglyArrow
+        width={96}
+        height={48}
+        strokeWidth={2}
+        direction="right"
+        variant="smooth"
+        className="absolute bottom-[64px] left-[2%] hidden rotate-[18deg] text-patricia opacity-80 lg:block"
       />
 
       <div data-at="1" className="relative z-10 -mt-3 ml-auto w-[78%] sm:w-[64%]">
@@ -129,13 +137,13 @@ export const HeroIllustration = ({ className }: { className?: string }) => {
               <Field key={label} label={label} value={value} />
             ))}
           </div>
-          <div className="mt-3 flex items-center gap-1.5 text-[11px] font-semibold">
+          <div className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-2 text-[11px] font-semibold">
             <span className="rounded-full bg-foreground/[0.06] px-2 py-0.5 text-muted-foreground">{wahubDemo.lead.from}</span>
             <ArrowRight className="h-3 w-3 text-subtle-foreground" />
             <span className="rounded-full px-2 py-0.5 text-foreground" style={{ background: "hsl(var(--wahub) / 0.28)" }}>
               {wahubDemo.lead.to}
             </span>
-            <span className="ml-auto inline-flex items-center gap-1 text-muted-foreground">
+            <span className="ml-auto inline-flex items-center gap-1 whitespace-nowrap text-muted-foreground">
               <UserCheck className="h-3.5 w-3.5" />
               {wahubDemo.lead.handoff}
             </span>
