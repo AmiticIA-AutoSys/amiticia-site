@@ -4,8 +4,9 @@
 # `amiticia-site-preview`.
 #
 # What it is
-#   web     nginx serving the site image built locally with SITE_URL=<tunnel url> and
-#           SITE_NOINDEX=1 (so canonical/og URLs point at the tunnel and every page is noindex).
+#   web     nginx serving the site image built locally with SITE_NOINDEX=1 (every page noindex).
+#           nginx.preview.conf rewrites the baked https://amiticia.cc origin to the requested host,
+#           so canonical/og URLs follow whatever tunnel URL is current, with no rebuild.
 #           No ports published, no Traefik labels, NOT on network_public: production cannot see
 #           it and it cannot see production. It has no /k area.
 #   tunnel  a Cloudflare quick tunnel (random https://*.trycloudflare.com URL, no account, no DNS
@@ -13,10 +14,9 @@
 #
 # How to run it (the coordinator runs these; the scripts print each step). Both first sync the VPS
 # checkout with the local v2-br commit through a git bundle (scripts/preview-sync.sh): no GitHub push.
-#   1. scripts/preview-tunnel.sh        starts only `tunnel` on the VPS (no web yet), prints the URL
-#   2. scripts/preview-deploy.sh <url>  builds the image with that URL, ships it, starts `web`
-#   Order matters: the image bakes the tunnel URL into og:image/canonical, so the tunnel
-#   starts first. Restarting the tunnel gives a new URL: run preview-deploy.sh again.
+#   scripts/preview-deploy.sh   builds the image, ships it, starts `web` (rerun after each commit)
+#   scripts/preview-tunnel.sh   starts `tunnel` if needed and prints its current URL
+#   Any order. A tunnel restart (or a VPS reboot) gives a new URL: rerun preview-tunnel.sh to read it.
 #   Tear down:  ssh hostinger 'cd /opt/amiticia/amiticia-site-preview/deploy/preview && docker compose down'
 #
 # Why a quick tunnel: it needs no DNS or Traefik change, so nothing near production is touched,

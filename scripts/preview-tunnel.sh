@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Starts ONLY the Cloudflare quick tunnel of the preview stack on the VPS and prints its public
-# https://*.trycloudflare.com URL (polls the tunnel logs for up to 60 s). Run it first, then pass the
-# URL to scripts/preview-deploy.sh. Touches only /opt/amiticia/amiticia-site-preview and the
+# https://*.trycloudflare.com URL (polls the tunnel logs for up to 60 s). If the tunnel already runs,
+# it just prints the current URL. Independent of scripts/preview-deploy.sh. Touches only /opt/amiticia/amiticia-site-preview and the
 # `amiticia-site-preview` compose project. See deploy/preview/docker-compose.yaml for the whole picture.
 set -euo pipefail
 
