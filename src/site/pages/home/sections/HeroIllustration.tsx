@@ -5,7 +5,6 @@ import { LiveChat } from "@/components/kit/originkit/live-chat";
 import { SquigglyArrow } from "@/components/kit/cult/squiggle-arrow";
 import { cn } from "@/lib/utils";
 import { patriciaDemo, productTint, wahubDemo } from "../demo";
-import { useMounted } from "../use-mounted";
 
 /*
  * Staging: items marked data-at="1|2|3" appear when the root carries the class s1/s2/s3.
@@ -56,33 +55,6 @@ const ChatHeader = ({ initial, name, sub, tint }: { initial: string; name: strin
   </div>
 );
 
-const received = "bg-surface text-foreground/95 text-[13px] leading-snug";
-const sent = "bg-[hsl(243_45%_26%)] text-foreground text-[13px] leading-snug";
-const time = "text-[10px] opacity-100 text-[hsl(225_30%_80%)]";
-
-/**
- * Server and hydration frame of the chat: the kit LiveChat's final frame, same classes. The kit
- * component mounts right after hydration and plays; until then, under html.js, these bubbles
- * stay hidden (with the 2.5 s fallback), so nothing flashes before the chat plays.
- */
-const StaticChat = () => (
-  <div className="flex flex-col gap-1.5 p-3 text-[13px]">
-    {wahubDemo.chat.map((m) => (
-      <div key={m.text} data-at="0" className={cn("flex w-full flex-col", m.sender === "me" ? "items-end" : "items-start")}>
-        <div
-          className={cn(
-            "max-w-[75%] rounded-2xl px-3.5 py-2 break-words",
-            m.sender === "me" ? cn("rounded-tr-sm", sent) : cn("rounded-tl-sm", received),
-          )}
-        >
-          <div>{m.text}</div>
-          <div className={cn("mt-0.5 text-right", time)}>{m.time}</div>
-        </div>
-      </div>
-    ))}
-  </div>
-);
-
 const cardClass =
   "relative rounded-[20px] border border-border bg-surface-raised/95 shadow-[var(--hairline),0_24px_60px_-28px_rgba(0,0,0,0.8)] backdrop-blur";
 
@@ -93,7 +65,6 @@ const cardClass =
  */
 export const HeroIllustration = ({ className }: { className?: string }) => {
   const reduce = useReducedMotion();
-  const mounted = useMounted();
   const [chatDone, setChatDone] = useState(false);
   const [step, setStep] = useState(0);
 
@@ -118,25 +89,20 @@ export const HeroIllustration = ({ className }: { className?: string }) => {
       data-hero-illustration=""
       className={cn("relative mx-auto w-full max-w-[480px]", step >= 1 && "s1", step >= 2 && "s2", step >= 3 && "s3", className)}
     >
-      {/* Raw, so SSR does not escape the quotes in the selectors. */}
-      <style dangerouslySetInnerHTML={{ __html: stageCss }} />
+      <style>{stageCss}</style>
 
       {/* Flow 1 — WaHub: WhatsApp chat → qualified lead */}
       <div className={cn(cardClass, "w-[88%] overflow-hidden sm:w-[80%]")}>
         <ChatHeader initial="R" name={wahubDemo.contact} sub={wahubDemo.status} tint={productTint.wahub.gradient} />
-        {mounted ? (
-          <LiveChat
-            messages={wahubDemo.chat}
-            staggerSeconds={1}
-            onComplete={() => setChatDone(true)}
-            className="gap-1.5 p-3 font-[inherit] text-[13px]"
-            receivedBubbleClassName={received}
-            sentBubbleClassName={sent}
-            timeClassName={time}
-          />
-        ) : (
-          <StaticChat />
-        )}
+        <LiveChat
+          messages={wahubDemo.chat}
+          staggerSeconds={1}
+          onComplete={() => setChatDone(true)}
+          className="gap-1.5 p-3 font-[inherit] text-[13px]"
+          receivedBubbleClassName="bg-surface text-foreground/95 text-[13px] leading-snug"
+          sentBubbleClassName="bg-[hsl(243_45%_26%)] text-foreground text-[13px] leading-snug"
+          timeClassName="text-[10px] opacity-100 text-[hsl(225_30%_80%)]"
+        />
       </div>
 
       <SquigglyArrow
