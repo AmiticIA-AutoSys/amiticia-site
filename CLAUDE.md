@@ -15,7 +15,8 @@ Traefik on the Hostinger VPS. Two generations live side by side:
   BasicAuth). They stay exactly as they are until v2 is validated; `e2e/legacy.spec.ts` guards `/`
   pixel by pixel.
 
-Status: v2 lives on branch `v2-br`, not deployed. `main` is what is live.
+Status: v2 lives on branch `v2-br` and is not on amiticia.cc; `main` is what is live. Phones see v2
+through the preview stack (see Deployment).
 
 ## Tech Stack
 
@@ -36,10 +37,17 @@ npm run typecheck  # tsc --noEmit -p tsconfig.app.json
 npm run lint       # ESLint
 npm test           # vitest (unit + component)
 npm run e2e        # build the Docker image, run it on 127.0.0.1:${E2E_PORT:-4310}, run Playwright
+npm run og         # regenerate the share images public/og/br-*.jpg (rerun and commit after an h1/eyebrow change)
+bash scripts/e2e-preview-nginx.sh   # check the preview stack's nginx: noindex, no /k, robots.txt
 ```
 
 Parallel worktrees must use different `E2E_PORT` values. Update the legacy `/` screenshot baseline
 only from a known-good image: `npx playwright test e2e/legacy.spec.ts --update-snapshots`.
+
+`npm run build` reads two build-time variables (Docker build args of the same name): `SITE_URL`, the
+origin of canonical and og URLs (default `https://amiticia.cc`), and `SITE_NOINDEX=1`, which marks
+every prerendered page noindex. `scripts/preview-tunnel.sh` and `scripts/preview-deploy.sh <url>`
+act on the VPS: coordinator only (see Preview stack).
 
 ## Project Layout
 
@@ -55,10 +63,14 @@ src/
   components/kit/    adapted third-party components (Cult UI, Skiper UI, OriginKit): keep attribution headers
   components/ui/     shadcn primitives
   pages/ components/ legacy pages and their components
+  legacy/            LegacyLayout: providers only the legacy pages use (react-query, tooltips, toasters),
+                     loaded on demand so /br never downloads them
   entry-server.tsx   SSR entry used by the prerender
+public/og/           share images, 1200×630 JPEG ≤ 180 KB (WhatsApp drops bigger ones)
 e2e/                 Playwright specs + the legacy screenshot baseline
-scripts/             prerender, e2e-preview
+scripts/             prerender, e2e-preview, og/ (share images), preview-* (VPS preview stack)
 deploy/              production compose: the VPS checkout deploys from here
+deploy/preview/      throwaway preview stack (quick tunnel, noindex): see Preview stack
 .github/workflows/   deploy.yml: build → ghcr.io → SSH deploy (push to main only)
 ```
 
@@ -68,7 +80,7 @@ Red → Green → Refactor. Which test proves which kind of change:
 
 | Change | Test |
 |---|---|
-| Registries, WhatsApp links, analytics, meta/head builders, copy rules (pending claims) | vitest unit |
+| Registries, WhatsApp links, analytics, meta/head builders, copy rules (pending claims), share-image size | vitest unit |
 | Component behaviour (clicks tracked, tabs, chat final frame, reduced motion) | vitest + Testing Library |
 | Prerendered HTML, routing, nginx headers, hydration, mobile overflow, CTA visibility, axe, legacy look | Playwright against the Docker image (`npm run e2e`) |
 | Visual quality | build → screenshot at 360/390/768/1280/1440 → critique loop (`standards/skills/frontend-design`) |
@@ -109,7 +121,9 @@ before v2 ships: it also fronts co-hosted paths owned by other repos (see below)
   (`standards/deployment.md`). The compose has `pull_policy: always`: **any push to `main` ships.**
 - ⚠️ **Issue #1.** On `main`, the workflow still `cd`s into `/root/amiticia-site`, which no longer
   exists: CI builds the image but the deploy step fails. The live version got there by a manual
-  deploy. The fix is on `v2-br` and ships with it.
+  deploy. Fixed on `v2-br` (`614fd1a`); the fix ships when `v2-br` merges to `main`.
+- **Caching** (`nginx.conf`): HTML is never cached, because it names the hashed bundles. Other
+  files from `public/` are cached for an hour, and `/assets/` is immutable for a year.
 - **Manual deploy** (escape hatch):
   ```bash
   ssh hostinger
@@ -124,6 +138,32 @@ before v2 ships: it also fronts co-hosted paths owned by other repos (see below)
   `deploy/docker-compose.yaml`. Do not use it.
 - Required GitHub secrets: `SSH_HOST` (Hostinger IP), `SSH_USER` (`root`), `SSH_KEY` (deploy key).
   `GITHUB_TOKEN` handles the ghcr.io push.
+
+### Preview stack (before anything changes on amiticia.cc)
+
+The preview stack is a throwaway copy of the site for phones. It runs on the same VPS, isolated
+from production:
+
+- **Where:** compose project `amiticia-site-preview` in `/opt/amiticia/amiticia-site-preview`, a
+  checkout of this repo on `v2-br`. Its files are in `deploy/preview/`.
+- **Isolation:** no Traefik labels, no `network_public`, no published ports, no DNS.
+- **URL:** a Cloudflare quick tunnel gives a random `https://*.trycloudflare.com` address. Anyone
+  holding it can open the site; it is unguessable but not a secret.
+- **Indexing:** every page is noindex (meta tag and `X-Robots-Tag`), `robots.txt` disallows all,
+  and `/k` answers 404.
+
+To bring it up:
+
+1. Push `v2-br`: the VPS checkout resets to `origin/v2-br`.
+2. Run `scripts/preview-tunnel.sh`. It starts the tunnel and prints its URL.
+3. Run `scripts/preview-deploy.sh <url>`. It builds the image locally with that URL baked into
+   canonical and og, ships it with `docker save | ssh … docker load`, and starts `web`.
+
+The URL changes whenever the tunnel container restarts, including after a VPS reboot. When that
+happens, rerun both scripts.
+
+Tear down with
+`ssh hostinger 'cd /opt/amiticia/amiticia-site-preview/deploy/preview && docker compose down'`.
 
 ### Gotchas
 
