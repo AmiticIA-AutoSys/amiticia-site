@@ -9,14 +9,14 @@ export const common: CommonCopy = {
     products: {
       label: "Produtos",
       items: [
-        { label: "WaHub", to: "/br/wahub" },
-        { label: "Patrícia", to: "/br/patricia" },
+        { label: "WaHub", to: "/wahub" },
+        { label: "Patrícia", to: "/patricia" },
       ],
     },
     links: [
-      { label: "Sob medida", to: "/br#sob-medida" },
-      { label: "Como trabalhamos", to: "/br#como-trabalhamos" },
-      { label: "Quem somos", to: "/br#quem-somos" },
+      { label: "Sob medida", to: "/#sob-medida" },
+      { label: "Como trabalhamos", to: "/#como-trabalhamos" },
+      { label: "Quem somos", to: "/#quem-somos" },
     ],
   },
   headerCta: "Fale conosco",
@@ -30,8 +30,8 @@ export const common: CommonCopy = {
     brand: "AmiticIA",
     tagline: "Data & AI Ops",
     links: [
-      { label: "WaHub", to: "/br/wahub" },
-      { label: "Patrícia", to: "/br/patricia" },
+      { label: "WaHub", to: "/wahub" },
+      { label: "Patrícia", to: "/patricia" },
     ],
     loginLabel: "Entrar no WaHub",
     copyright: "© 2026 AmiticIA",

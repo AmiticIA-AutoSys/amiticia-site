@@ -1,5 +1,5 @@
 import type { MarketId } from "./markets";
-import { markets } from "./markets";
+import { markets, productPath as marketProductPath } from "./markets";
 
 export type ProductId = "wahub" | "patricia";
 
@@ -30,4 +30,4 @@ export const products: Record<ProductId, Product> = {
 export const productsFor = (market: MarketId): Product[] =>
   markets[market].live ? Object.values(products).filter((p) => p.markets.includes(market)) : [];
 
-export const productPath = (market: MarketId, product: ProductId): string => `/${market}/${product}`;
+export const productPath = (market: MarketId, product: ProductId): string => marketProductPath(market, product);

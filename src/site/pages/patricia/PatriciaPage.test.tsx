@@ -19,7 +19,7 @@ vi.mock("motion/react", async (orig) => {
 const copy = brCopy.patricia;
 
 const tree = () => (
-  <MemoryRouter initialEntries={["/br/patricia"]} future={routerFuture}>
+  <MemoryRouter initialEntries={["/patricia"]} future={routerFuture}>
     <SitePageProvider market="br" page="patricia">
       <PatriciaPage copy={copy} />
     </SitePageProvider>

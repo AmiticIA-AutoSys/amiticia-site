@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { homePath } from "../../markets";
 import { products, type ProductId } from "../../products";
 import { fillProduct } from "../../copy";
 import { useSitePage } from "../../layout/page-context";
@@ -33,7 +34,7 @@ export const UnavailablePage = ({ productId }: { productId: ProductId }) => {
             <WhatsAppButton placement="hero" size="lg">
               {c.stickyCta}
             </WhatsAppButton>
-            <Link to={`/${market}`} className={secondaryButtonClass}>
+            <Link to={homePath(market)} className={secondaryButtonClass}>
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               {c.homeCta}
             </Link>

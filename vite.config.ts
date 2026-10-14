@@ -9,11 +9,7 @@ export default defineConfig(() => ({
     port: 8080,
   },
   preview: {
-    allowedHosts: ["amiticia.cc", "www.amiticia.cc", "localhost"],
-  },
-  // Canonical and og: URLs are absolute; SITE_URL picks the origin (preview stacks use a tunnel URL).
-  define: {
-    __SITE_URL__: JSON.stringify(process.env.SITE_URL || "https://amiticia.cc"),
+    allowedHosts: ["amiticia.cc", "www.amiticia.cc", "amiticia.com.br", "www.amiticia.com.br", "localhost"],
   },
   plugins: [react()],
   resolve: {

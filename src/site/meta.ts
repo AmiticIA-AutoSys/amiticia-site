@@ -3,14 +3,8 @@ import { useEffect } from "react";
 import type { MarketId } from "./markets";
 import type { PageId } from "./copy/types";
 
-declare const __SITE_URL__: string | undefined;
-
 const normalizeOrigin = (url: string): string => url.replace(/\/+$/, "");
 
-/** Origin written into canonical and og: URLs. Fixed at build time from SITE_URL (see vite.config.ts). */
-export const SITE_ORIGIN = normalizeOrigin(
-  (typeof __SITE_URL__ === "string" && __SITE_URL__) || "https://amiticia.cc",
-);
 export const DEFAULT_OG_IMAGE = "/og-image.png";
 
 /**
@@ -21,8 +15,6 @@ export const ogImageFor = (market: MarketId, page: PageId): string =>
   `/og/${market}-${page === "unavailable" ? "home" : page}.jpg`;
 
 export interface HeadOptions {
-  /** Origin for absolute URLs; defaults to SITE_ORIGIN. */
-  siteUrl?: string;
   /** Adds <meta name="robots" content="noindex, nofollow"> (preview stacks). */
   noindex?: boolean;
 }
@@ -30,8 +22,10 @@ export interface HeadOptions {
 export interface PageMeta {
   title: string;
   description: string;
-  /** Path on the site, e.g. /br/wahub. */
+  /** Path on the market's origin, e.g. /wahub (br) or /it/wahub. */
   path: string;
+  /** Origin of the market, e.g. https://amiticia.com.br: canonical, og:url and og:image use it. */
+  origin: string;
   /** Path or absolute URL of the share image. */
   ogImage: string;
   /** Alternative text of the share image. */
@@ -42,7 +36,7 @@ export interface PageMeta {
   noindex?: boolean;
 }
 
-export const absoluteUrl = (pathOrUrl: string, origin: string = SITE_ORIGIN): string =>
+export const absoluteUrl = (pathOrUrl: string, origin: string): string =>
   /^https?:\/\//.test(pathOrUrl) ? pathOrUrl : `${normalizeOrigin(origin)}${pathOrUrl}`;
 
 const escapeAttr = (value: string): string =>
@@ -52,12 +46,9 @@ const escapeText = (value: string): string =>
   value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /** Name/property → content pairs written to <head>, shared by the prerender and the client. */
-const metaTags = (
-  meta: PageMeta,
-  origin: string = SITE_ORIGIN,
-): Array<[attr: "name" | "property", key: string, content: string]> => {
-  const url = absoluteUrl(meta.path, origin);
-  const image = absoluteUrl(meta.ogImage, origin);
+const metaTags = (meta: PageMeta): Array<[attr: "name" | "property", key: string, content: string]> => {
+  const url = absoluteUrl(meta.path, meta.origin);
+  const image = absoluteUrl(meta.ogImage, meta.origin);
   return [
     ["name", "description", meta.description],
     ["property", "og:title", meta.title],
@@ -81,12 +72,11 @@ const metaTags = (
 
 /** The <head> block the prerender writes between <!--app-head-start--> and <!--app-head-end-->. */
 export const headHtml = (meta: PageMeta, options: HeadOptions = {}): string => {
-  const origin = options.siteUrl ?? SITE_ORIGIN;
   return [
     `<title>${escapeText(meta.title)}</title>`,
-    `<link rel="canonical" href="${escapeAttr(absoluteUrl(meta.path, origin))}" />`,
+    `<link rel="canonical" href="${escapeAttr(absoluteUrl(meta.path, meta.origin))}" />`,
     ...(options.noindex || meta.noindex ? ['<meta name="robots" content="noindex, nofollow" />'] : []),
-    ...metaTags(meta, origin).map(([attr, key, content]) => `<meta ${attr}="${key}" content="${escapeAttr(content)}" />`),
+    ...metaTags(meta).map(([attr, key, content]) => `<meta ${attr}="${key}" content="${escapeAttr(content)}" />`),
   ].join("\n    ");
 };
 
@@ -111,6 +101,6 @@ export const useDocumentMeta = (meta: PageMeta): void => {
       canonical.rel = "canonical";
       head.appendChild(canonical);
     }
-    canonical.href = absoluteUrl(meta.path);
+    canonical.href = absoluteUrl(meta.path, meta.origin);
   }, [meta]);
 };

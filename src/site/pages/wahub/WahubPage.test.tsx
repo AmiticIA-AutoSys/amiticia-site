@@ -9,7 +9,7 @@ import { WahubPage } from "./WahubPage";
 
 const renderWahub = (copy: WahubCopy) =>
   render(
-    <MemoryRouter initialEntries={["/br/wahub"]} future={routerFuture}>
+    <MemoryRouter initialEntries={["/wahub"]} future={routerFuture}>
       <SitePageProvider market="br" page="wahub">
         <WahubPage copy={copy} />
       </SitePageProvider>
