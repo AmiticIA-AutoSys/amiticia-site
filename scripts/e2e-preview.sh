@@ -23,9 +23,9 @@ docker run --detach --rm --name "$container" --publish "127.0.0.1:${port}:3000" 
 
 echo "e2e: waiting for ${base_url}"
 for _ in $(seq 1 50); do
-  if curl --silent --fail --output /dev/null "${base_url}/br"; then break; fi
+  if curl --silent --fail --output /dev/null "${base_url}/it"; then break; fi
   sleep 0.2
 done
-curl --silent --fail --output /dev/null "${base_url}/br" || { echo "e2e: container did not answer"; docker logs "$container" || true; exit 1; }
+curl --silent --fail --output /dev/null "${base_url}/it" || { echo "e2e: container did not answer"; docker logs "$container" || true; exit 1; }
 
 E2E_BASE_URL="$base_url" npx playwright test "$@"

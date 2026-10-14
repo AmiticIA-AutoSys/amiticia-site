@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { BR_HOST, brUrl, getAs } from "./fixtures";
 
 // Expected values written out by hand: an independent oracle of the copy and the demo case.
 const HEADINGS = [
@@ -23,7 +24,7 @@ test.describe("/br/patricia", () => {
     isMobile,
   }) => {
     test.skip(!isMobile, "HTML is viewport-independent: run once");
-    const html = await (await request.get("/br/patricia")).text();
+    const html = await (await getAs(request, BR_HOST, "/patricia")).text();
     for (const h of HEADINGS) expect(html).toMatch(new RegExp(`<h[123][^>]*>${h.replace(/[.?]/g, "\\$&")}</h[123]>`));
     const text = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
     for (const word of NEVER.split(" ")) expect(text).toContain(word);
@@ -32,7 +33,7 @@ test.describe("/br/patricia", () => {
 
   test("with reduced motion the case card is complete at once", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/br/patricia", { waitUntil: "networkidle" });
+    await page.goto(brUrl("/patricia"), { waitUntil: "networkidle" });
     const card = page.locator("[data-briefing]");
     await expect(card).toHaveAttribute("data-phase", "done");
     for (const value of [...CASE, "Resposta pronta", "Enviar", "Editar"]) {
@@ -43,7 +44,7 @@ test.describe("/br/patricia", () => {
   });
 
   test("the chat plays once and then the case card assembles", async ({ page }) => {
-    await page.goto("/br/patricia", { waitUntil: "networkidle" });
+    await page.goto(brUrl("/patricia"), { waitUntil: "networkidle" });
     const card = page.locator("[data-briefing]");
     await card.scrollIntoViewIfNeeded();
     await expect(card).toHaveAttribute("data-phase", "done", { timeout: 15_000 });
@@ -55,7 +56,7 @@ test.describe("/br/patricia", () => {
     isMobile,
   }) => {
     test.skip(!isMobile, "360 px check");
-    await page.goto("/br/patricia", { waitUntil: "networkidle" });
+    await page.goto(brUrl("/patricia"), { waitUntil: "networkidle" });
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
     const box = await page.locator("[data-briefing]").boundingBox();
     expect(box!.width).toBeLessThanOrEqual(360);
@@ -64,7 +65,7 @@ test.describe("/br/patricia", () => {
 
   test("the visible text makes no usage claim", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/br/patricia", { waitUntil: "networkidle" });
+    await page.goto(brUrl("/patricia"), { waitUntil: "networkidle" });
     const text = await page.locator("body").innerText();
     expect(text).not.toMatch(/atendidos|em uso|em produção|depoimento|clientes satisfeitos|\d+\s*(escritórios|casos)/i);
   });

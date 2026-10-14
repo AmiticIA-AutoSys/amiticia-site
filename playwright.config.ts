@@ -7,6 +7,15 @@ import { defineConfig } from "@playwright/test";
 const baseURL = process.env.E2E_BASE_URL;
 if (!baseURL) throw new Error("E2E_BASE_URL is not set — run `npm run e2e`");
 
+// One container answers for both production hostnames, picking the market from the Host header.
+// Browsers reach them through Chromium's resolver (amiticia.com.br and amiticia.cc → the container,
+// whatever the port in the URL); `request` calls send an explicit Host header (e2e/fixtures.ts getAs).
+// e2e/domains.spec.ts proves both mechanisms deliver the right host: it fails when pointed at the wrong one.
+const { port } = new URL(baseURL);
+const hostRules = ["amiticia.com.br", "www.amiticia.com.br", "amiticia.cc", "www.amiticia.cc"]
+  .map((h) => `MAP ${h} 127.0.0.1:${port}`)
+  .join(", ");
+
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
@@ -16,6 +25,7 @@ export default defineConfig({
   use: {
     baseURL,
     browserName: "chromium",
+    launchOptions: { args: [`--host-resolver-rules=${hostRules}`] },
     trace: "retain-on-failure",
   },
   projects: [

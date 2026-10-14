@@ -1,9 +1,33 @@
+import type { APIRequestContext } from "@playwright/test";
+
 /** Expected values, written out by hand so the E2E suite is an independent oracle of the copy. */
 export const BR_NUMBER = "5531986983745";
 export const IT_NUMBER = "393926044070";
 
+/** The two production hostnames. The suite reaches both on the one container (see playwright.config.ts). */
+export const BR_HOST = "amiticia.com.br";
+export const IT_HOST = "amiticia.cc";
+
+/** What a browser or a request must use to reach `path` on `host` (plain http: the container has no TLS). */
+export const urlOf = (host: string, path: string) => `http://${host}${path}`;
+export const brUrl = (path: string) => urlOf(BR_HOST, path);
+export const itUrl = (path: string) => urlOf(IT_HOST, path);
+
+/** GET from the container as `host`: the Host header is what nginx picks the market by. */
+export const getAs = (
+  request: APIRequestContext,
+  host: string,
+  path: string,
+  options: { headers?: Record<string, string>; maxRedirects?: number } = {},
+) => request.get(path, { ...options, headers: { ...options.headers, Host: host } });
+
 export interface MarketPage {
+  host: string;
+  /** Origin written into canonical and og:image: what the page's market owns. */
+  origin: string;
   path: string;
+  /** Where a browser opens it in the suite. */
+  url: string;
   lang: string;
   number: string;
   title: string;
@@ -13,7 +37,10 @@ export interface MarketPage {
 
 export const brPages: MarketPage[] = [
   {
-    path: "/br",
+    host: BR_HOST,
+    origin: "https://amiticia.com.br",
+    path: "/",
+    url: brUrl("/"),
     lang: "pt-BR",
     number: BR_NUMBER,
     title: "AmiticIA - Inteligência e Automação que Escala",
@@ -21,7 +48,10 @@ export const brPages: MarketPage[] = [
     message: "Olá! Vim pelo site da AmiticIA e gostaria de conversar sobre um projeto.",
   },
   {
-    path: "/br/wahub",
+    host: BR_HOST,
+    origin: "https://amiticia.com.br",
+    path: "/wahub",
+    url: brUrl("/wahub"),
     lang: "pt-BR",
     number: BR_NUMBER,
     title: "WaHub - Seu time inteiro atendendo no mesmo número do WhatsApp",
@@ -29,7 +59,10 @@ export const brPages: MarketPage[] = [
     message: "Olá! Vi o WaHub no site da AmiticIA e gostaria de saber mais.",
   },
   {
-    path: "/br/patricia",
+    host: BR_HOST,
+    origin: "https://amiticia.com.br",
+    path: "/patricia",
+    url: brUrl("/patricia"),
     lang: "pt-BR",
     number: BR_NUMBER,
     title: "Patrícia - A primeira conversa, organizada para o advogado",
@@ -40,7 +73,10 @@ export const brPages: MarketPage[] = [
 
 export const itPages: MarketPage[] = [
   {
+    host: IT_HOST,
+    origin: "https://amiticia.cc",
     path: "/it",
+    url: itUrl("/it"),
     lang: "it-IT",
     number: IT_NUMBER,
     title: "AmiticIA - Intelligenza e Automazione che Scalano",
@@ -48,7 +84,10 @@ export const itPages: MarketPage[] = [
     message: "Ciao Flavio, ho visto il sito AmiticIA e vorrei parlare di un progetto.",
   },
   {
+    host: IT_HOST,
+    origin: "https://amiticia.cc",
     path: "/it/wahub",
+    url: itUrl("/it/wahub"),
     lang: "it-IT",
     number: IT_NUMBER,
     title: "WaHub - Tutto il tuo team risponde sullo stesso numero WhatsApp",
@@ -56,7 +95,10 @@ export const itPages: MarketPage[] = [
     message: "Ciao Flavio, ho visto WaHub sul sito AmiticIA e vorrei saperne di più.",
   },
   {
+    host: IT_HOST,
+    origin: "https://amiticia.cc",
     path: "/it/patricia",
+    url: itUrl("/it/patricia"),
     lang: "it-IT",
     number: IT_NUMBER,
     title: "Patrícia - Non disponibile in Italia",

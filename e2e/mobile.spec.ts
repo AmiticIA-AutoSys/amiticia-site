@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { sitePages } from "./fixtures";
+import { brUrl, sitePages } from "./fixtures";
 
 test.skip(({ isMobile }) => !isMobile, "360 px checks");
 
@@ -31,15 +31,15 @@ const reachableWhatsApp = (page: Page) =>
   });
 
 for (const p of sitePages) {
-  test(`${p.path} fits 360 px: no horizontal overflow, every control inside the viewport`, async ({ page }) => {
-    await page.goto(p.path, { waitUntil: "networkidle" });
+  test(`${p.host}${p.path} fits 360 px: no horizontal overflow, every control inside the viewport`, async ({ page }) => {
+    await page.goto(p.url, { waitUntil: "networkidle" });
     const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
     expect(scrollWidth).toBeLessThanOrEqual(360);
     expect(await outOfBounds(page)).toEqual([]);
   });
 
-  test(`${p.path} keeps a WhatsApp button reachable at the top, middle and bottom`, async ({ page }) => {
-    await page.goto(p.path, { waitUntil: "networkidle" });
+  test(`${p.host}${p.path} keeps a WhatsApp button reachable at the top, middle and bottom`, async ({ page }) => {
+    await page.goto(p.url, { waitUntil: "networkidle" });
     for (const where of ["top", "middle", "bottom"] as const) {
       await page.evaluate((w) => {
         const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -52,7 +52,7 @@ for (const p of sitePages) {
 }
 
 test("the sticky bar steps aside while the hero button is fully on screen, and returns below it", async ({ page }) => {
-  await page.goto("/br/wahub", { waitUntil: "networkidle" });
+  await page.goto(brUrl("/wahub"), { waitUntil: "networkidle" });
   const sticky = page.locator('a[data-placement="sticky"]');
   await expect(page.locator('a[data-placement="hero"]')).toBeInViewport({ ratio: 1 });
   await expect(sticky).toBeHidden();
