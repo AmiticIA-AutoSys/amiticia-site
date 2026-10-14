@@ -4,18 +4,26 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## What This Is
 
-Marketing website for **amiticia.cc**: a Vite + React SPA served by nginx in Docker, behind
+Marketing website for **amiticia.com.br** (Brazil) and **amiticia.cc** (Italy): a Vite + React SPA served by nginx in Docker, behind
 Traefik on the Hostinger VPS.
 
-- **v2 market pages**: `/br`, `/br/wahub`, `/br/patricia`, `/it`, `/it/wahub` (later `/en`). A product
-  not sold in a market still gets its path there, as a noindex "not available" page
-  (`/it/patricia`), so the language switcher never leads to a 404. They are
-  prerendered to static HTML at build time and hydrated in the browser. Design rules and tokens are
-  in `DESIGN.md`, with tokens scoped to `.site-v2`. Copy lives in `src/site/copy/<market>/` and
-  changes only with the product owner's approval.
-- **Bare domain `/`**: nginx answers a 302 to `/it` or `/br`, picked from the first Italian or
-  Portuguese entry in `Accept-Language`; any other language goes to `/it` until `/en` exists
-  (`e2e/root.spec.ts`). The old one-page landing is no longer served.
+- **Two domains, one image.** Each market owns a domain (registry: `src/site/markets.ts`, `origin` and
+  `basePath`). **Brazil = `amiticia.com.br`, no prefix**: `/`, `/wahub`, `/patricia`. **Italy =
+  `amiticia.cc/it`**: `/it`, `/it/wahub` (later `/en`). `/k` stays on `.cc` only. A product not sold in
+  a market still gets its path there, as a noindex "not available" page (`/it/patricia`), so the
+  language switcher never leads to a 404. Pages are prerendered to static HTML at build time and
+  hydrated in the browser. Canonical, `og:url` and `og:image` use the market's own origin; the language
+  switcher is a plain `<a>` to the same page on the other domain. Design rules and tokens are in
+  `DESIGN.md`, with tokens scoped to `.site-v2`. Copy lives in `src/site/copy/<market>/` and changes
+  only with the product owner's approval (Brazilian links are clean paths: `/wahub`, `/#sob-medida`).
+- **nginx picks the market by `Host`** (`nginx.conf`, two `server` blocks). `amiticia.com.br` (and
+  `www`) serves Brazil from the prerendered `dist/br/…` files through `try_files`, so `/br` never shows;
+  `/br…` → 301 to the clean path, `/it…` and `/k…` → 301 to `https://amiticia.cc` (no `/k` proxy here:
+  it injects the research token). Every other host (amiticia.cc, 127.0.0.1) serves Italy; `/br…`,
+  `/wahub`, `/patricia` → 301 to `amiticia.com.br`.
+- **Bare `amiticia.cc/`**: 302, picked from the first Italian or Portuguese entry in `Accept-Language`:
+  Portuguese → `https://amiticia.com.br/`; Italian, any other language or none → `/it` until `/en`
+  exists (`e2e/root.spec.ts`).
 - **Legacy `/k`**: knowledge area behind Traefik BasicAuth, served by the legacy SPA shell
   (`e2e/knowledge.spec.ts`).
 
@@ -33,21 +41,21 @@ Traefik on the Hostinger VPS.
 ```bash
 npm ci             # install deps (also installs the husky hooks)
 npm run dev        # Vite dev server on :8080 (SPA only, no prerender)
-npm run build      # client + SSR build, then prerender /br pages into dist/<path>/index.html
+npm run build      # client + SSR build, then prerender the market pages into dist/<market>/<path>/index.html
 npm run typecheck  # tsc --noEmit -p tsconfig.app.json
 npm run lint       # ESLint
 npm test           # vitest (unit + component)
-npm run e2e        # build the Docker image, run it on 127.0.0.1:${E2E_PORT:-4310}, run Playwright
+npm run e2e        # build the Docker image, run it on 127.0.0.1:${E2E_PORT:-4310}, run Playwright (both hostnames hit that one container)
 npm run og         # regenerate the share images public/og/br-*.jpg (rerun and commit after an h1/eyebrow change)
 bash scripts/e2e-preview-nginx.sh   # check the preview stack's nginx: noindex, no /k, robots.txt
 ```
 
 Parallel worktrees must use different `E2E_PORT` values.
 
-`npm run build` reads two build-time variables (Docker build args of the same name): `SITE_URL`, the
-origin of canonical and og URLs (default `https://amiticia.cc`), and `SITE_NOINDEX=1`, which marks
-every prerendered page noindex. `scripts/preview-tunnel.sh` and `scripts/preview-deploy.sh <url>`
-act on the VPS: coordinator only (see Preview stack).
+`npm run build` reads one build-time variable (Docker build arg of the same name): `SITE_NOINDEX=1`,
+which marks every prerendered page noindex. Canonical and og origins come from the market registry, not
+from the build. `scripts/preview-tunnel.sh` and `scripts/preview-deploy.sh <url>` act on the VPS:
+coordinator only (see Preview stack).
 
 ## Project Layout
 
@@ -64,7 +72,7 @@ src/
   components/ui/     shadcn primitives
   pages/ components/ legacy pages and their components
   legacy/            LegacyLayout: providers only the legacy pages use (react-query, tooltips, toasters),
-                     loaded on demand so /br never downloads them
+                     loaded on demand so the market pages never download them
   entry-server.tsx   SSR entry used by the prerender
 public/og/           share images, 1200×630 JPEG ≤ 180 KB (WhatsApp drops bigger ones)
 e2e/                 Playwright specs
@@ -82,7 +90,7 @@ Red → Green → Refactor. Which test proves which kind of change:
 |---|---|
 | Registries, WhatsApp links, analytics, meta/head builders, copy rules (pending claims), share-image size | vitest unit |
 | Component behaviour (clicks tracked, tabs, chat final frame, reduced motion) | vitest + Testing Library |
-| Prerendered HTML, routing, nginx headers, hydration, mobile overflow, CTA visibility, root redirect, axe | Playwright against the Docker image (`npm run e2e`) |
+| Prerendered HTML, routing, nginx headers and redirects per domain, hydration, mobile overflow, CTA visibility, root redirect, axe | Playwright against the Docker image (`npm run e2e`): browsers reach `amiticia.com.br`/`amiticia.cc` through Chromium `--host-resolver-rules` (`playwright.config.ts`), `request` calls send an explicit `Host` header (`getAs` in `e2e/fixtures.ts`); `e2e/domains.spec.ts` proves both reach the right host |
 | Visual quality | build → screenshot at 360/390/768/1280/1440 → critique loop (`standards/skills/frontend-design`) |
 
 **Pre-commit stack** (husky): `pre-commit` runs `typecheck`, `lint`, `test`; `commit-msg` runs
@@ -105,12 +113,12 @@ own `E2E_PORT`. There is no database to allocate.
 
 | Probe | Tool | Allowed target |
 |---|---|---|
-| Each `/br` page renders from prerendered HTML, hydrates with no console errors, and every WhatsApp button carries its page's message | Playwright (`npm run e2e`, unattended) | the local Docker image |
-| `/` redirects by browser language and `/k` still renders | Playwright (`npm run e2e`, unattended) | the local Docker image |
+| Each Brazilian page (`amiticia.com.br`) renders from prerendered HTML, hydrates with no console errors, and every WhatsApp button carries its page's message | Playwright (`npm run e2e`, unattended) | the local Docker image |
+| `amiticia.cc/` redirects by browser language, the cross-domain redirects hold and `/k` still renders | Playwright (`npm run e2e`, unattended) | the local Docker image |
 | The pages look right on a real phone and the WhatsApp buttons open the pre-filled chat | a person on a phone (attended) | the preview tunnel URL |
 | The WhatsApp link preview shows the page's image and title | attended: paste the link in a WhatsApp chat (third party) | the preview tunnel URL |
 
-Run them at the merge/release boundary, not in the commit gate. ⚠️ Probe `amiticia.cc` read-only
+Run them at the merge/release boundary, not in the commit gate. ⚠️ Probe `amiticia.cc` and `amiticia.com.br` read-only
 (GET the market pages): it also fronts co-hosted paths owned by other repos (see below).
 
 ## Deployment
@@ -122,6 +130,9 @@ Run them at the merge/release boundary, not in the commit gate. ⚠️ Probe `am
   The image name is written in both the workflow and the compose file: change them together.
   Builds from before the 2026-10-13 rename stay at `ghcr.io/eusoubrasileiro/amitic-ai-core`, for
   rollback only.
+- **Traefik** (`deploy/docker-compose.yaml`): the `amiticia` and `amiticia-redirect` routers carry both
+  domains (and `www`); the BasicAuth `amiticia-k` router stays on `amiticia.cc` only. DNS and the
+  Cloudflare rules for `.com.br` are switched by hand after a deploy.
 - **Caching** (`nginx.conf`): HTML is never cached, because it names the hashed bundles. Other
   files from `public/` are cached for an hour, and `/assets/` is immutable for a year.
 - **Manual deploy** (escape hatch):
@@ -150,8 +161,9 @@ from production:
   holding it can open the site; it is unguessable but not a secret.
 - **Indexing:** every page is noindex (meta tag and `X-Robots-Tag`), `robots.txt` disallows all,
   and `/k` answers 404.
-- **`/` by language:** the same 302 to `/it` or `/br` as production; the `Accept-Language` maps in
-  both nginx files must stay identical.
+- **One host, both markets:** `/` is the Brazilian home (no language redirect), `/wahub` and
+  `/patricia` are Brazilian, `/it…` is Italian and served locally (no cross-domain redirect), `/br/x`
+  → 301 to the clean path on the same host.
 
 To bring it up:
 
@@ -163,8 +175,9 @@ To bring it up:
 
 The URL changes whenever the tunnel container restarts, including after a VPS reboot: rerun
 `scripts/preview-tunnel.sh` to read the new one. Nothing needs a rebuild, because
-`nginx.preview.conf` rewrites the baked `https://amiticia.cc` origin in HTML to the requested host,
-so canonical and og URLs follow the current tunnel.
+`nginx.preview.conf` rewrites both baked origins (`https://amiticia.cc` and `https://amiticia.com.br`)
+in HTML to the requested host, so canonical, og URLs and the language-switcher links follow the
+current tunnel.
 
 Tear down with
 `ssh hostinger 'cd /opt/amiticia/amiticia-site-preview/deploy/preview && docker compose down'`.
@@ -180,7 +193,7 @@ Tear down with
 
 ## Co-hospedagem em amiticia.cc (por path, via Traefik)
 
-Este SPA responde à raiz de `amiticia.cc`. Outros projetos podem co-hospedar em **paths** do mesmo
+Este SPA responde à raiz de `amiticia.cc` (Itália) e a todo o `amiticia.com.br` (Brasil). Outros projetos podem co-hospedar em **paths** do mesmo
 domínio usando **containers próprios** com label Traefik `PathPrefix(/<slug>)` de prioridade maior.
 **NÃO incluir esses projetos neste repo**: eles têm compose/CI/CD próprios.
 
@@ -188,7 +201,7 @@ domínio usando **containers próprios** com label Traefik `PathPrefix(/<slug>)`
 |---|---|---|
 | `/pibconfins` | Tesouraria PIB Confins (dashboard financeiro da igreja) | `side-projects/pibconfins-site/` |
 
-Rotas deste SPA: `/` (redirect), `/k`, `/br/*`, `/it/*` (e no futuro `/en/*`). Ao adicionar uma nova rota,
+Rotas deste SPA em `amiticia.cc`: `/` (redirect), `/k`, `/it/*` (no futuro `/en/*`), e `/br/*`, `/wahub`, `/patricia` (301 para `.com.br`). Em `amiticia.com.br`: `/`, `/wahub`, `/patricia`. Ao adicionar uma nova rota,
 confirmar antes que o path não conflita com nenhum co-hospedado.
 
 ## Parent Context

@@ -1,5 +1,5 @@
 ---
-# DESIGN.md — amiticia.cc v2 (market pages: /br, later /it and /en)
+# DESIGN.md — AmiticIA v2 (market pages: amiticia.com.br, amiticia.cc/it, later /en)
 # Scope: everything under src/site/**. The legacy pages (/ and /k) keep the old theme untouched.
 name: AmiticIA v2
 theme: dark-only
