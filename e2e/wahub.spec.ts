@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { BR_HOST, brUrl, getAs } from "./fixtures";
 
 /** Written out by hand: the suite is an independent oracle of the copy and of the hero demo. */
 const headings = ["Como funciona", "O que tem dentro", "Quer ver o WaHub atendendo o seu WhatsApp?"];
@@ -35,7 +36,7 @@ test.describe("/br/wahub", () => {
     isMobile,
   }) => {
     test.skip(!isMobile, "HTML is viewport-independent: run once");
-    const html = await (await request.get("/br/wahub")).text();
+    const html = await (await getAs(request, BR_HOST, "/wahub")).text();
     for (const text of [...headings, ...stepTitles, ...featureTitles, ...chatFinalFrame, ...leadCardText]) {
       expect(html, text).toContain(text);
     }
@@ -44,13 +45,13 @@ test.describe("/br/wahub", () => {
 
   test("with reduced motion the lead card is visible at once", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/br/wahub", { waitUntil: "networkidle" });
+    await page.goto(brUrl("/wahub"), { waitUntil: "networkidle" });
     await expect(leadCard(page)).toHaveAttribute("data-state", "shown");
     expect(await opacityOf(page)).toBe("1");
   });
 
   test("the lead card pops out once the chat has played", async ({ page }) => {
-    await page.goto("/br/wahub", { waitUntil: "networkidle" });
+    await page.goto(brUrl("/wahub"), { waitUntil: "networkidle" });
     await page.locator("[data-wahub-hero-visual]").evaluate((el) => el.scrollIntoView({ block: "center" }));
     await expect(leadCard(page)).toHaveAttribute("data-state", "hidden");
     await expect(leadCard(page)).toHaveAttribute("data-state", "shown", { timeout: 15_000 });
@@ -58,7 +59,7 @@ test.describe("/br/wahub", () => {
   });
 
   test("every screenshot loads after scrolling, and the tour tabs swap the screen", async ({ page }) => {
-    await page.goto("/br/wahub", { waitUntil: "networkidle" });
+    await page.goto(brUrl("/wahub"), { waitUntil: "networkidle" });
     const height = await page.evaluate(() => document.documentElement.scrollHeight);
     for (let y = 0; y <= height; y += 400) {
       await page.evaluate((top) => window.scrollTo(0, top), y);
@@ -86,7 +87,7 @@ test.describe("/br/wahub", () => {
     isMobile,
   }) => {
     test.skip(!isMobile, "360 px layout");
-    await page.goto("/br/wahub", { waitUntil: "networkidle" });
+    await page.goto(brUrl("/wahub"), { waitUntil: "networkidle" });
     await expect(page.locator('a[data-placement="hero"]')).toBeInViewport({ ratio: 1 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
     const wide = await page.evaluate(() =>

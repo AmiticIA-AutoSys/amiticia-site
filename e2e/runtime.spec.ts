@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { sitePages } from "./fixtures";
+import { BR_HOST, sitePages } from "./fixtures";
 
 const scrollThrough = async (page: Page) => {
   const height = await page.evaluate(() => document.documentElement.scrollHeight);
@@ -11,7 +11,7 @@ const scrollThrough = async (page: Page) => {
 
 test.describe("with JavaScript", () => {
   for (const p of sitePages) {
-    test(`${p.path} hydrates with no console errors or hydration warnings`, async ({ page }) => {
+    test(`${p.host}${p.path} hydrates with no console errors or hydration warnings`, async ({ page }) => {
       const problems: string[] = [];
       page.on("console", (msg) => {
         const text = msg.text();
@@ -21,15 +21,15 @@ test.describe("with JavaScript", () => {
       });
       page.on("pageerror", (err) => problems.push(`pageerror: ${err.message}`));
 
-      await page.goto(p.path, { waitUntil: "networkidle" });
+      await page.goto(p.url, { waitUntil: "networkidle" });
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(p.h1);
       await scrollThrough(page);
       await page.waitForLoadState("networkidle");
       expect(problems).toEqual([]);
     });
 
-    test(`${p.path} links only inside its market, except the language switcher`, async ({ page }) => {
-      await page.goto(p.path);
+    test(`${p.host}${p.path} links only inside its market, except the language switcher`, async ({ page }) => {
+      await page.goto(p.url);
       const own = p.path.split("/")[1];
       const offenders = await page.evaluate(
         (market) =>
