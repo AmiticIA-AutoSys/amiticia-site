@@ -33,14 +33,15 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=network_public"
       # main marketing site (public)
-      - "traefik.http.routers.amiticia.rule=Host(`amiticia.cc`) || Host(`www.amiticia.cc`)"
+      - "traefik.http.routers.amiticia.rule=Host(`amiticia.cc`) || Host(`www.amiticia.cc`) || Host(`amiticia.com.br`) || Host(`www.amiticia.com.br`)"
       - "traefik.http.routers.amiticia.entrypoints=websecure"
       - "traefik.http.routers.amiticia.tls.certresolver=myresolver"
       - "traefik.http.services.amiticia.loadbalancer.server.port=3000"
       - "traefik.http.services.amiticia.loadbalancer.healthcheck.path=/"
       - "traefik.http.services.amiticia.loadbalancer.healthcheck.interval=10s"
       - "traefik.http.services.amiticia.loadbalancer.healthcheck.timeout=3s"
-      # private knowledge page — /k path, BasicAuth-gated, higher priority
+      # private knowledge page — /k path on amiticia.cc ONLY, BasicAuth-gated, higher priority.
+      # Never add the .com.br hosts: nginx redirects /k there to amiticia.cc (no token-injecting proxy).
       - "traefik.http.routers.amiticia-k.rule=(Host(`amiticia.cc`) || Host(`www.amiticia.cc`)) && PathPrefix(`/k`)"
       - "traefik.http.routers.amiticia-k.entrypoints=websecure"
       - "traefik.http.routers.amiticia-k.tls.certresolver=myresolver"
@@ -48,7 +49,7 @@ services:
       - "traefik.http.routers.amiticia-k.middlewares=amiticia-k-auth"
       - "traefik.http.middlewares.amiticia-k-auth.basicauth.users=${AMITICIA_K_BASICAUTH}"
       # HTTP → HTTPS redirect
-      - "traefik.http.routers.amiticia-redirect.rule=Host(`amiticia.cc`) || Host(`www.amiticia.cc`)"
+      - "traefik.http.routers.amiticia-redirect.rule=Host(`amiticia.cc`) || Host(`www.amiticia.cc`) || Host(`amiticia.com.br`) || Host(`www.amiticia.com.br`)"
       - "traefik.http.routers.amiticia-redirect.entrypoints=web"
       - "traefik.http.routers.amiticia-redirect.middlewares=amiticia-https"
       - "traefik.http.middlewares.amiticia-https.redirectscheme.scheme=https"
