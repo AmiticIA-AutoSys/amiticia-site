@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components -- route table module: data plus route elements */
 import type { ComponentType } from "react";
 import { Route, Routes } from "react-router-dom";
-import { liveMarkets, markets, type MarketId } from "./markets";
+import { homePath, liveMarkets, markets, type MarketId } from "./markets";
 import { productPath, products, productsFor, type ProductId } from "./products";
 import type { PageId } from "./copy/types";
 import { copyFor, fillProduct } from "./copy";
@@ -34,6 +34,7 @@ const metaOf = (market: MarketId, page: PageId, path: string, product?: ProductI
     title: fill(title),
     description: fill(description),
     path,
+    origin: markets[market].origin,
     ogImage: ogImageFor(market, page),
     ogImageAlt: fill(title),
     lang: markets[market].lang,
@@ -69,7 +70,7 @@ const unavailableRoute = (market: MarketId, product: ProductId): SiteRoute => {
 export const siteRoutes: SiteRoute[] = liveMarkets().flatMap((m) => {
   const sold = productsFor(m.id).map((p) => p.id);
   return [
-    route(m.id, "home", `/${m.id}`),
+    route(m.id, "home", homePath(m.id)),
     ...(Object.keys(products) as ProductId[]).map((id) =>
       sold.includes(id) ? route(m.id, id, productPath(m.id, id)) : unavailableRoute(m.id, id),
     ),
@@ -77,6 +78,16 @@ export const siteRoutes: SiteRoute[] = liveMarkets().flatMap((m) => {
 });
 
 export const prerenderPaths: string[] = siteRoutes.map((r) => r.path);
+
+/**
+ * Where the prerender writes a page, relative to dist/: <market>/<path within the market>/index.html.
+ * Brazil's clean URLs (/, /wahub) land in dist/br/, so nginx can serve them on amiticia.com.br without
+ * the /br prefix ever being visible, and dist/index.html stays the SPA shell.
+ */
+export const prerenderFile = (r: Pick<SiteRoute, "market" | "path">): string => {
+  const within = r.path.slice(markets[r.market].basePath.length).replace(/^\/+|\/+$/g, "");
+  return [r.market, within, "index.html"].filter(Boolean).join("/");
+};
 
 /** Meta for a path (trailing slash tolerated), or undefined when it is not a market route. */
 export const metaFor = (path: string): PageMeta | undefined => {

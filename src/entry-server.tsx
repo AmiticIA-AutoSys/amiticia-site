@@ -11,5 +11,5 @@ export const render = (url: string): string =>
     </StaticRouter>,
   );
 
-export { prerenderPaths, metaFor } from "./site/routes";
+export { prerenderPaths, prerenderFile, siteRoutes, metaFor } from "./site/routes";
 export { headHtml } from "./site/meta";

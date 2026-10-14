@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { homePath } from "../markets";
 import { useSitePage } from "./page-context";
 import { WhatsAppButton } from "./WhatsAppButton";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -40,7 +41,7 @@ export const SiteHeader = () => {
       )}
     >
       <div className="v2-container flex h-16 items-center justify-between gap-3 md:h-[72px]">
-        <Link to={`/${market}`} aria-label={homeLinkLabel} className="-ml-1 inline-flex min-h-11 items-center rounded-lg px-1">
+        <Link to={homePath(market)} aria-label={homeLinkLabel} className="-ml-1 inline-flex min-h-11 items-center rounded-lg px-1">
           <Logo />
         </Link>
 
