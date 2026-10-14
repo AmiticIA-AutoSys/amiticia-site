@@ -63,12 +63,12 @@ describe("analytics", () => {
   });
 
   it("records the pageview with the path at the time of the call", () => {
-    window.history.pushState({}, "", "/br/wahub");
+    window.history.pushState({}, "", "/wahub");
     trackPageview();
-    window.history.pushState({}, "", "/br");
+    window.history.pushState({}, "", "/");
     const track = installUmami();
     trackPageview();
     const first = track.mock.calls[0][0] as (p: Record<string, unknown>) => Record<string, unknown>;
-    expect(first({ website: "x" })).toMatchObject({ website: "x", url: "/br/wahub" });
+    expect(first({ website: "x" })).toMatchObject({ website: "x", url: "/wahub" });
   });
 });

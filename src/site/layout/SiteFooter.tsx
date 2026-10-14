@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { products } from "../products";
+import { homePath } from "../markets";
 import { useSitePage } from "./page-context";
 import { Logo } from "./Logo";
 
@@ -14,7 +15,7 @@ export const SiteFooter = () => {
     <footer className="border-t border-border">
       <div className="v2-container flex flex-col gap-8 py-12 md:flex-row md:items-center md:justify-between md:py-14">
         <div className="flex flex-col gap-2">
-          <Link to={`/${market}`} aria-label={homeLinkLabel} className="inline-flex min-h-11 w-fit items-center">
+          <Link to={homePath(market)} aria-label={homeLinkLabel} className="inline-flex min-h-11 w-fit items-center">
             <Logo />
           </Link>
           <p className="text-sm text-muted-foreground">{footer.tagline}</p>

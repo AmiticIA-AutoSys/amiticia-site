@@ -8,7 +8,7 @@ import { HomePage } from "./HomePage";
 
 const renderHome = () =>
   render(
-    <MemoryRouter initialEntries={["/br"]} future={routerFuture}>
+    <MemoryRouter initialEntries={["/"]} future={routerFuture}>
       <SitePageProvider market="br" page="home">
         <HomePage copy={brCopy.home} />
       </SitePageProvider>
@@ -20,9 +20,9 @@ describe("home products section", () => {
     renderHome();
     const section = screen.getByRole("region", { name: "Nossos produtos" });
     const links = within(section).getAllByRole("link");
-    expect(links.map((l) => l.getAttribute("href"))).toEqual(["/br/wahub", "/br/patricia"]);
-    expect(within(section).getByRole("link", { name: "Conhecer o WaHub" })).toHaveAttribute("href", "/br/wahub");
-    expect(within(section).getByRole("link", { name: "Conhecer a Patrícia" })).toHaveAttribute("href", "/br/patricia");
+    expect(links.map((l) => l.getAttribute("href"))).toEqual(["/wahub", "/patricia"]);
+    expect(within(section).getByRole("link", { name: "Conhecer o WaHub" })).toHaveAttribute("href", "/wahub");
+    expect(within(section).getByRole("link", { name: "Conhecer a Patrícia" })).toHaveAttribute("href", "/patricia");
   });
 });
 
