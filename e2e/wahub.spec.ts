@@ -123,6 +123,27 @@ test.describe("/br/wahub", () => {
     await expect.poll(() => pipeline.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
   });
 
+  test("the video section has no WhatsApp button until the video ends; then its end card does, alone on screen", async ({
+    page,
+    isMobile,
+  }) => {
+    await page.goto(brUrl("/wahub"), { waitUntil: "networkidle" });
+    const section = page.locator("section#video");
+    const videoCta = section.locator('a[data-placement="video"]');
+    await expect(section.locator('a[href^="https://wa.me/"]')).toHaveCount(0);
+
+    await section.locator("video").scrollIntoViewIfNeeded();
+    await section.locator("video").dispatchEvent("ended");
+    await expect(section.getByText("Quer isso no seu WhatsApp?")).toBeVisible();
+    await videoCta.scrollIntoViewIfNeeded();
+    await expect(videoCta).toBeInViewport({ ratio: 1 });
+    await expect(videoCta).toHaveAttribute("href", waHref("Olá! Vi o WaHub no site da AmiticIA e gostaria de saber mais."));
+    if (isMobile) await expect(page.locator('a[data-placement="sticky"]')).toBeHidden();
+
+    await section.getByRole("button", { name: "Ver de novo" }).click();
+    await expect(videoCta).toHaveCount(0);
+  });
+
   test("at 360 px the hero fits: nothing crosses the edge and the green button is in the first screen", async ({
     page,
     isMobile,

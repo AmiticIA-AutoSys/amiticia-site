@@ -159,6 +159,10 @@ export interface WahubCopy {
     caption: string;
     /** Accessible name of the video. */
     label: string;
+    /** End card shown over the video once it finishes: the question above the WhatsApp button. */
+    endTitle: string;
+    /** End card button that plays the video again. */
+    replay: string;
   } | null;
 }
 
