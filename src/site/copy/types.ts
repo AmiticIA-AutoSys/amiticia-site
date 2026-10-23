@@ -45,6 +45,8 @@ export interface CommonCopy {
   };
   /** Appended to the label of links that open in a new tab, for screen readers. */
   opensInNewTab: string;
+  /** "(indicação de {ref})": appended to the WhatsApp message when the page is opened with ?ref=. null: no suffix. */
+  referral: string | null;
 }
 
 export interface Step {
@@ -151,6 +153,13 @@ export interface WahubCopy {
     leads: string;
   };
   closing: ClosingCopy;
+  /** Demo video section right after the hero. null: the section does not render. */
+  video: {
+    title: string;
+    caption: string;
+    /** Accessible name of the video. */
+    label: string;
+  } | null;
 }
 
 export interface PatriciaCopy {

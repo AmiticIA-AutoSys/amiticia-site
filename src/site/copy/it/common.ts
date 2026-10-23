@@ -31,4 +31,5 @@ export const common: CommonCopy = {
     copyright: "© 2026 AmiticIA",
   },
   opensInNewTab: "(si apre in una nuova scheda)",
+  referral: null,
 };

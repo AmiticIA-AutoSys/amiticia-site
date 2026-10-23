@@ -87,4 +87,5 @@ export const wahub: WahubCopy = {
     body: "Scrivici un messaggio e te lo mostriamo in funzione con il tuo caso.",
     cta: "Parliamo di WaHub",
   },
+  video: null,
 };

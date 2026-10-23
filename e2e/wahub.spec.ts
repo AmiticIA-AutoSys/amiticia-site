@@ -1,8 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
-import { BR_HOST, brUrl, getAs } from "./fixtures";
+import { BR_HOST, IT_HOST, brUrl, getAs, waHref } from "./fixtures";
 
 /** Written out by hand: the suite is an independent oracle of the copy and of the hero demo. */
-const headings = ["Como funciona", "O que tem dentro", "Quer ver o WaHub atendendo o seu WhatsApp?"];
+const headings = ["Veja o WaHub atendendo, em 1min30", "Como funciona", "O que tem dentro", "Quer ver o WaHub atendendo o seu WhatsApp?"];
 const stepTitles = [
   "O cliente chama no WhatsApp da empresa",
   "O assistente de IA atende na hora",
@@ -41,6 +41,47 @@ test.describe("/br/wahub", () => {
       expect(html, text).toContain(text);
     }
     expect(html).not.toMatch(/desde|1\/10|Quanto custa/);
+  });
+
+  test("the demo video is in the raw HTML with its poster, and the file streams in ranges", async ({
+    request,
+    isMobile,
+  }) => {
+    test.skip(!isMobile, "HTML is viewport-independent: run once");
+    const html = await (await getAs(request, BR_HOST, "/wahub")).text();
+    expect(html).toMatch(/<video[^>]*\bcontrols\b/);
+    expect(html).not.toMatch(/<video[^>]*\bautoplay\b/);
+    expect(html).toMatch(/<video[^>]*poster="\/assets\/video-poster-720[^"]*\.webp"/);
+    expect(html).toContain('<source src="/media/wahub-demo-pt-v1.mp4" type="video/mp4"');
+    expect(html).toContain("Empresa fictícia. As telas e as respostas do assistente de IA são reais; a narração usa voz sintética.");
+
+    const range = await getAs(request, BR_HOST, "/media/wahub-demo-pt-v1.mp4", { headers: { Range: "bytes=0-99" } });
+    expect(range.status()).toBe(206);
+    expect(range.headers()["content-type"]).toContain("video/mp4");
+    expect(range.headers()["content-range"]).toMatch(/^bytes 0-99\/15076484$/);
+    expect((await range.body()).length).toBe(100);
+  });
+
+  test("the Italian WaHub page has no video", async ({ request, isMobile }) => {
+    test.skip(!isMobile, "HTML is viewport-independent: run once");
+    const html = await (await getAs(request, IT_HOST, "/it/wahub")).text();
+    expect(html).not.toContain("<video");
+    expect(html).not.toContain("1min30");
+  });
+
+  test("?ref=magno puts the partner in every WhatsApp button, and nothing without it", async ({ page }) => {
+    const plain = waHref("Olá! Vi o WaHub no site da AmiticIA e gostaria de saber mais.");
+    await page.goto(brUrl("/wahub"), { waitUntil: "networkidle" });
+    expect(await page.locator('a[href^="https://wa.me/"]').evaluateAll((as) => as.map((a) => a.getAttribute("href")))).toEqual(
+      expect.arrayContaining([plain]),
+    );
+    await page.goto(brUrl("/wahub?ref=magno"), { waitUntil: "networkidle" });
+    const referred = waHref("Olá! Vi o WaHub no site da AmiticIA e gostaria de saber mais. (indicação de Magno)");
+    await expect(page.locator('a[data-placement="hero"]')).toHaveAttribute("href", referred);
+    expect(referred).toContain("indica%C3%A7%C3%A3o%20de%20Magno");
+    const hrefs = await page.locator('a[href^="https://wa.me/"]').evaluateAll((as) => as.map((a) => a.getAttribute("href")));
+    expect(hrefs.length).toBeGreaterThanOrEqual(4);
+    expect(new Set(hrefs)).toEqual(new Set([referred]));
   });
 
   test("with reduced motion the lead card is visible at once", async ({ page }) => {
