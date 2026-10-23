@@ -4,12 +4,12 @@ import { useSitePage } from "./page-context";
 import { WhatsAppButton } from "./WhatsAppButton";
 
 /** In-page WhatsApp buttons that make the sticky bar redundant while fully on screen. */
-const PAGE_CTAS = 'a[data-placement="hero"], a[data-placement="cta"]';
+const PAGE_CTAS = 'a[data-placement="hero"], a[data-placement="cta"], a[data-placement="video"]';
 
 /**
  * Mobile only (< md): a full-width WhatsApp button pinned to the bottom, safe-area aware.
  * SiteLayout reserves its height at the end of the page so it never covers content.
- * It steps aside while the hero or closing button is fully visible, so the two never stack;
+ * It steps aside while the hero, closing or video end-card button is fully visible, so the two never stack;
  * without JS (or IntersectionObserver) it simply stays.
  */
 export const StickyWhatsAppBar = () => {
@@ -18,8 +18,6 @@ export const StickyWhatsAppBar = () => {
 
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined") return;
-    const targets = Array.from(document.querySelectorAll(PAGE_CTAS));
-    if (targets.length === 0) return;
     const onScreen = new Set<Element>();
     const io = new IntersectionObserver(
       (entries) => {
@@ -31,8 +29,19 @@ export const StickyWhatsAppBar = () => {
       },
       { threshold: [0, 0.99, 1] },
     );
-    targets.forEach((t) => io.observe(t));
-    return () => io.disconnect();
+    // Buttons can mount later (the video's end card), and leave: watch the DOM for both.
+    const sync = () => {
+      document.querySelectorAll(PAGE_CTAS).forEach((t) => io.observe(t));
+      for (const t of onScreen) if (!t.isConnected) onScreen.delete(t);
+      setHidden(onScreen.size > 0);
+    };
+    sync();
+    const mo = new MutationObserver(sync);
+    mo.observe(document.body, { childList: true, subtree: true });
+    return () => {
+      mo.disconnect();
+      io.disconnect();
+    };
   }, [page]);
 
   return (

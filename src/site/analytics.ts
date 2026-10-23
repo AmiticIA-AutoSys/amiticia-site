@@ -21,7 +21,7 @@ declare global {
   }
 }
 
-export type WhatsAppPlacement = "header" | "menu" | "hero" | "sticky" | "cta" | "card";
+export type WhatsAppPlacement = "header" | "menu" | "hero" | "sticky" | "cta" | "card" | "video";
 
 export interface WhatsAppClick {
   market: MarketId;

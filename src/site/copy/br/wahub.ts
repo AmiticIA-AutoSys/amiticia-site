@@ -90,5 +90,7 @@ export const wahub: WahubCopy = {
     title: "Veja o WaHub atendendo, em 1min30",
     caption: "Empresa fictícia. As telas e as respostas do assistente de IA são reais; a narração usa voz sintética.",
     label: "Vídeo: o WaHub atendendo um cliente no WhatsApp, 1min30",
+    endTitle: "Quer isso no seu WhatsApp?",
+    replay: "Ver de novo",
   },
 };

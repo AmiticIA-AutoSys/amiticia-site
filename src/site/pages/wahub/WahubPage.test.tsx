@@ -1,6 +1,6 @@
 import { routerFuture } from "../../router-future";
-import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { brCopy } from "../../copy/br";
 import { itCopy } from "../../copy/it";
@@ -64,7 +64,31 @@ describe("WaHub demo video", () => {
     expect(video?.querySelector("source")).toHaveAttribute("type", "video/mp4");
     const section = container.querySelector("section#video");
     expect(section?.previousElementSibling?.querySelector("h1")).not.toBeNull();
-    expect(section?.querySelector('a[data-placement="cta"]')).toHaveTextContent("Falar sobre o WaHub");
+    expect(section?.querySelector('a[href^="https://wa.me/"]')).toBeNull();
+  });
+
+  it("offers WhatsApp only once the video ends, and 'Ver de novo' restarts it", () => {
+    const play = vi.spyOn(HTMLMediaElement.prototype, "play").mockResolvedValue(undefined);
+    const { container } = renderWahub(brCopy.wahub);
+    const video = container.querySelector("video")!;
+    const section = container.querySelector("section#video")!;
+
+    fireEvent.ended(video);
+    expect(screen.getByText("Quer isso no seu WhatsApp?")).toBeInTheDocument();
+    const cta = section.querySelector('a[data-placement="video"]');
+    expect(cta).toHaveTextContent("Falar sobre o WaHub");
+    expect(cta?.getAttribute("href")).toMatch(/^https:\/\/wa\.me\//);
+
+    video.currentTime = 93;
+    fireEvent.click(screen.getByRole("button", { name: "Ver de novo" }));
+    expect(video.currentTime).toBe(0);
+    expect(play).toHaveBeenCalledOnce();
+    expect(screen.queryByText("Quer isso no seu WhatsApp?")).not.toBeInTheDocument();
+
+    fireEvent.ended(video);
+    fireEvent.play(video);
+    expect(screen.queryByText("Quer isso no seu WhatsApp?")).not.toBeInTheDocument();
+    play.mockRestore();
   });
 
   it("renders no video section while the market has none", () => {
