@@ -1,8 +1,9 @@
-import { createContext, useContext, useMemo, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { MarketId } from "../markets";
 import type { MarketCopy, PageId } from "../copy/types";
 import { copyFor } from "../copy";
 import { whatsappHrefFor } from "../whatsapp";
+import { fillReferral } from "../referral";
 
 export interface SitePage {
   market: MarketId;
@@ -29,6 +30,11 @@ export const SitePageProvider = ({
   path?: string;
   children: ReactNode;
 }) => {
+  // Read after mount, so the prerendered HTML and the first client render stay identical.
+  const [ref, setRef] = useState<string | null>(null);
+  useEffect(() => {
+    setRef(new URLSearchParams(window.location.search).get("ref"));
+  }, []);
   const value = useMemo<SitePage>(() => {
     const copy = copyFor(market);
     return {
@@ -36,10 +42,10 @@ export const SitePageProvider = ({
       page,
       path,
       copy,
-      whatsappHref: whatsappHrefFor(market, page),
+      whatsappHref: whatsappHrefFor(market, page, fillReferral(copy.common.referral, ref)),
       stickyCta: copy[page].stickyCta,
     };
-  }, [market, page, path]);
+  }, [market, page, path, ref]);
   return <SitePageContext.Provider value={value}>{children}</SitePageContext.Provider>;
 };
 

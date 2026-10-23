@@ -1,6 +1,7 @@
 import type { WahubCopy } from "../../copy/types";
 import { useSitePage } from "../../layout/page-context";
 import { WahubHero } from "./sections/WahubHero";
+import { WahubVideo } from "./sections/WahubVideo";
 import { WahubHowItWorks } from "./sections/WahubHowItWorks";
 import { WahubFeatures } from "./sections/WahubFeatures";
 import { WahubPricing } from "./sections/WahubPricing";
@@ -12,6 +13,7 @@ export const WahubPage = ({ copy: injected }: { copy?: WahubCopy }) => {
   return (
     <>
       <WahubHero copy={copy} />
+      {copy.video && <WahubVideo copy={copy.video} cta={copy.hero.primaryCta} />}
       <WahubHowItWorks copy={copy.howItWorks} />
       <WahubFeatures market={market} copy={copy.features} alts={copy.screenshots} />
       <WahubPricing copy={copy} />
