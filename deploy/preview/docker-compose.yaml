@@ -23,7 +23,7 @@
 # and `down` removes every trace. The link is public to anyone holding the URL: it is
 # unguessable but not a secret, and the pages are noindex.
 #
-# Image tag: cloudflared 2026.10.0 is the latest stable release at the time of writing
+# Image tag: cloudflared 2026.10.3 — eMudhra cert compromise (CF advisory 2026-10-20); <2026.10.2 still trusts the weak intermediates
 # (Docker Hub, same digest as :latest on 2026-10-13). Pinned so the preview does not change
 # behaviour under us; bump it deliberately.
 name: amiticia-site-preview
@@ -38,7 +38,7 @@ services:
       - ./nginx.preview.conf:/etc/nginx/conf.d/default.conf:ro
 
   tunnel:
-    image: cloudflare/cloudflared:2026.10.0
+    image: cloudflare/cloudflared:2026.10.3
     restart: unless-stopped
     mem_limit: 128m
     command: tunnel --no-autoupdate --url http://web:3000
