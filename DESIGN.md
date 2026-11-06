@@ -86,8 +86,9 @@ Real WaHub screenshots and coded illustrations carry that story; decoration neve
    and steps aside while a hero or closing WhatsApp button is fully visible.
 7. **Contrast AA** at minimum: body text uses `--muted-foreground`, never lighter grays on
    `--background`. Visible focus ring: 2 px `--focus-ring`, 2 px offset.
-8. **Truth.** No client logos, testimonials, usage numbers or team photos. Product visuals are
-   either real screenshots (fictitious demo data) or illustrations clearly built in code.
+8. **Truth.** No client logos, testimonials, usage numbers or team photos; the one exception is
+   the portrait under Imagery, approved by the product owner. Product visuals are either real
+   screenshots (fictitious demo data) or illustrations clearly built in code.
 9. **Performance.** One font file family (variable, latin), WebP images with `srcset` and
    `loading="lazy"` below the fold, no third-party requests at runtime.
 
@@ -119,3 +120,6 @@ project (Tailwind v3, `motion/react`, no Next.js APIs). Keep each file's attribu
   company-level sections.
 - Saiu no DOU home card: a search drawn in code (`src/site/pages/home/demo.ts`), invented organ,
   titles and dates; no real company, person or case number.
+- André's portrait, Brazilian "Quem somos" only (`src/site/assets/andre-*.webp`): cropped and resized,
+  never retouched or filtered, in the highlight tiles' card. The caption is his name alone: no job
+  title, never owner or founder.

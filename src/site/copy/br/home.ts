@@ -87,6 +87,7 @@ export const home: HomeCopy = {
       { value: "IA desde 2006", label: "antes do hype" },
       { value: "HPC", label: "computação científica de alto desempenho" },
     ],
+    photo: { alt: "Foto de André", caption: "André" },
   },
   audience: {
     title: "Para quem é",

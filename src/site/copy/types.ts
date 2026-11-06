@@ -111,6 +111,8 @@ export interface HomeCopy {
     lead: string;
     body: string;
     highlights: Array<{ value: string; label: string }>;
+    /** Set: a portrait joins the highlights. Not set: the highlights stand alone. */
+    photo?: { alt: string; caption: string };
   };
   audience: {
     title: string;

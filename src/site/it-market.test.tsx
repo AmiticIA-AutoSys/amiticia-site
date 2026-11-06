@@ -101,3 +101,16 @@ describe("Brazilian links carry no /br prefix", () => {
     });
   }
 });
+
+describe("the Quem somos photo is Brazilian only", () => {
+  it.each(["/it", "/it/wahub"])("%s has no photo", (path) => {
+    const { container } = renderAt(path);
+    expect(container.querySelector("#quem-somos img, #quem-somos figure")).toBeNull();
+    expect(container.innerHTML).not.toContain("andre-");
+    expect(container.textContent).not.toContain("André");
+  });
+
+  it("has no photo in its copy", () => {
+    expect(itCopy.home.about.photo).toBeUndefined();
+  });
+});

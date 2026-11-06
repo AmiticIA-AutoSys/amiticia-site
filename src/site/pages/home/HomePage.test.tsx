@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { routerFuture } from "../../router-future";
 import { describe, expect, it } from "vitest";
 import { fireEvent, render, screen, within } from "@testing-library/react";
@@ -161,5 +162,48 @@ describe("the retired product", () => {
     );
     expect(container.textContent).not.toMatch(/patr[ií]cia/i);
     expect(container.innerHTML).not.toMatch(/patr[ií]cia/i);
+  });
+});
+
+describe("home Quem somos photo", () => {
+  const about = () => document.getElementById("quem-somos") as HTMLElement;
+  const photo = () => within(about()).getByRole("img", { name: "Foto de André" });
+
+  it("shows André's photo, captioned with his name and nothing else", () => {
+    renderHome();
+    expect(photo().closest("figure")?.querySelector("figcaption")?.textContent).toBe("André");
+  });
+
+  it("describes him as neither founder nor owner", () => {
+    renderHome();
+    expect(about().textContent).not.toMatch(/fundador|fundou|founder|dono|propriet|s[oó]cio|CEO/i);
+  });
+
+  it("reserves its space, loads lazily and offers both sizes", () => {
+    renderHome();
+    expect(photo()).toHaveAttribute("width", "540");
+    expect(photo()).toHaveAttribute("height", "675");
+    expect(photo()).toHaveAttribute("loading", "lazy");
+    expect(photo().getAttribute("srcset")).toMatch(/270w.*540w/);
+    expect(photo().getAttribute("sizes")).toBeTruthy();
+  });
+
+  it("shares the highlight tiles' card: same radius, border and surface", () => {
+    renderHome();
+    const card = photo().closest("li") as HTMLElement;
+    const tile = within(about()).getByText("antes do hype").closest("li") as HTMLElement;
+    for (const name of ["rounded-[20px]", "border", "border-border", "bg-surface"]) {
+      expect(card).toHaveClass(name);
+      expect(tile).toHaveClass(name);
+    }
+  });
+
+  it.each(["andre-270.webp", "andre-540.webp"])("%s is a small WebP with no metadata", (name) => {
+    const bytes = readFileSync(`src/site/assets/${name}`);
+    expect(bytes.subarray(0, 4).toString("latin1")).toBe("RIFF");
+    expect(bytes.subarray(8, 12).toString("latin1")).toBe("WEBP");
+    expect(bytes.includes("EXIF")).toBe(false);
+    expect(bytes.includes("XMP ")).toBe(false);
+    expect(bytes.length).toBeLessThanOrEqual(60 * 1024);
   });
 });

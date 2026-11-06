@@ -243,3 +243,76 @@ test.describe("the first step of how we work", () => {
     }
   });
 });
+
+test.describe("André's photo in Quem somos", () => {
+  const photo = (page: Page) => page.locator("#quem-somos").getByRole("img", { name: "Foto de André" });
+
+  test("is in the prerendered Brazilian HTML, captioned only with his name, its size reserved", async ({ request, isMobile }) => {
+    test.skip(!isMobile, "HTML is viewport-independent: run once");
+    const home = await (await getAs(request, BR_HOST, "/")).text();
+    const img = home.match(/<img[^>]*alt="Foto de André"[^>]*>/)?.[0] ?? "";
+    expect(img).toContain('width="540"');
+    expect(img).toContain('height="675"');
+    expect(img).toContain('loading="lazy"');
+    expect(home).toMatch(/<figcaption[^>]*>André<\/figcaption>/);
+  });
+
+  test("loads as a real image with its caption", async ({ page }) => {
+    await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+    await photo(page).scrollIntoViewIfNeeded();
+    await expect(photo(page)).toBeVisible();
+    await expect
+      .poll(() => photo(page).evaluate((img: HTMLImageElement) => (img.complete ? img.naturalWidth : 0)))
+      .toBeGreaterThan(0);
+    await expect(page.locator("#quem-somos figcaption")).toHaveText("André");
+  });
+
+  test("on desktop sits below the first tile, to the left of the other two", async ({ page, isMobile }) => {
+    test.skip(isMobile, "two columns from sm up");
+    const tile = (text: string) => page.locator("#quem-somos li").filter({ hasText: text }).boundingBox();
+    const boxes = () => Promise.all(["André", "desenvolvendo software", "antes do hype", "alto desempenho"].map(tile));
+    for (const width of [1280, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+      await page.locator("#quem-somos").scrollIntoViewIfNeeded();
+      // Wait for the reveal to settle: a tile mid-reveal is still shifted down.
+      let last = "";
+      await expect
+        .poll(async () => {
+          const now = JSON.stringify(await boxes());
+          const stable = now === last;
+          last = now;
+          return stable;
+        })
+        .toBe(true);
+      const [card, first, second, third] = JSON.parse(last) as Array<{ x: number; y: number; width: number; height: number }>;
+      expect(card.y).toBeGreaterThanOrEqual(first.y + first.height);
+      expect(card.x + card.width).toBeLessThanOrEqual(second.x);
+      expect(Math.abs(card.y - second.y)).toBeLessThanOrEqual(1);
+      expect(Math.abs(card.y + card.height - (third.y + third.height))).toBeLessThanOrEqual(1);
+    }
+  });
+
+  test("on a phone stacks first, inside the viewport, with no horizontal scroll", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "one column below sm");
+    for (const width of [360, 390]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+      const card = page.locator("#quem-somos li").first();
+      await expect(card.getByRole("img", { name: "Foto de André" })).toHaveCount(1);
+      await card.scrollIntoViewIfNeeded();
+      const box = await card.boundingBox();
+      expect(box!.x).toBeGreaterThanOrEqual(0);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    }
+  });
+
+  test("Italy has no photo", async ({ page }) => {
+    for (const path of ["/it", "/it/wahub"]) {
+      await page.goto(itUrl(path), { waitUntil: "networkidle" });
+      await expect(page.locator("#quem-somos img, #quem-somos figure")).toHaveCount(0);
+      expect(await page.content()).not.toContain("andre-");
+    }
+  });
+});
