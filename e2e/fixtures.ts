@@ -1,7 +1,7 @@
 import type { APIRequestContext } from "@playwright/test";
 
 /** Expected values, written out by hand so the E2E suite is an independent oracle of the copy. */
-export const BR_NUMBER = "5531986983745";
+export const BR_NUMBER = "5531988963436";
 export const IT_NUMBER = "393926044070";
 
 /** The two production hostnames. The suite reaches both on the one container (see playwright.config.ts). */

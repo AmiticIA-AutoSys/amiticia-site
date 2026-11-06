@@ -30,7 +30,7 @@ export const markets: Record<MarketId, Market> = {
     origin: "https://amiticia.com.br",
     basePath: "",
     label: "Português",
-    whatsappNumber: "5531986983745",
+    whatsappNumber: "5531988963436",
     live: true,
   },
   it: {
