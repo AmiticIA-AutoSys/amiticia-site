@@ -10,7 +10,6 @@ import { SitePageProvider } from "./layout/page-context";
 import { SiteLayout } from "./layout/SiteLayout";
 import { HomePage } from "./pages/home/HomePage";
 import { WahubPage } from "./pages/wahub/WahubPage";
-import { PatriciaPage } from "./pages/patricia/PatriciaPage";
 import { UnavailablePage } from "./pages/unavailable/UnavailablePage";
 
 export interface SiteRoute {
@@ -24,7 +23,6 @@ export interface SiteRoute {
 const pageComponents: Record<Exclude<PageId, "unavailable">, ComponentType> = {
   home: HomePage,
   wahub: WahubPage,
-  patricia: PatriciaPage,
 };
 
 const metaOf = (market: MarketId, page: PageId, path: string, product?: ProductId): PageMeta => {

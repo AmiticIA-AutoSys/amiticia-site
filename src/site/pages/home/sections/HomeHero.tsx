@@ -41,7 +41,7 @@ export const HomeHero = ({ market, copy }: { market: MarketId; copy: HomeCopy["h
       className="pointer-events-none absolute right-[-10%] top-[20%] hidden h-[520px] w-[620px] rounded-full opacity-60 blur-3xl lg:block"
       style={{
         background:
-          "radial-gradient(closest-side, hsl(var(--wahub) / 0.16), hsl(var(--patricia) / 0.06) 60%, transparent)",
+          "radial-gradient(closest-side, hsl(var(--wahub) / 0.16), hsl(var(--wahub-2) / 0.06) 60%, transparent)",
       }}
     />
     <TextureOverlay

@@ -12,13 +12,11 @@ test.describe("Cache-Control", () => {
     [BR_HOST, "/"],
     [BR_HOST, "/wahub"],
     [BR_HOST, "/wahub/"],
-    [BR_HOST, "/patricia"],
     [BR_HOST, "/index.html"],
     [BR_HOST, "/some/spa/route"],
     [IT_HOST, "/it"],
     [IT_HOST, "/it/"],
     [IT_HOST, "/it/wahub"],
-    [IT_HOST, "/it/patricia"],
     [IT_HOST, "/index.html"],
     [IT_HOST, "/some/spa/route"],
   ];
@@ -43,7 +41,7 @@ test.describe("Cache-Control", () => {
     }
   });
 
-  for (const url of ["/og/br-home.jpg", "/og/br-wahub.jpg", "/og/br-patricia.jpg", "/og/it-home.jpg", "/og/it-wahub.jpg", "/robots.txt", "/og-image.png"]) {
+  for (const url of ["/og/br-home.jpg", "/og/br-wahub.jpg", "/og/it-home.jpg", "/og/it-wahub.jpg", "/robots.txt", "/og-image.png"]) {
     for (const host of [BR_HOST, IT_HOST]) {
       test(`${host}${url} is cached for an hour`, async ({ request }) => {
         const res = await getAs(request, host, url);
@@ -54,7 +52,7 @@ test.describe("Cache-Control", () => {
   }
 
   test("share images are JPEGs that WhatsApp accepts (<= 180 KB)", async ({ request }) => {
-    for (const name of ["br-home", "br-wahub", "br-patricia"]) {
+    for (const name of ["br-home", "br-wahub"]) {
       const res = await request.get(`/og/${name}.jpg`);
       expect(res.headers()["content-type"]).toBe("image/jpeg");
       expect((await res.body()).length).toBeLessThanOrEqual(180 * 1024);

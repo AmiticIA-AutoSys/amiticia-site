@@ -27,14 +27,13 @@ export const home: HomeCopy = {
         body: "Um assistente de IA atende cada contato na hora, descobre o que a pessoa quer e entrega o lead organizado para o seu time vender.",
         cta: "Conhecer o WaHub",
       },
-      {
-        productId: "patricia",
-        name: "Patrícia",
-        title: "A primeira conversa, organizada para o advogado",
-        body: "A assistente de IA para escritórios de Direito de Família. Acolhe o cliente no WhatsApp e entrega o caso organizado ao advogado.",
-        cta: "Conhecer a Patrícia",
-      },
     ],
+    secondary: {
+      name: "Saiu no DOU",
+      text: "Busca pública e gratuita no Diário Oficial da União.",
+      linkLabel: "saiunodou.com.br",
+      href: "https://saiunodou.com.br",
+    },
   },
   benefits: {
     title: "O que você ganha",

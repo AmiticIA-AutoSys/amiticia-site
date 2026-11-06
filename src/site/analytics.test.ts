@@ -41,7 +41,7 @@ describe("analytics", () => {
     document.head.appendChild(script);
 
     trackPageview();
-    trackWhatsAppClick({ market: "br", page: "patricia", placement: "sticky" });
+    trackWhatsAppClick({ market: "br", page: "wahub", placement: "sticky" });
 
     const track = installUmami();
     expect(track).not.toHaveBeenCalled();
@@ -51,7 +51,7 @@ describe("analytics", () => {
     expect(track.mock.calls[0][0]).toBeTypeOf("function");
     expect(track.mock.calls[1]).toEqual([
       "whatsapp-click",
-      { market: "br", page: "patricia", placement: "sticky" },
+      { market: "br", page: "wahub", placement: "sticky" },
     ]);
   });
 

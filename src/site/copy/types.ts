@@ -2,7 +2,7 @@
  * Typed shape of the copy of one market. Each page has its own file per market
  * (copy/<market>/<page>.ts) so page work never collides; this file is the contract.
  */
-export type PageId = "home" | "wahub" | "patricia" | "unavailable";
+export type PageId = "home" | "wahub" | "unavailable";
 
 export interface MetaCopy {
   title: string;
@@ -76,12 +76,19 @@ export interface HomeCopy {
   products: {
     title: string;
     cards: Array<{
-      productId: "wahub" | "patricia";
+      productId: "wahub";
       name: string;
       title: string;
       body: string;
       cta: string;
     }>;
+    /** One quiet row under the cards: a product of ours that lives on its own site. Not set: nothing renders. */
+    secondary?: {
+      name: string;
+      text: string;
+      linkLabel: string;
+      href: string;
+    };
   };
   benefits: {
     title: string;
@@ -166,35 +173,9 @@ export interface WahubCopy {
   } | null;
 }
 
-export interface PatriciaCopy {
-  meta: MetaCopy;
-  whatsappMessage: string;
-  stickyCta: string;
-  hero: {
-    eyebrow: string;
-    title: string;
-    lead: string;
-    primaryCta: string;
-  };
-  problem: {
-    title: string;
-    items: string[];
-  };
-  howItWorks: {
-    title: string;
-    steps: Step[];
-    risk: Step;
-  };
-  never: {
-    title: string;
-    body: string;
-  };
-  closing: ClosingCopy;
-}
-
 /**
  * The page a market shows at a product's path when the product is not sold there
- * (e.g. /it/patricia). `{product}` in any string is replaced by the product's name.
+ * (no route needs it today). `{product}` in any string is replaced by the product's name.
  */
 export interface UnavailableCopy {
   meta: MetaCopy;
@@ -211,7 +192,5 @@ export interface MarketCopy {
   common: CommonCopy;
   home: HomeCopy;
   wahub: WahubCopy;
-  /** Only in markets that sell Patrícia (products.ts). */
-  patricia?: PatriciaCopy;
   unavailable: UnavailableCopy;
 }

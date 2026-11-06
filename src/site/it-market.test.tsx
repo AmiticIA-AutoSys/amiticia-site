@@ -26,6 +26,12 @@ describe("/it home", () => {
     expect(screen.queryByText(/Patrícia/)).toBeNull();
   });
 
+  it("does not show Saiu no DOU, which is a Brazilian product", () => {
+    const { container } = renderAt("/it");
+    expect(container.textContent).not.toContain("Saiu no DOU");
+    expect(screen.getAllByRole("link").map((a) => a.getAttribute("href"))).not.toContain("https://saiunodou.com.br");
+  });
+
   it("sends every WhatsApp button to the Italian number", () => {
     renderAt("/it");
     const links = waLinks();
@@ -62,23 +68,15 @@ describe("/it/wahub", () => {
   });
 });
 
-describe("/it/patricia", () => {
-  it("says Patrícia is not available in Italy and links to the /it home", () => {
-    renderAt("/it/patricia");
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Patrícia non è ancora disponibile in Italia");
-    expect(screen.getByRole("link", { name: "Vai alla home" })).toHaveAttribute("href", "/it");
-  });
-});
-
 describe("Brazilian pages", () => {
   it("offer Italiano, which opens the same page on amiticia.cc/it", () => {
-    renderAt("/patricia");
-    expect(screen.getByRole("link", { name: "Italiano" })).toHaveAttribute("href", "https://amiticia.cc/it/patricia");
+    renderAt("/wahub");
+    expect(screen.getByRole("link", { name: "Italiano" })).toHaveAttribute("href", "https://amiticia.cc/it/wahub");
   });
 });
 
 describe("Brazilian links carry no /br prefix", () => {
-  for (const path of ["/", "/wahub", "/patricia"]) {
+  for (const path of ["/", "/wahub"]) {
     it(`${path}: no link points at a /br path; menu and anchors use clean paths`, () => {
       renderAt(path);
       const hrefs = screen.getAllByRole("link").map((a) => a.getAttribute("href") ?? "");

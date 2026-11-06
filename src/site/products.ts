@@ -1,7 +1,7 @@
 import type { MarketId } from "./markets";
 import { markets, productPath as marketProductPath } from "./markets";
 
-export type ProductId = "wahub" | "patricia";
+export type ProductId = "wahub";
 
 export interface Product {
   id: ProductId;
@@ -18,11 +18,6 @@ export const products: Record<ProductId, Product> = {
     name: "WaHub",
     markets: ["br", "it"],
     loginUrl: "https://wahub.amiticia.cc",
-  },
-  patricia: {
-    id: "patricia",
-    name: "Patrícia",
-    markets: ["br"],
   },
 };
 

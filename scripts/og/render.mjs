@@ -7,10 +7,9 @@ import path from "node:path";
 import { chromium } from "@playwright/test";
 import { home as brHome } from "../../src/site/copy/br/home.ts";
 import { wahub as brWahub } from "../../src/site/copy/br/wahub.ts";
-import { patricia as brPatricia } from "../../src/site/copy/br/patricia.ts";
 import { home as itHome } from "../../src/site/copy/it/home.ts";
 import { wahub as itWahub } from "../../src/site/copy/it/wahub.ts";
-import { homeTemplate, wahubTemplate, patriciaTemplate } from "./templates.mjs";
+import { homeTemplate, wahubTemplate } from "./templates.mjs";
 
 const root = process.cwd();
 const outDir = path.join(root, "public", "og");
@@ -25,9 +24,9 @@ const assets = {
 };
 const brShotUrl = await dataUrl("src/site/assets/wahub/inbox-1024.webp", "image/webp");
 const itShotUrl = await dataUrl("src/site/assets/wahub/it/inbox-1024.webp", "image/webp");
-const chip = { wahub: { name: "WaHub", tint: "#6E6CF5" }, patricia: { name: "Patrícia", tint: "#F2A477" } };
+const chip = { wahub: { name: "WaHub", tint: "#6E6CF5" } };
 
-// One image per page that has its own share image (/it/patricia, not sold in Italy, shares it-home).
+// One image per page that has its own share image.
 const pages = [
   {
     file: "br-home.jpg",
@@ -36,16 +35,12 @@ const pages = [
       lang: "pt-BR",
       h1: brHome.hero.title,
       eyebrow: brHome.hero.leadHighlight,
-      chips: [chip.wahub, chip.patricia],
+      chips: [chip.wahub],
     }),
   },
   {
     file: "br-wahub.jpg",
     html: wahubTemplate({ ...assets, lang: "pt-BR", shotUrl: brShotUrl, h1: brWahub.hero.title, eyebrow: brWahub.hero.eyebrow }),
-  },
-  {
-    file: "br-patricia.jpg",
-    html: patriciaTemplate({ ...assets, lang: "pt-BR", h1: brPatricia.hero.title, eyebrow: brPatricia.hero.eyebrow }),
   },
   {
     file: "it-home.jpg",

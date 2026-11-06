@@ -3,16 +3,13 @@ import { useReducedMotion } from "motion/react";
 import {
   ArrowRight,
   BadgeCheck,
-  CheckCheck,
-  FileText,
   UserCheck,
 } from "lucide-react";
 import { LiveChat } from "@/components/kit/originkit/live-chat";
 import { SquigglyArrow } from "@/components/kit/cult/squiggle-arrow";
 import { cn } from "@/lib/utils";
 import type { MarketId } from "../../../markets";
-import { productsFor } from "../../../products";
-import { patriciaDemo, productTint, wahubDemoFor } from "../demo";
+import { productTint, wahubDemoFor } from "../demo";
 
 /*
  * Staging: items marked data-at="1|2|3" appear when the root carries the class s1/s2/s3.
@@ -88,10 +85,8 @@ const cardClass =
   "relative rounded-[20px] border border-border bg-surface-raised/95 shadow-[var(--hairline),0_24px_60px_-28px_rgba(0,0,0,0.8)] backdrop-blur";
 
 /**
- * "A conversa que vira negócio" in miniature: two flows, each message → result.
- * WaHub: a WhatsApp exchange with Ricardo becomes a qualified lead; Patrícia: one client
- * message becomes an organized case. A market that does not sell Patrícia (/it) shows only the
- * WaHub flow. Decorative: aria-hidden, built in code (DESIGN.md rule 8).
+ * "A conversa que vira negócio" in miniature: a WhatsApp exchange with Ricardo becomes a
+ * qualified lead in WaHub. Decorative: aria-hidden, built in code (DESIGN.md rule 8).
  */
 export const HeroIllustration = ({
   market,
@@ -101,7 +96,6 @@ export const HeroIllustration = ({
   className?: string;
 }) => {
   const wahubDemo = wahubDemoFor(market);
-  const withPatricia = productsFor(market).some((p) => p.id === "patricia");
   const reduce = useReducedMotion();
   const [chatDone, setChatDone] = useState(false);
   const [step, setStep] = useState(0);
@@ -200,60 +194,6 @@ export const HeroIllustration = ({
           </div>
         </div>
       </div>
-
-      {withPatricia && (
-        <>
-          <SquigglyArrow
-            width={96}
-            height={48}
-            strokeWidth={2}
-            direction="right"
-            variant="smooth"
-            className="absolute bottom-[64px] left-[2%] hidden rotate-[18deg] text-patricia opacity-80 lg:block"
-          />
-
-          {/* Flow 2 — Patrícia: one client message → organized case */}
-          <div data-at="2" className="relative mt-5 w-[84%] sm:w-[72%]">
-            <div className={cn(cardClass, "px-3 py-3")}>
-              <div className="flex items-start gap-2.5">
-                <span
-                  className="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold text-background"
-                  style={{ background: productTint.patricia.gradient }}
-                >
-                  C
-                </span>
-                <div className="max-w-full rounded-2xl rounded-tl-sm bg-surface px-3.5 py-2 text-[13px] leading-snug text-foreground/95">
-                  {patriciaDemo.message}
-                  <span className="mt-0.5 flex items-center justify-end gap-1 text-[10px] text-[hsl(225_30%_80%)]">
-                    {patriciaDemo.time}
-                    <CheckCheck className="h-3 w-3" />
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            data-at="3"
-            className="relative z-10 -mt-2 ml-auto w-[86%] sm:w-[70%]"
-          >
-            <div className={cn(cardClass, "p-4")}>
-              <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 text-[13px] font-bold">
-                  <FileText className="h-4 w-4 text-patricia" />
-                  {patriciaDemo.case.title}
-                </span>
-                <Tag product="patricia">Patrícia</Tag>
-              </div>
-              <div className="mt-2.5 space-y-1">
-                {patriciaDemo.case.fields.slice(0, 3).map(([label, value]) => (
-                  <Field key={label} label={label} value={value} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 };

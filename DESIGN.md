@@ -20,7 +20,7 @@ colors:
   # products
   wahub: "243 85% 68%"            # indigo of the WaHub app (#6E6CF5)
   wahub-2: "268 75% 62%"          # violet end of the WaHub bubble gradient
-  patricia: "22 85% 70%"          # warm peach (#F2A477) — human, calm
+  patricia: "22 85% 70%"          # warm peach (#F2A477) — retired product, no market page uses it
   # actions
   whatsapp: "142 70% 49%"         # #25D366 — ONLY for WhatsApp actions
   whatsapp-foreground: "150 80% 6%" # #031A0D dark text on green (contrast ~9:1)
@@ -62,7 +62,7 @@ often mid-conversation. The page must look like a real company with real product
 screen, then let them reach WhatsApp in one tap. Not neon, not "AI hype": product first.
 
 **Concept: "a conversa que vira negócio".** Every page tells the same visual story — a WhatsApp
-conversation turns into organized work (a lead in the funnel, a case briefing for the lawyer).
+conversation turns into organized work (a lead in the funnel).
 Real WaHub screenshots and coded illustrations carry that story; decoration never competes with it.
 
 ## Rules (non-negotiable)
@@ -99,11 +99,11 @@ Real WaHub screenshots and coded illustrations carry that story; decoration neve
 | Sticky WhatsApp bar | mobile only (`< md`), full-width green button, safe-area aware | own |
 | Eyebrow | small uppercase label with a gradient dot | own |
 | Product card | home: big clickable card, product-tinted glow, mini preview, "Conhecer →" | own + OriginKit `glow-border` |
+| Secondary product row | home, below the cards: one neutral text row that links out to a product's own site, no glow or preview | own |
 | Phone + chat | WaHub hero: WhatsApp-style chat that types, then a lead card pops out | Cult `apple-iphone-17-pro` + OriginKit `live-chat` (restyled to WhatsApp) |
 | Browser window + tabs | WaHub screenshots: Conversas / Funil / Leads | Cult `mock-browser-window` + `direction-aware-tabs` |
 | Bento grid | WaHub "O que tem dentro": cards of varied size, some with screenshot crops | own |
 | Steps | "Como funciona": 3 numbered steps joined by a line | own |
-| Briefing card | Patrícia hero: chat → organized case for the lawyer, "Enviar / Editar" | own (coded illustration) |
 | Rotating words | home hero accent word | OriginKit `type-sequence` (visible static word in SSR) |
 | CTA band | end of every page: headline + WhatsApp button inside a glowing frame | OriginKit `glow-border` |
 | Grain | hero texture at ~4 % opacity | Cult `texture-overlay` |
@@ -116,5 +116,5 @@ project (Tailwind v3, `motion/react`, no Next.js APIs). Keep each file's attribu
 
 - WaHub screenshots: `src/site/assets/wahub/*.webp` — demo tenant "Ótica Lumen", 100 % fictitious
   data, sidebar cropped out (the app still shows the "Nexus" name there).
-- Product tint behind visuals: WaHub indigo→violet, Patrícia peach; AmiticIA brand gradient for
+- Product tint behind visuals: WaHub indigo→violet; AmiticIA brand gradient for
   company-level sections.

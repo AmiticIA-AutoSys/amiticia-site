@@ -67,12 +67,6 @@ test.describe("prerendered HTML (no JS)", () => {
     });
   }
 
-  test("/it/patricia stays out of search engines in every build", async ({ request }) => {
-    const html = await (await getAs(request, IT_HOST, "/it/patricia")).text();
-    expect(html).toContain('<meta name="robots" content="noindex, nofollow" />');
-    expect(html).toContain('<meta property="og:image" content="https://amiticia.cc/og/it-home.jpg" />');
-  });
-
   test("/it/wahub is indexable in the production build", async ({ request }) => {
     expect(await (await getAs(request, IT_HOST, "/it/wahub")).text()).not.toContain('name="robots"');
   });

@@ -3,7 +3,7 @@ import { forMarket, type MarketId } from "../../markets";
 
 /**
  * Labels drawn inside the home illustrations. They are visuals, not page copy: the demo tenant
- * and contacts are 100 % fictitious and match the WaHub and Patrícia pages and share images.
+ * and contacts are 100 % fictitious and match the WaHub page and share images.
  */
 const brWahubDemo = {
   contact: "Ricardo",
@@ -49,35 +49,10 @@ const itWahubDemo: typeof brWahubDemo = {
 export const wahubDemoFor = (market: MarketId) =>
   forMarket({ br: brWahubDemo, it: itWahubDemo }, market, "WaHub home demo");
 
-/** Patrícia is sold only in Brazil, so its demo exists only in Portuguese. */
-export const patriciaDemo = {
-  client: "Cliente",
-  message: "Quero entender como funciona a separação…",
-  time: "19:08",
-  case: {
-    title: "Caso organizado",
-    fields: [
-      ["Envolvidos", "Cliente, ex-marido e dois filhos"],
-      ["Contexto", "Separados há dois meses, sem acordo"],
-      ["Fato central", "Dúvidas sobre a separação"],
-      ["Bens", "Apartamento financiado"],
-    ],
-    replyLabel: "Resposta pronta",
-    reply: "Olá! Li o seu relato. Podemos conversar amanhã às 10h para eu explicar como funciona a separação?",
-    send: "Enviar",
-    edit: "Editar",
-  },
-};
-
 export const productTint = {
   wahub: {
     color: "hsl(var(--wahub))",
     gradient: "linear-gradient(120deg, hsl(var(--wahub)), hsl(var(--wahub-2)))",
     text: "text-[hsl(243_90%_80%)]",
-  },
-  patricia: {
-    color: "hsl(var(--patricia))",
-    gradient: "linear-gradient(120deg, hsl(var(--patricia)), hsl(22 85% 60%))",
-    text: "text-patricia",
   },
 } as const;

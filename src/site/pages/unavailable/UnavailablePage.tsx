@@ -9,7 +9,7 @@ import { secondaryButtonClass } from "../../layout/blocks";
 import { WhatsAppButton } from "../../layout/WhatsAppButton";
 
 /**
- * A product's path in a market that does not sell it (e.g. /it/patricia): says so plainly and
+ * A product's path in a market that does not sell it: says so plainly and
  * sends the visitor to this market's home, or to the market's WhatsApp. Never a 404, so a link
  * shared across markets keeps working.
  */

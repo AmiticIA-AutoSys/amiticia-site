@@ -58,17 +58,6 @@ export const brPages: MarketPage[] = [
     h1: "Seu time inteiro atendendo no mesmo número do WhatsApp",
     message: "Olá! Vi o WaHub no site da AmiticIA e gostaria de saber mais.",
   },
-  {
-    host: BR_HOST,
-    origin: "https://amiticia.com.br",
-    path: "/patricia",
-    url: brUrl("/patricia"),
-    lang: "pt-BR",
-    number: BR_NUMBER,
-    title: "Patrícia - A primeira conversa, organizada para o advogado",
-    h1: "A primeira conversa, organizada para o advogado",
-    message: "Olá! Vi a Patrícia no site da AmiticIA e gostaria de saber mais.",
-  },
 ];
 
 export const itPages: MarketPage[] = [
@@ -93,17 +82,6 @@ export const itPages: MarketPage[] = [
     title: "WaHub - Tutto il tuo team risponde sullo stesso numero WhatsApp",
     h1: "Tutto il tuo team risponde sullo stesso numero WhatsApp",
     message: "Ciao Flavio, ho visto WaHub sul sito AmiticIA e vorrei saperne di più.",
-  },
-  {
-    host: IT_HOST,
-    origin: "https://amiticia.cc",
-    path: "/it/patricia",
-    url: itUrl("/it/patricia"),
-    lang: "it-IT",
-    number: IT_NUMBER,
-    title: "Patrícia - Non disponibile in Italia",
-    h1: "Patrícia non è ancora disponibile in Italia",
-    message: "Ciao Flavio, ho visto il sito AmiticIA e vorrei parlare di un progetto.",
   },
 ];
 

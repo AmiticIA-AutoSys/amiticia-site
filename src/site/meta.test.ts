@@ -51,6 +51,5 @@ describe("ogImageFor", () => {
   it("names one image per market page", () => {
     expect(ogImageFor("br", "home")).toBe("/og/br-home.jpg");
     expect(ogImageFor("br", "wahub")).toBe("/og/br-wahub.jpg");
-    expect(ogImageFor("br", "patricia")).toBe("/og/br-patricia.jpg");
   });
 });

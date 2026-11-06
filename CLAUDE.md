@@ -8,10 +8,10 @@ Marketing website for **amiticia.com.br** (Brazil) and **amiticia.cc** (Italy): 
 Traefik on the Hostinger VPS.
 
 - **Two domains, one image.** Each market owns a domain (registry: `src/site/markets.ts`, `origin` and
-  `basePath`). **Brazil = `amiticia.com.br`, no prefix**: `/`, `/wahub`, `/patricia`. **Italy =
+  `basePath`). **Brazil = `amiticia.com.br`, no prefix**: `/`, `/wahub`. **Italy =
   `amiticia.cc/it`**: `/it`, `/it/wahub` (later `/en`). `/k` stays on `.cc` only. A product not sold in
-  a market still gets its path there, as a noindex "not available" page (`/it/patricia`), so the
-  language switcher never leads to a 404. Pages are prerendered to static HTML at build time and
+  a market would still get its path there, as a noindex "not available" page (no route needs it today), so
+  the language switcher never leads to a 404. Pages are prerendered to static HTML at build time and
   hydrated in the browser. Canonical, `og:url` and `og:image` use the market's own origin; the language
   switcher is a plain `<a>` to the same page on the other domain. Design rules and tokens are in
   `DESIGN.md`, with tokens scoped to `.site-v2`. Copy lives in `src/site/copy/<market>/` and changes
@@ -20,7 +20,8 @@ Traefik on the Hostinger VPS.
   `www`) serves Brazil from the prerendered `dist/br/…` files through `try_files`, so `/br` never shows;
   `/br…` → 301 to the clean path, `/it…` and `/k…` → 301 to `https://amiticia.cc` (no `/k` proxy here:
   it injects the research token). Every other host (amiticia.cc, 127.0.0.1) serves Italy; `/br…`,
-  `/wahub`, `/patricia` → 301 to `amiticia.com.br`.
+  `/wahub` → 301 to `amiticia.com.br`. The retired `/patricia` → 301 to the Brazilian home on both hosts,
+  and `/it/patricia` → 301 to `/it`.
 - **Bare `amiticia.cc/`**: 302, picked from the first Italian or Portuguese entry in `Accept-Language`:
   Portuguese → `https://amiticia.com.br/`; Italian, any other language or none → `/it` until `/en`
   exists (`e2e/root.spec.ts`).
@@ -161,9 +162,9 @@ from production:
   holding it can open the site; it is unguessable but not a secret.
 - **Indexing:** every page is noindex (meta tag and `X-Robots-Tag`), `robots.txt` disallows all,
   and `/k` answers 404.
-- **One host, both markets:** `/` is the Brazilian home (no language redirect), `/wahub` and
-  `/patricia` are Brazilian, `/it…` is Italian and served locally (no cross-domain redirect), `/br/x`
-  → 301 to the clean path on the same host.
+- **One host, both markets:** `/` is the Brazilian home (no language redirect), `/wahub` is
+  Brazilian, `/it…` is Italian and served locally (no cross-domain redirect), `/br/x` → 301 to the clean
+  path on the same host, the retired `/patricia` → 301 `/` and `/it/patricia` → 301 `/it`.
 
 To bring it up:
 
@@ -201,7 +202,7 @@ domínio usando **containers próprios** com label Traefik `PathPrefix(/<slug>)`
 |---|---|---|
 | `/pibconfins` | Tesouraria PIB Confins (dashboard financeiro da igreja) | `side-projects/pibconfins-site/` |
 
-Rotas deste SPA em `amiticia.cc`: `/` (redirect), `/k`, `/it/*` (no futuro `/en/*`), e `/br/*`, `/wahub`, `/patricia` (301 para `.com.br`). Em `amiticia.com.br`: `/`, `/wahub`, `/patricia`. Ao adicionar uma nova rota,
+Rotas deste SPA em `amiticia.cc`: `/` (redirect), `/k`, `/it/*` (no futuro `/en/*`), e `/br/*`, `/wahub`, `/patricia` (301 para `.com.br`), `/it/patricia` (301 para `/it`). Em `amiticia.com.br`: `/`, `/wahub`; `/patricia` é 301 para `/`. Ao adicionar uma nova rota,
 confirmar antes que o path não conflita com nenhum co-hospedado.
 
 ## Parent Context

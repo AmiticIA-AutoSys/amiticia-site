@@ -1,4 +1,4 @@
-// Build-time prerender of the market pages (/, /wahub, /patricia on amiticia.com.br; /it… on amiticia.cc).
+// Build-time prerender of the market pages (/, /wahub on amiticia.com.br; /it… on amiticia.cc).
 // Runs after `vite build` (client → dist/) and `vite build --ssr src/entry-server.tsx --outDir dist-ssr`.
 // For each path: render the app, put the HTML in #root, swap the head block between
 // <!--app-head-start--> and <!--app-head-end--> for the page's own meta, set <html lang>,

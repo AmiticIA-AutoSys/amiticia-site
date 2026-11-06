@@ -44,7 +44,7 @@ test.describe("the suite reaches both hostnames", () => {
 test.describe("amiticia.com.br", () => {
   test.skip(({ isMobile }) => !isMobile, "headers are viewport-independent: run once");
 
-  for (const path of ["/", "/wahub", "/wahub/", "/patricia"]) {
+  for (const path of ["/", "/wahub", "/wahub/"]) {
     test(`${path} answers 200 without a redirect`, async ({ request }) => {
       const res = await getAs(request, BR_HOST, path, { maxRedirects: 0 });
       expect(res.status()).toBe(200);
@@ -63,6 +63,11 @@ test.describe("amiticia.com.br", () => {
     ["/k/data/x", `${CC}/k/data/x`],
     ["/k/api/x", `${CC}/k/api/x`],
     ["/k/api/x?q=1", `${CC}/k/api/x?q=1`],
+    // The retired product page lands on the home. /br/patricia takes two hops: the /br rule, then this one.
+    ["/patricia", `${BR}/`],
+    ["/patricia/", `${BR}/`],
+    ["/patricia?utm_source=ad", `${BR}/?utm_source=ad`],
+    ["/br/patricia", `${BR}/patricia`],
   ];
   for (const host of [BR_HOST, `www.${BR_HOST}`]) {
     for (const [path, location] of redirects) {
@@ -84,7 +89,7 @@ test.describe("amiticia.com.br", () => {
 test.describe("amiticia.cc", () => {
   test.skip(({ isMobile }) => !isMobile, "headers are viewport-independent: run once");
 
-  for (const path of ["/it", "/it/wahub", "/it/patricia"]) {
+  for (const path of ["/it", "/it/wahub"]) {
     test(`${path} answers 200`, async ({ request }) => {
       expect((await getAs(request, IT_HOST, path, { maxRedirects: 0 })).status()).toBe(200);
     });
@@ -96,7 +101,13 @@ test.describe("amiticia.cc", () => {
     ["/br/patricia", `${BR}/patricia`],
     ["/br/wahub?utm_source=ad", `${BR}/wahub?utm_source=ad`],
     ["/wahub", `${BR}/wahub`],
-    ["/patricia", `${BR}/patricia`],
+    // The retired product page lands on a home, never a 404 and never a loop (/it answers 200 above).
+    ["/patricia", `${BR}/`],
+    ["/patricia/", `${BR}/`],
+    ["/patricia?ref=ana", `${BR}/?ref=ana`],
+    ["/it/patricia", `${CC}/it`],
+    ["/it/patricia/", `${CC}/it`],
+    ["/it/patricia?ref=ana", `${CC}/it?ref=ana`],
   ];
   for (const [path, location] of redirects) {
     test(`${path} → 301 ${location}`, async ({ request }) => {
@@ -110,7 +121,6 @@ test.describe("language switcher", () => {
   const cases: Array<[string, string, string, string]> = [
     [BR_HOST, "/wahub", "Italiano", `${CC}/it/wahub`],
     [BR_HOST, "/", "Italiano", `${CC}/it`],
-    [BR_HOST, "/patricia", "Italiano", `${CC}/it/patricia`],
     [IT_HOST, "/it/wahub", "Português", `${BR}/wahub`],
     [IT_HOST, "/it", "Português", `${BR}/`],
   ];

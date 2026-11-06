@@ -19,7 +19,6 @@ describe("whatsappHref", () => {
   it.each([
     ["home", "Olá! Vim pelo site da AmiticIA e gostaria de conversar sobre um projeto."],
     ["wahub", "Olá! Vi o WaHub no site da AmiticIA e gostaria de saber mais."],
-    ["patricia", "Olá! Vi a Patrícia no site da AmiticIA e gostaria de saber mais."],
   ] as const)("carries the approved %s message", (page, text) => {
     expect(brCopy[page].whatsappMessage).toBe(text);
     expect(whatsappHrefFor("br", page)).toBe(

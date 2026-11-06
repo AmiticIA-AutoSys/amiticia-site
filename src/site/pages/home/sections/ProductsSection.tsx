@@ -1,12 +1,13 @@
 import type { CSSProperties } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, FileText, Pencil, Send } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import type { HomeCopy } from "../../../copy/types";
 import type { MarketId } from "../../../markets";
 import { productPath } from "../../../products";
+import { useSitePage } from "../../../layout/page-context";
 import { Reveal, Section } from "../../../layout/primitives";
 import { shotsFor } from "../../wahub/screenshots";
-import { patriciaDemo, productTint } from "../demo";
+import { productTint } from "../demo";
 
 type ProductId = HomeCopy["products"]["cards"][number]["productId"];
 
@@ -30,48 +31,38 @@ const WahubPreview = ({ market }: { market: MarketId }) => {
   );
 };
 
-/** Patrícia: a tiny coded briefing card with the ready reply (illustration). */
-const PatriciaPreview = () => (
-  <div className="relative mx-auto h-full w-[min(300px,84%)] overflow-hidden rounded-t-[16px] border border-b-0 border-border bg-surface-raised px-4 pt-4 shadow-[0_30px_60px_-30px_hsl(var(--patricia)/0.6)]">
-    <span className="inline-flex items-center gap-1.5 text-[13px] font-bold">
-      <FileText className="h-4 w-4 text-patricia" />
-      {patriciaDemo.case.title}
-    </span>
-    <dl className="mt-3 space-y-1.5 text-[12px] leading-snug">
-      {patriciaDemo.case.fields.slice(0, 1).map(([label, value]) => (
-        <div key={label} className="flex justify-between gap-3">
-          <dt className="text-subtle-foreground">{label}</dt>
-          <dd className="text-right font-medium text-foreground/90">{value}</dd>
-        </div>
-      ))}
-    </dl>
-    <div className="mt-3 rounded-[12px] border border-[hsl(var(--patricia)/0.3)] bg-[hsl(var(--patricia)/0.07)] p-3">
-      <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-patricia">
-        {patriciaDemo.case.replyLabel}
-      </span>
-      <p className="mt-1 text-[12px] leading-snug text-foreground/90">
-        {patriciaDemo.case.reply}
-      </p>
-      <div className="mt-2.5 flex gap-2 text-[11px] font-semibold">
-        <span className="inline-flex items-center gap-1 rounded-full bg-patricia px-2.5 py-1 text-background">
-          <Send className="h-3 w-3" />
-          {patriciaDemo.case.send}
-        </span>
-        <span className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-muted-foreground">
-          <Pencil className="h-3 w-3" />
-          {patriciaDemo.case.edit}
-        </span>
-      </div>
-    </div>
-  </div>
-);
-
 const previews: Record<
   ProductId,
   (props: { market: MarketId }) => JSX.Element
 > = {
   wahub: WahubPreview,
-  patricia: PatriciaPreview,
+};
+
+/** A product we mention without pushing it: one row of plain text, the whole row is the link. */
+const SecondaryProductRow = ({
+  item,
+}: {
+  item: NonNullable<HomeCopy["products"]["secondary"]>;
+}) => {
+  const { opensInNewTab } = useSitePage().copy.common;
+  return (
+    <Reveal className="mt-5 md:mt-6">
+      <a
+        href={item.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1 rounded-[20px] border border-border px-5 py-3 text-[15px] leading-snug transition-colors duration-[160ms] hover:border-foreground/25 md:flex-nowrap md:px-7"
+      >
+        <span className="font-semibold text-foreground">{item.name}</span>{" "}
+        <span className="text-muted-foreground">{item.text}</span>{" "}
+        <span className="inline-flex items-center gap-1 text-muted-foreground md:ml-auto">
+          {item.linkLabel}
+          <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+          <span className="sr-only"> {opensInNewTab}</span>
+        </span>
+      </a>
+    </Reveal>
+  );
 };
 
 export const ProductsSection = ({
@@ -152,5 +143,6 @@ export const ProductsSection = ({
         );
       })}
     </div>
+    {copy.secondary && <SecondaryProductRow item={copy.secondary} />}
   </Section>
 );

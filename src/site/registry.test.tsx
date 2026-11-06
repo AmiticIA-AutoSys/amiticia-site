@@ -27,8 +27,8 @@ describe("market and product registry", () => {
     expect(productPath("it", "wahub")).toBe("/it/wahub");
   });
 
-  it("lists WaHub and Patrícia under /br", () => {
-    expect(productsFor("br").map((p) => p.name)).toEqual(["WaHub", "Patrícia"]);
+  it("lists only WaHub under /br", () => {
+    expect(productsFor("br").map((p) => p.name)).toEqual(["WaHub"]);
   });
 
   it("lists only WaHub under /it", () => {
@@ -39,26 +39,21 @@ describe("market and product registry", () => {
     expect(productsFor("en")).toEqual([]);
   });
 
-  it("prerenders each live market's home, its product pages and a not-available page for the rest", () => {
-    expect(prerenderPaths).toEqual(["/", "/wahub", "/patricia", "/it", "/it/wahub", "/it/patricia"]);
-    expect(siteRoutes.find((r) => r.path === "/it/patricia")?.page).toBe("unavailable");
+  it("prerenders each live market's home and its product pages", () => {
+    expect(prerenderPaths).toEqual(["/", "/wahub", "/it", "/it/wahub"]);
   });
 
   it("writes each page to dist/<market>/<path within the market>/index.html, never over the SPA shell", () => {
     expect(siteRoutes.map(prerenderFile)).toEqual([
       "br/index.html",
       "br/wahub/index.html",
-      "br/patricia/index.html",
       "it/index.html",
       "it/wahub/index.html",
-      "it/patricia/index.html",
     ]);
     expect(siteRoutes.map(prerenderFile)).not.toContain("index.html");
   });
 
-  it("keeps a not-available page out of search engines", () => {
-    expect(metaFor("/it/patricia")?.noindex).toBe(true);
-    expect(metaFor("/it/patricia")?.title).toMatch(/Patrícia/);
+  it("leaves the market pages indexable", () => {
     expect(metaFor("/it/wahub")?.noindex).toBeFalsy();
   });
 });
@@ -91,11 +86,9 @@ describe("LanguageSwitcher", () => {
     expect(switcherHref("br", "/wahub", "Italiano")).toHaveAttribute("href", "https://amiticia.cc/it/wahub");
   });
 
-  it("maps the Brazilian home and Patrícia to the Italian ones", () => {
+  it("maps the Brazilian home to the Italian one", () => {
     cleanup();
     expect(switcherHref("br", "/", "Italiano")).toHaveAttribute("href", "https://amiticia.cc/it");
-    cleanup();
-    expect(switcherHref("br", "/patricia", "Italiano")).toHaveAttribute("href", "https://amiticia.cc/it/patricia");
   });
 
   it("maps Italian pages to clean Brazilian URLs", () => {

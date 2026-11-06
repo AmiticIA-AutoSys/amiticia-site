@@ -32,7 +32,6 @@ beforeEach(() => {
 describe.each([
   ["/", "home", ["header", "hero", "sticky", "cta"]],
   ["/wahub", "wahub", ["header", "hero", "sticky", "cta"]],
-  ["/patricia", "patricia", ["header", "hero", "sticky", "cta"]],
 ] as const)("WhatsApp buttons on %s", (path, page, placements) => {
   it("all open the page's own message", () => {
     renderAt(path);
