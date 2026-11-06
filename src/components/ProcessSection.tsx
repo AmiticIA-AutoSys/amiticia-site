@@ -10,7 +10,7 @@ const content = {
     steps: [
       {
         number: "01",
-        title: "Diagnóstico Rápido",
+        title: "Diagnóstico",
         description: "entendemos metas, dados, ferramentas e restrições.",
       },
       {

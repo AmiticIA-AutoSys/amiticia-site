@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +21,7 @@ const navLinkClass =
 // VISUAL: skiper40 animated nav links + skiper41 progressive blur (kit) replace the plain links/blur.
 export const SiteHeader = () => {
   const { market, path, copy } = useSitePage();
-  const { nav, headerCta, whatsappIconLabel, homeLinkLabel, languageSwitcherLabel } = copy.common;
+  const { nav, headerCta, whatsappIconLabel, homeLinkLabel, languageSwitcherLabel, opensInNewTab } = copy.common;
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -58,7 +58,16 @@ export const SiteHeader = () => {
             >
               {nav.products.items.map((item) => (
                 <DropdownMenuItem key={item.to} asChild className="min-h-11 cursor-pointer rounded-xl px-3 text-[15px]">
-                  <Link to={item.to}>{item.label}</Link>
+                  {item.external ? (
+                    <a href={item.to} target="_blank" rel="noopener noreferrer" className="gap-1.5">
+                      {item.label}
+                      <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                      {" "}
+                      <span className="sr-only">{opensInNewTab}</span>
+                    </a>
+                  ) : (
+                    <Link to={item.to}>{item.label}</Link>
+                  )}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>

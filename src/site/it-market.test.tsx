@@ -1,7 +1,8 @@
 import { routerFuture } from "./router-future";
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import { itCopy } from "./copy/it";
 import { SiteRoutes } from "./routes";
 
 const IT_NUMBER = "393926044070";
@@ -30,6 +31,20 @@ describe("/it home", () => {
     const { container } = renderAt("/it");
     expect(container.textContent).not.toContain("Saiu no DOU");
     expect(screen.getAllByRole("link").map((a) => a.getAttribute("href"))).not.toContain("https://saiunodou.com.br");
+  });
+
+  it.each(["/it", "/it/wahub"])("%s has no Saiu no DOU in the menu or the footer", (path) => {
+    renderAt(path);
+    expect(within(screen.getByRole("contentinfo")).queryByText(/Saiu no DOU/)).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: itCopy.common.menu.open }));
+    expect(within(screen.getByRole("dialog")).queryByText(/Saiu no DOU/)).toBeNull();
+    expect(itCopy.common.nav.products.items).toEqual([{ label: "WaHub", to: "/it/wahub" }]);
+  });
+
+  it("stays one full-width product card", () => {
+    renderAt("/it");
+    const products = screen.getByRole("region", { name: "Il nostro prodotto" });
+    expect(within(products).getByRole("link").parentElement).toHaveClass("md:col-span-2");
   });
 
   it("sends every WhatsApp button to the Italian number", () => {

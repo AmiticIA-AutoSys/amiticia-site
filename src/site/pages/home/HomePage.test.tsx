@@ -1,6 +1,6 @@
 import { routerFuture } from "../../router-future";
 import { describe, expect, it } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { brCopy } from "../../copy/br";
 import { SitePageProvider } from "../../layout/page-context";
@@ -19,30 +19,107 @@ const renderHome = () =>
 describe("home products section", () => {
   const productsSection = () => screen.getByRole("region", { name: "Nossos produtos" });
 
-  it("has exactly two links: the WaHub card and the Saiu no DOU row", () => {
+  const saiuCard = () =>
+    within(productsSection()).getByRole("link", { name: "Conhecer o Saiu no DOU (abre em nova aba)" });
+
+  it("has exactly two cards, WaHub first, each one a single link", () => {
     renderHome();
     const links = within(productsSection()).getAllByRole("link");
     expect(links.map((l) => l.getAttribute("href"))).toEqual(["/wahub", "https://saiunodou.com.br"]);
-    expect(within(productsSection()).getByRole("link", { name: "Conhecer o WaHub" })).toHaveAttribute("href", "/wahub");
+    expect(within(productsSection()).getAllByRole("heading", { level: 3 })).toHaveLength(2);
   });
 
-  it("shows Saiu no DOU as one quiet link that opens the site in a new tab", () => {
+  it("keeps the WaHub card inside the site, in the same tab", () => {
     renderHome();
-    const link = within(productsSection()).getByRole("link", { name: /Saiu no DOU/ });
-    expect(link).toHaveAttribute("href", "https://saiunodou.com.br");
-    expect(link).toHaveAttribute("target", "_blank");
-    expect(link).toHaveAttribute("rel", "noopener noreferrer");
-    expect(link).toHaveTextContent("Busca pública e gratuita no Diário Oficial da União.");
-    expect(link).toHaveTextContent("saiunodou.com.br");
-    expect(link).toHaveTextContent("(abre em nova aba)");
-    // Quiet by construction: a row of text, never a product card with its own heading.
-    expect(within(link).queryByRole("heading")).toBeNull();
+    const wahub = within(productsSection()).getByRole("link", { name: "Conhecer o WaHub" });
+    expect(wahub).toHaveAttribute("href", "/wahub");
+    expect(wahub).not.toHaveAttribute("target");
+  });
+
+  it("makes the whole Saiu no DOU card open its own site in a new tab", () => {
+    renderHome();
+    const card = saiuCard();
+    expect(card).toHaveAttribute("href", "https://saiunodou.com.br");
+    expect(card).toHaveAttribute("target", "_blank");
+    expect(card).toHaveAttribute("rel", "noopener noreferrer");
+  });
+
+  it("gives Saiu no DOU the same anatomy as WaHub: name, title, description and call to action", () => {
+    renderHome();
+    const card = saiuCard();
+    expect(within(card).getByText("Saiu no DOU")).toBeInTheDocument();
+    expect(
+      within(card).getByRole("heading", { level: 3, name: "Busca pública e gratuita no Diário Oficial da União" }),
+    ).toBeInTheDocument();
+    expect(card).toHaveAccessibleDescription(
+      "Busca pública e gratuita no Diário Oficial da União Portarias, editais, nomeações, aposentadorias e concursos: cada resultado leva à publicação oficial no DOU.",
+    );
+    expect(card).toHaveTextContent("Conhecer o Saiu no DOU");
+  });
+
+  it("draws the Saiu no DOU search as a decorative illustration with fictional labels", () => {
+    renderHome();
+    const illustration = saiuCard().querySelector('[aria-hidden="true"]');
+    expect(illustration).not.toBeNull();
+    for (const label of ["concurso público", "Seção 3", "Seção 2", "Portaria de nomeação", "Órgão Exemplo"]) {
+      expect(illustration).toHaveTextContent(label);
+    }
+    expect(illustration).toHaveTextContent("Edital de concurso público");
+    // Hidden from assistive technology: only the call to action names the card.
+    expect(within(saiuCard()).queryByText("Portaria de nomeação")).toBeInTheDocument();
+    expect(saiuCard()).not.toHaveAccessibleName(expect.stringContaining("Portaria"));
   });
 
   it("offers no WhatsApp link inside the section", () => {
     renderHome();
     const hrefs = within(productsSection()).getAllByRole("link").map((l) => l.getAttribute("href") ?? "");
     expect(hrefs.filter((h) => h.includes("wa.me"))).toEqual([]);
+  });
+});
+
+describe("Saiu no DOU in the site navigation", () => {
+  const renderSite = () =>
+    render(
+      <MemoryRouter initialEntries={["/"]} future={routerFuture}>
+        <SiteRoutes />
+      </MemoryRouter>,
+    );
+
+  const expectNewTabLink = (link: HTMLElement) => {
+    expect(link).toHaveAttribute("href", "https://saiunodou.com.br");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+  };
+
+  it("is in the footer, and says it opens in a new tab", () => {
+    renderSite();
+    const footer = screen.getByRole("contentinfo");
+    expectNewTabLink(within(footer).getByRole("link", { name: "Saiu no DOU (abre em nova aba)" }));
+    expect(within(footer).getByRole("link", { name: "WaHub" })).toHaveAttribute("href", "/wahub");
+  });
+
+  it("follows WaHub in the mobile menu, and says it opens in a new tab", () => {
+    renderSite();
+    fireEvent.click(screen.getByRole("button", { name: brCopy.common.menu.open }));
+    const links = within(screen.getByRole("dialog")).getAllByRole("link");
+    const names = links.map((a) => a.textContent ?? "");
+    expect(names.indexOf("Saiu no DOU (abre em nova aba)")).toBe(names.indexOf("WaHub") + 1);
+    expectNewTabLink(links[names.indexOf("Saiu no DOU (abre em nova aba)")]);
+  });
+
+  it("follows WaHub in the header's product list, as an external entry", () => {
+    expect(brCopy.common.nav.products.items).toEqual([
+      { label: "WaHub", to: "/wahub" },
+      { label: "Saiu no DOU", to: "https://saiunodou.com.br", external: true },
+    ]);
+  });
+});
+
+describe("how we work", () => {
+  it('calls the first step "Diagnóstico", no longer "Diagnóstico Rápido"', () => {
+    const { container } = renderHome();
+    expect(screen.getByRole("heading", { level: 4, name: "Diagnóstico" })).toBeInTheDocument();
+    expect(container.textContent).not.toContain("Diagnóstico Rápido");
   });
 });
 

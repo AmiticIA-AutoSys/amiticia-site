@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Menu, X } from "lucide-react";
+import { ArrowUpRight, Menu, X } from "lucide-react";
 import { useSitePage } from "./page-context";
 import { WhatsAppButton } from "./WhatsAppButton";
 
@@ -11,7 +11,7 @@ const itemClass =
 /** Mobile/tablet menu (< lg): a right-hand sheet. Radix portals it out of .site-v2, so it carries the class itself. */
 export const SiteMenu = () => {
   const { copy } = useSitePage();
-  const { nav, menu, headerCta } = copy.common;
+  const { nav, menu, headerCta, opensInNewTab } = copy.common;
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
 
@@ -42,11 +42,27 @@ export const SiteMenu = () => {
             <p className="px-3 pb-1 pt-2 text-[13px] font-semibold uppercase tracking-[0.08em] text-subtle-foreground">
               {nav.products.label}
             </p>
-            {nav.products.items.map((item) => (
-              <Link key={item.to} to={item.to} onClick={close} className={itemClass}>
-                {item.label}
-              </Link>
-            ))}
+            {nav.products.items.map((item) =>
+              item.external ? (
+                <a
+                  key={item.to}
+                  href={item.to}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={close}
+                  className={`${itemClass} gap-1.5`}
+                >
+                  {item.label}
+                  <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                  {" "}
+                  <span className="sr-only">{opensInNewTab}</span>
+                </a>
+              ) : (
+                <Link key={item.to} to={item.to} onClick={close} className={itemClass}>
+                  {item.label}
+                </Link>
+              ),
+            )}
             <div className="my-2 h-px bg-border" />
             {nav.links.map((item) => (
               <Link key={item.to} to={item.to} onClick={close} className={itemClass}>

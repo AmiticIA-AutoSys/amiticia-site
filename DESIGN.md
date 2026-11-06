@@ -99,7 +99,6 @@ Real WaHub screenshots and coded illustrations carry that story; decoration neve
 | Sticky WhatsApp bar | mobile only (`< md`), full-width green button, safe-area aware | own |
 | Eyebrow | small uppercase label with a gradient dot | own |
 | Product card | home: big clickable card, product-tinted glow, mini preview, "Conhecer →" | own + OriginKit `glow-border` |
-| Secondary product row | home, below the cards: one neutral text row that links out to a product's own site, no glow or preview | own |
 | Phone + chat | WaHub hero: WhatsApp-style chat that types, then a lead card pops out | Cult `apple-iphone-17-pro` + OriginKit `live-chat` (restyled to WhatsApp) |
 | Browser window + tabs | WaHub screenshots: Conversas / Funil / Leads | Cult `mock-browser-window` + `direction-aware-tabs` |
 | Bento grid | WaHub "O que tem dentro": cards of varied size, some with screenshot crops | own |
@@ -116,5 +115,7 @@ project (Tailwind v3, `motion/react`, no Next.js APIs). Keep each file's attribu
 
 - WaHub screenshots: `src/site/assets/wahub/*.webp` — demo tenant "Ótica Lumen", 100 % fictitious
   data, sidebar cropped out (the app still shows the "Nexus" name there).
-- Product tint behind visuals: WaHub indigo→violet; AmiticIA brand gradient for
+- Product tint behind visuals: WaHub indigo→violet; Saiu no DOU cyan; AmiticIA brand gradient for
   company-level sections.
+- Saiu no DOU home card: a search drawn in code (`src/site/pages/home/demo.ts`), invented organ,
+  titles and dates; no real company, person or case number.

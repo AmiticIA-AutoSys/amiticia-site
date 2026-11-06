@@ -49,10 +49,26 @@ const itWahubDemo: typeof brWahubDemo = {
 export const wahubDemoFor = (market: MarketId) =>
   forMarket({ br: brWahubDemo, it: itWahubDemo }, market, "WaHub home demo");
 
+/** The Saiu no DOU search drawn on the home card: invented organ, dates and titles, Brazil only. */
+export const saiuNoDouDemo = {
+  term: "concurso público",
+  button: "Buscar",
+  results: [
+    { section: "Seção 3", date: "14/03/2026", title: "Edital de concurso público", org: "Órgão Exemplo" },
+    { section: "Seção 2", date: "12/03/2026", title: "Portaria de nomeação", org: "Órgão Exemplo" },
+    { section: "Seção 2", date: "09/03/2026", title: "Portaria de aposentadoria", org: "Órgão Exemplo" },
+  ],
+};
+
 export const productTint = {
   wahub: {
     color: "hsl(var(--wahub))",
     gradient: "linear-gradient(120deg, hsl(var(--wahub)), hsl(var(--wahub-2)))",
     text: "text-[hsl(243_90%_80%)]",
+  },
+  saiunodou: {
+    color: "hsl(var(--brand-cyan))",
+    gradient: "linear-gradient(120deg, hsl(var(--brand-cyan)), hsl(205 90% 58%))",
+    text: "text-brand-cyan",
   },
 } as const;

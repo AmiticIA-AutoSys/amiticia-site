@@ -10,6 +10,7 @@ export const common: CommonCopy = {
       label: "Produtos",
       items: [
         { label: "WaHub", to: "/wahub" },
+        { label: "Saiu no DOU", to: "https://saiunodou.com.br", external: true },
       ],
     },
     links: [
@@ -30,6 +31,7 @@ export const common: CommonCopy = {
     tagline: "Data & AI Ops",
     links: [
       { label: "WaHub", to: "/wahub" },
+      { label: "Saiu no DOU", to: "https://saiunodou.com.br", external: true },
     ],
     loginLabel: "Entrar no WaHub",
     copyright: "© 2026 AmiticIA",

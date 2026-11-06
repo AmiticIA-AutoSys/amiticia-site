@@ -1,5 +1,5 @@
-import { expect, test } from "@playwright/test";
-import { BR_HOST, IT_HOST, brUrl, getAs } from "./fixtures";
+import { expect, test, type Page } from "@playwright/test";
+import { BR_HOST, IT_HOST, brUrl, getAs, itUrl } from "./fixtures";
 
 /** Section headings of the /br copy, written out by hand (HTML-escaped as nginx serves them). */
 const sectionHeadings = [
@@ -96,31 +96,150 @@ test.describe("the hero lead on the Brazilian home", () => {
   });
 });
 
+const SAIU_URL = "https://saiunodou.com.br";
+
+/** The name is scoped to one place: the card, the header menu and the footer all carry it. */
+const saiuCard = (page: Page) => page.locator("#produtos").getByRole("link", { name: /Saiu no DOU/ });
+const wahubCard = (page: Page) => page.locator("#produtos").getByRole("link", { name: "Conhecer o WaHub" });
+
+const expectNewTab = async (link: ReturnType<Page["locator"]>) => {
+  await expect(link).toHaveAttribute("href", SAIU_URL);
+  await expect(link).toHaveAttribute("target", "_blank");
+  await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+};
+
+/** Both cards in view, reveal transition settled: a card mid-reveal is still shifted down. */
+const settledBoxes = async (page: Page) => {
+  await saiuCard(page).scrollIntoViewIfNeeded();
+  let last = "";
+  await expect
+    .poll(async () => {
+      const now = JSON.stringify([await wahubCard(page).boundingBox(), await saiuCard(page).boundingBox()]);
+      const stable = now === last;
+      last = now;
+      return stable;
+    })
+    .toBe(true);
+  const [wahub, saiu] = JSON.parse(last) as Array<{ x: number; y: number; width: number; height: number }>;
+  return { wahub, saiu };
+};
+
 test.describe("Saiu no DOU on the Brazilian home", () => {
-  test("shows its approved text as visible body text", async ({ page }) => {
+  test("is a full card with its approved text, opening its own site in a new tab", async ({ page }) => {
     await page.goto(brUrl("/"), { waitUntil: "networkidle" });
-    const link = page.getByRole("link", { name: /Saiu no DOU/ });
-    await link.scrollIntoViewIfNeeded();
-    await expect(link).toBeVisible();
-    await expect(link).toHaveAttribute("href", "https://saiunodou.com.br");
-    await expect(link).toHaveAttribute("target", "_blank");
-    const body = await page.locator("body").innerText();
-    expect(body).toContain("Saiu no DOU");
-    expect(body).toContain("Busca pública e gratuita no Diário Oficial da União.");
-    expect(body).toContain("saiunodou.com.br");
-    expect(body).not.toMatch(/patr[ií]cia/i);
+    const card = saiuCard(page);
+    await card.scrollIntoViewIfNeeded();
+    await expect(card).toBeVisible();
+    await expect(card).toHaveAccessibleName("Conhecer o Saiu no DOU (abre em nova aba)");
+    await expectNewTab(card);
+    await expect(card.getByRole("heading", { level: 3 })).toHaveText("Busca pública e gratuita no Diário Oficial da União");
+    await expect(card).toContainText("Portarias, editais, nomeações, aposentadorias e concursos");
+    await expect(card.locator('a[href*="wa.me"]')).toHaveCount(0);
+    expect(await page.locator("body").innerText()).not.toMatch(/patr[ií]cia/i);
   });
 
-  test("stays quiet: less than half the height of the WaHub card, and still a real tap target", async ({ page }) => {
+  test("its illustration is built in code, cyan, with fictional labels", async ({ page }) => {
     await page.goto(brUrl("/"), { waitUntil: "networkidle" });
-    const row = page.getByRole("link", { name: /Saiu no DOU/ });
-    const card = page.getByRole("link", { name: "Conhecer o WaHub" });
-    await row.scrollIntoViewIfNeeded();
-    const rowBox = await row.boundingBox();
-    const cardBox = await card.boundingBox();
-    expect(rowBox).not.toBeNull();
-    expect(cardBox).not.toBeNull();
-    expect(rowBox!.height).toBeLessThan(cardBox!.height / 2);
-    expect(rowBox!.height).toBeGreaterThanOrEqual(44);
+    const art = saiuCard(page).locator('[aria-hidden="true"]').first();
+    await art.scrollIntoViewIfNeeded();
+    for (const label of ["concurso público", "Seção 3", "Seção 2", "Portaria de nomeação", "Órgão Exemplo"]) {
+      await expect(art).toContainText(label);
+    }
+  });
+
+  test("on desktop the two cards sit side by side, WaHub left, same top, width and height", async ({ page, isMobile }) => {
+    test.skip(isMobile, "two columns from md up");
+    for (const width of [1280, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+      const { wahub, saiu } = await settledBoxes(page);
+      expect(wahub.x + wahub.width).toBeLessThanOrEqual(saiu.x);
+      expect(Math.abs(wahub.y - saiu.y)).toBeLessThanOrEqual(1);
+      expect(Math.abs(wahub.width - saiu.width)).toBeLessThanOrEqual(1);
+      expect(Math.abs(wahub.height - saiu.height)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  test("on a phone the cards stack, WaHub first, with no horizontal scroll", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "one column below md");
+    for (const width of [360, 390]) {
+      await page.setViewportSize({ width, height: 800 });
+      await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+      const { wahub, saiu } = await settledBoxes(page);
+      expect(wahub.y + wahub.height).toBeLessThanOrEqual(saiu.y);
+      expect(Math.abs(wahub.width - saiu.width)).toBeLessThanOrEqual(1);
+      expect(saiu.height).toBeGreaterThanOrEqual(44);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    }
+  });
+
+  test("the Produtos menu lists WaHub, then Saiu no DOU in a new tab", async ({ page, isMobile }) => {
+    test.skip(isMobile, "the header menu is desktop only");
+    await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+    await page.getByRole("banner").getByRole("button", { name: "Produtos" }).click();
+    const items = page.getByRole("menuitem");
+    await expect(items).toHaveCount(2);
+    await expect(items.nth(0)).toHaveAccessibleName("WaHub");
+    await expect(items.nth(1)).toHaveAccessibleName("Saiu no DOU (abre em nova aba)");
+    await expectNewTab(items.nth(1));
+    expect((await items.nth(1).boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  });
+
+  test("the mobile menu lists WaHub, then Saiu no DOU in a new tab", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "the sheet menu is mobile only");
+    await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Abrir menu" }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("link").nth(0)).toHaveAccessibleName("WaHub");
+    const saiu = dialog.getByRole("link").nth(1);
+    await expect(saiu).toHaveAccessibleName("Saiu no DOU (abre em nova aba)");
+    await expectNewTab(saiu);
+    expect((await saiu.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  });
+
+  test("the footer links to it in a new tab", async ({ page }) => {
+    await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+    const link = page.locator("footer").getByRole("link", { name: /Saiu no DOU/ });
+    await expect(link).toHaveAccessibleName("Saiu no DOU (abre em nova aba)");
+    await expectNewTab(link);
+    expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  });
+
+  test("Italy shows none of it: card, menu or footer", async ({ page, isMobile }) => {
+    for (const path of ["/it", "/it/wahub"]) {
+      await page.goto(itUrl(path), { waitUntil: "networkidle" });
+      await expect(page.getByRole("link", { name: /Saiu no DOU/ })).toHaveCount(0);
+      await expect(page.locator(`a[href^="${SAIU_URL}"]`)).toHaveCount(0);
+      if (isMobile) {
+        await page.getByRole("button", { name: "Apri il menu" }).click();
+        await expect(page.getByRole("dialog").getByRole("link", { name: "WaHub", exact: true })).toBeVisible();
+        await expect(page.getByRole("dialog").getByText("Saiu no DOU")).toHaveCount(0);
+      } else {
+        await page.getByRole("banner").getByRole("button", { name: "Prodotti" }).click();
+        await expect(page.getByRole("menuitem")).toHaveCount(1);
+        await expect(page.getByRole("menuitem")).toHaveAccessibleName("WaHub");
+      }
+    }
+  });
+
+  test("Italy keeps its one full-width card", async ({ page, isMobile }) => {
+    test.skip(isMobile, "two columns from md up");
+    await page.goto(itUrl("/it"), { waitUntil: "networkidle" });
+    const card = page.locator("#produtos").getByRole("link");
+    await expect(card).toHaveCount(1);
+    await card.scrollIntoViewIfNeeded();
+    expect((await card.boundingBox())!.width).toBeGreaterThan(1000);
+  });
+});
+
+test.describe("the first step of how we work", () => {
+  test.skip(({ isMobile }) => !isMobile, "HTML is viewport-independent: run once");
+
+  test('reads "Diagnóstico" on the Brazilian pages, never "Diagnóstico Rápido"', async ({ request }) => {
+    const home = await (await getAs(request, BR_HOST, "/")).text();
+    expect(home).toMatch(/<h4[^>]*>Diagnóstico<\/h4>/);
+    for (const path of ["/", "/wahub"]) {
+      expect(await (await getAs(request, BR_HOST, path)).text()).not.toContain("Diagnóstico Rápido");
+    }
   });
 });

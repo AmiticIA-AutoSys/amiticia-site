@@ -11,8 +11,10 @@ export interface MetaCopy {
 
 export interface NavLink {
   label: string;
-  /** Path inside the site, optionally with a #hash. */
+  /** Path inside the site, optionally with a #hash; or a full URL when `external` is set. */
   to: string;
+  /** A site of its own: opens in a new tab, and says so to a screen reader. */
+  external?: boolean;
 }
 
 export interface NavGroup {
@@ -76,19 +78,14 @@ export interface HomeCopy {
   products: {
     title: string;
     cards: Array<{
-      productId: "wahub";
+      productId: "wahub" | "saiunodou";
       name: string;
       title: string;
       body: string;
       cta: string;
+      /** Set: the product lives on its own site, and the card opens it in a new tab. */
+      href?: string;
     }>;
-    /** One quiet row under the cards: a product of ours that lives on its own site. Not set: nothing renders. */
-    secondary?: {
-      name: string;
-      text: string;
-      linkLabel: string;
-      href: string;
-    };
   };
   benefits: {
     title: string;

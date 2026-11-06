@@ -27,13 +27,15 @@ export const home: HomeCopy = {
         body: "Um assistente de IA atende cada contato na hora, descobre o que a pessoa quer e entrega o lead organizado para o seu time vender.",
         cta: "Conhecer o WaHub",
       },
+      {
+        productId: "saiunodou",
+        name: "Saiu no DOU",
+        title: "Busca pública e gratuita no Diário Oficial da União",
+        body: "Portarias, editais, nomeações, aposentadorias e concursos: cada resultado leva à publicação oficial no DOU.",
+        cta: "Conhecer o Saiu no DOU",
+        href: "https://saiunodou.com.br",
+      },
     ],
-    secondary: {
-      name: "Saiu no DOU",
-      text: "Busca pública e gratuita no Diário Oficial da União.",
-      linkLabel: "saiunodou.com.br",
-      href: "https://saiunodou.com.br",
-    },
   },
   benefits: {
     title: "O que você ganha",
@@ -59,7 +61,7 @@ export const home: HomeCopy = {
       steps: [
         {
           number: "01",
-          title: "Diagnóstico Rápido",
+          title: "Diagnóstico",
           description: "entendemos metas, dados, ferramentas e restrições.",
         },
         {

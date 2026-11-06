@@ -21,11 +21,20 @@ export const SiteFooter = () => {
           <p className="text-sm text-muted-foreground">{footer.tagline}</p>
         </div>
         <nav aria-label={footer.brand} className="flex flex-wrap items-center gap-x-6 gap-y-1">
-          {footer.links.map((item) => (
-            <Link key={item.to} to={item.to} className={linkClass}>
-              {item.label}
-            </Link>
-          ))}
+          {footer.links.map((item) =>
+            item.external ? (
+              <a key={item.to} href={item.to} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                {item.label}
+                <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+                {" "}
+                <span className="sr-only">{opensInNewTab}</span>
+              </a>
+            ) : (
+              <Link key={item.to} to={item.to} className={linkClass}>
+                {item.label}
+              </Link>
+            ),
+          )}
           <a href={products.wahub.loginUrl} target="_blank" rel="noopener noreferrer" className={linkClass}>
             {footer.loginLabel}
             <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
