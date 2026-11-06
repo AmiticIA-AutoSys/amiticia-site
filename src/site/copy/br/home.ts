@@ -4,7 +4,7 @@ export const home: HomeCopy = {
   meta: {
     title: "AmiticIA - Inteligência e Automação que Escala",
     description:
-      "Temos produtos prontos que colocam a IA para atender no WhatsApp da sua empresa e construímos sob medida o que o seu negócio precisar: agentes de IA, dashboards e automações.",
+      "Temos um produto pronto que coloca a IA para atender no WhatsApp da sua empresa e construímos sob medida o que o seu negócio precisar: agentes de IA, dashboards e automações.",
   },
   whatsappMessage: "Olá! Vim pelo site da AmiticIA e gostaria de conversar sobre um projeto.",
   stickyCta: "Fale conosco",
@@ -12,7 +12,7 @@ export const home: HomeCopy = {
     title: "Inteligência e Automação que Escala",
     leadHighlight: "Inteligência Artificial & Business Intelligence",
     leadRest:
-      " para sua dor. Temos produtos prontos que colocam a IA para atender no WhatsApp da sua empresa e construímos sob medida o que o seu negócio precisar: agentes de IA, dashboards que guiam decisões e automações que eliminam tarefas repetitivas. Do diagnóstico à operação rodando, self-hosted ou cloud.",
+      " para sua dor. Temos um produto pronto que coloca a IA para atender no WhatsApp da sua empresa e construímos sob medida o que o seu negócio precisar: agentes de IA, dashboards que guiam decisões e automações que eliminam tarefas repetitivas. Do diagnóstico à operação rodando, self-hosted ou cloud.",
     tagline: "Isso é Data & AI Ops na prática.",
     primaryCta: "Fale com a gente",
     secondaryCta: "Ver os produtos",

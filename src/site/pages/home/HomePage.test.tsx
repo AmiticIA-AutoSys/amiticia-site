@@ -46,6 +46,15 @@ describe("home products section", () => {
   });
 });
 
+describe("home hero lead", () => {
+  it("speaks of one ready-made product, as Andre approved", () => {
+    renderHome();
+    const lead = screen.getByRole("heading", { level: 1 }).closest("section")!.querySelector("p.v2-lead");
+    expect(lead).toHaveTextContent("Temos um produto pronto que coloca a IA para atender no WhatsApp da sua empresa");
+    expect(lead).not.toHaveTextContent("produtos prontos");
+  });
+});
+
 describe("home hero illustration", () => {
   it("is hidden from assistive technology, so its demo text is not announced", () => {
     renderHome();

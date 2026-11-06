@@ -82,6 +82,20 @@ test.describe("raw HTML of the market pages", () => {
   }
 });
 
+test.describe("the hero lead on the Brazilian home", () => {
+  const SENTENCE = "Temos um produto pronto que coloca a IA para atender no WhatsApp da sua empresa";
+
+  test("is singular in the visible lead and in every description tag of the raw HTML", async ({ request, isMobile }) => {
+    test.skip(!isMobile, "HTML is viewport-independent: run once");
+    const html = await (await getAs(request, BR_HOST, "/")).text();
+    expect(html).not.toContain("produtos prontos");
+    expect(html).toMatch(new RegExp(`<p class="v2-lead[^"]*">.*${SENTENCE}`));
+    for (const tag of ['name="description"', 'property="og:description"', 'name="twitter:description"']) {
+      expect(html).toContain(`<meta ${tag} content="${SENTENCE}`);
+    }
+  });
+});
+
 test.describe("Saiu no DOU on the Brazilian home", () => {
   test("shows its approved text as visible body text", async ({ page }) => {
     await page.goto(brUrl("/"), { waitUntil: "networkidle" });
