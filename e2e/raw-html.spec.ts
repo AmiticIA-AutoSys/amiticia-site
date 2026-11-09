@@ -54,7 +54,7 @@ test.describe("prerendered HTML (no JS)", () => {
     expect(res.status()).toBe(200);
     const html = await res.text();
     expect(html).toContain('<link rel="canonical" href="https://amiticia.com.br/" />');
-    expect(html).toMatch(/<h1[^>]*>Inteligência e Automação que Escala<\/h1>/);
+    expect(html).toMatch(/<h1[^>]*>IA funcionando no seu negócio\.<\/h1>/);
   });
 
   // A <style> is raw text: escaped CSS (&quot;…) breaks the selectors and fails hydration (#418).

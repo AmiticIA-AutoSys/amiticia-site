@@ -29,7 +29,7 @@ test.describe("the suite reaches both hostnames", () => {
     await page.goto(brUrl("/"), { waitUntil: "networkidle" });
     expect(new URL(page.url()).host).toBe(BR_HOST);
     expect(new URL(page.url()).pathname).toBe("/");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Inteligência e Automação que Escala");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("IA funcionando no seu negócio.");
     await page.goto(itUrl("/"), { waitUntil: "networkidle" });
     expect(new URL(page.url()).host).toBe(IT_HOST);
     expect(new URL(page.url()).pathname).toBe("/it");

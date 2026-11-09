@@ -2,18 +2,18 @@ import type { HomeCopy } from "../types";
 
 export const home: HomeCopy = {
   meta: {
-    title: "AmiticIA - Inteligência e Automação que Escala",
+    title: "AmiticIA - IA funcionando no seu negócio",
     description:
-      "Temos um produto pronto que coloca a IA para atender no WhatsApp da sua empresa e construímos sob medida o que o seu negócio precisar: agentes de IA, dashboards e automações.",
+      "Colocamos a inteligência artificial para trabalhar dentro da sua empresa: atendendo clientes no WhatsApp, lendo documentos e preenchendo planilhas.",
   },
   whatsappMessage: "Olá! Vim pelo site da AmiticIA e gostaria de conversar sobre um projeto.",
   stickyCta: "Fale conosco",
   hero: {
-    title: "Inteligência e Automação que Escala",
-    leadHighlight: "Inteligência Artificial & Business Intelligence",
+    title: "IA funcionando no seu negócio.",
+    leadHighlight: "Colocamos a inteligência artificial para trabalhar",
     leadRest:
-      " para sua dor. Temos um produto pronto que coloca a IA para atender no WhatsApp da sua empresa e construímos sob medida o que o seu negócio precisar: agentes de IA, dashboards que guiam decisões e automações que eliminam tarefas repetitivas. Do diagnóstico à operação rodando, self-hosted ou cloud.",
-    tagline: "Isso é Data & AI Ops na prática.",
+      " dentro da sua empresa: atendendo clientes no WhatsApp, lendo documentos e preenchendo planilhas. Do diagnóstico à operação rodando.",
+    tagline: "Mais de 20 anos de software. IA desde 2006, bem antes do ChatGPT.",
     primaryCta: "Fale com a gente",
     secondaryCta: "Ver os produtos",
   },

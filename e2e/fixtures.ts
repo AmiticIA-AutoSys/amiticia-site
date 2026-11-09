@@ -43,8 +43,8 @@ export const brPages: MarketPage[] = [
     url: brUrl("/"),
     lang: "pt-BR",
     number: BR_NUMBER,
-    title: "AmiticIA - Inteligência e Automação que Escala",
-    h1: "Inteligência e Automação que Escala",
+    title: "AmiticIA - IA funcionando no seu negócio",
+    h1: "IA funcionando no seu negócio.",
     message: "Olá! Vim pelo site da AmiticIA e gostaria de conversar sobre um projeto.",
   },
   {

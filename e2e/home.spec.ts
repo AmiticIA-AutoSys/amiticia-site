@@ -83,16 +83,42 @@ test.describe("raw HTML of the market pages", () => {
 });
 
 test.describe("the hero lead on the Brazilian home", () => {
-  const SENTENCE = "Temos um produto pronto que coloca a IA para atender no WhatsApp da sua empresa";
+  const HIGHLIGHT = "Colocamos a inteligência artificial para trabalhar";
+  const REST =
+    " dentro da sua empresa: atendendo clientes no WhatsApp, lendo documentos e preenchendo planilhas. Do diagnóstico à operação rodando.";
+  const TAGLINE = "Mais de 20 anos de software. IA desde 2006, bem antes do ChatGPT.";
+  const DESCRIPTION_START = `${HIGHLIGHT} dentro da sua empresa`;
+  const literal = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-  test("is singular in the visible lead and in every description tag of the raw HTML", async ({ request, isMobile }) => {
+  test("says what the company does in the lead and in every description tag of the raw HTML", async ({ request, isMobile }) => {
     test.skip(!isMobile, "HTML is viewport-independent: run once");
     const html = await (await getAs(request, BR_HOST, "/")).text();
-    expect(html).not.toContain("produtos prontos");
-    expect(html).toMatch(new RegExp(`<p class="v2-lead[^"]*">.*${SENTENCE}`));
+    // The highlight is a <span> inside the paragraph: the sentence crosses its closing tag.
+    expect(html).toMatch(
+      new RegExp(`<p class="v2-lead[^"]*"><span[^>]*>${literal(HIGHLIGHT)}</span>(?:<!-- -->)?${literal(REST)}</p>`),
+    );
+    expect(html).toContain(`>${TAGLINE}</p>`);
     for (const tag of ['name="description"', 'property="og:description"', 'name="twitter:description"']) {
-      expect(html).toContain(`<meta ${tag} content="${SENTENCE}`);
+      expect(html).toContain(`<meta ${tag} content="${DESCRIPTION_START}`);
     }
+  });
+
+  test("leaves nothing of the old first screen in the raw HTML", async ({ request, isMobile }) => {
+    test.skip(!isMobile, "HTML is viewport-independent: run once");
+    const html = await (await getAs(request, BR_HOST, "/")).text();
+    for (const gone of ["que Escala", "Temos um produto pronto", "produtos prontos", "para sua dor"]) {
+      expect(html).not.toContain(gone);
+    }
+    // "&" is served escaped in text and attributes: look for both spellings.
+    expect(html).not.toMatch(/Data (&|&amp;) AI Ops/);
+  });
+
+  test("shows the lead, the line under it and the footer phrase once the page runs", async ({ page }) => {
+    await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+    const lead = page.locator("section p.v2-lead").first();
+    await expect(lead).toHaveText(HIGHLIGHT + REST);
+    await expect(lead.locator("xpath=following-sibling::*[1]")).toHaveText(TAGLINE);
+    await expect(page.locator("footer").getByText("IA funcionando no seu negócio.", { exact: true })).toBeVisible();
   });
 });
 

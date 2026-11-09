@@ -28,7 +28,7 @@ export const common: CommonCopy = {
   languageSwitcherLabel: "Idioma",
   footer: {
     brand: "AmiticIA",
-    tagline: "Data & AI Ops",
+    tagline: "IA funcionando no seu negócio.",
     links: [
       { label: "WaHub", to: "/wahub" },
       { label: "Saiu no DOU", to: "https://saiunodou.com.br", external: true },

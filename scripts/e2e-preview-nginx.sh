@@ -45,7 +45,7 @@ check "/ answers 200 (Brazilian home, no language redirect)" "$([ "$(status /)" 
 check "/ ignores Accept-Language" "$([ "$(curl -s -o /dev/null -w '%{http_code}' -H 'Accept-Language: it-IT' "$base/")" = 200 ]; echo $?)"
 # grep -q on a here-string, not a pipe: with pipefail, curl would die of SIGPIPE when grep exits early.
 brhome="$(curl -s -H 'Accept-Language: it-IT' "$base/")"
-check "/ is the Brazilian home" "$(grep -q '<h1[^>]*>Inteligência e Automação que Escala</h1>' <<<"$brhome"; echo $?)"
+check "/ is the Brazilian home" "$(grep -q '<h1[^>]*>IA funcionando no seu negócio\.</h1>' <<<"$brhome"; echo $?)"
 check "/wahub answers 200" "$([ "$(status /wahub)" = 200 ]; echo $?)"
 brwahub="$(curl -s "$base/wahub")"
 check "/wahub is the Brazilian WaHub page" "$(grep -q '<h1[^>]*>Seu time inteiro atendendo no mesmo número do WhatsApp</h1>' <<<"$brwahub"; echo $?)"

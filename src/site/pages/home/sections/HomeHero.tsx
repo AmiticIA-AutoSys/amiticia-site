@@ -12,7 +12,8 @@ import { HeroIllustration } from "./HeroIllustration";
  * Gradient on the last words of the h1 without splitting its text (the prerendered h1 stays one
  * plain string): a brand-gradient layer one line tall (1lh) sits at the bottom of the text box,
  * over a solid foreground layer, both clipped to the glyphs. Whatever wraps onto the last line
- * ("Escala", or "que Escala") takes the gradient; browsers without `lh` show a full gradient.
+ * ("no seu negócio.", or "seu negócio.") takes the gradient; a title that fits on one line takes
+ * it whole, and so do browsers without `lh`.
  */
 const titleStyle: CSSProperties = {
   backgroundImage:

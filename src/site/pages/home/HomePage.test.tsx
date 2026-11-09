@@ -124,12 +124,62 @@ describe("how we work", () => {
   });
 });
 
+// The first screen repeats the phrase printed on the business card, then says in plain words what the company does.
 describe("home hero lead", () => {
-  it("speaks of one ready-made product, as Andre approved", () => {
+  const TITLE = "IA funcionando no seu negócio.";
+  const HIGHLIGHT = "Colocamos a inteligência artificial para trabalhar";
+  const LEAD = `${HIGHLIGHT} dentro da sua empresa: atendendo clientes no WhatsApp, lendo documentos e preenchendo planilhas. Do diagnóstico à operação rodando.`;
+  const TAGLINE = "Mais de 20 anos de software. IA desde 2006, bem antes do ChatGPT.";
+  const DESCRIPTION = `${HIGHLIGHT} dentro da sua empresa: atendendo clientes no WhatsApp, lendo documentos e preenchendo planilhas.`;
+
+  const hero = () => screen.getByRole("heading", { level: 1 }).closest("section")!;
+
+  it("has the card's phrase as its h1, full stop included", () => {
     renderHome();
-    const lead = screen.getByRole("heading", { level: 1 }).closest("section")!.querySelector("p.v2-lead");
-    expect(lead).toHaveTextContent("Temos um produto pronto que coloca a IA para atender no WhatsApp da sua empresa");
-    expect(lead).not.toHaveTextContent("produtos prontos");
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(TITLE);
+  });
+
+  it("says what the company does in one paragraph, its opening words highlighted", () => {
+    renderHome();
+    const lead = hero().querySelector("p.v2-lead")!;
+    expect(lead.textContent).toBe(LEAD);
+    expect(lead.querySelector("span")!.textContent).toBe(HIGHLIGHT);
+  });
+
+  it("follows the lead with the years of experience, and nothing else", () => {
+    renderHome();
+    expect(hero().querySelector("p.v2-lead")!.nextElementSibling!.textContent).toBe(TAGLINE);
+  });
+
+  it("drops the old title, the ready-made-product sentence and the jargon", () => {
+    renderHome();
+    for (const gone of ["que Escala", "Temos um produto", "produtos prontos", "Data & AI Ops", "para sua dor", "self-hosted"]) {
+      expect(hero().textContent).not.toContain(gone);
+    }
+  });
+
+  it("repeats the phrase in the footer, under the brand", () => {
+    render(
+      <MemoryRouter initialEntries={["/"]} future={routerFuture}>
+        <SiteRoutes />
+      </MemoryRouter>,
+    );
+    const footer = screen.getByRole("contentinfo");
+    expect(within(footer).getByText(TITLE).tagName).toBe("P");
+    expect(footer.textContent).not.toContain("Data & AI Ops");
+  });
+
+  it("carries the phrase in the page title and the plain sentence in the description", () => {
+    expect(brCopy.home.meta.title).toBe("AmiticIA - IA funcionando no seu negócio");
+    expect(brCopy.home.meta.description).toBe(DESCRIPTION);
+  });
+
+  it("gives the fallback head of index.html the same title and description", () => {
+    const html = readFileSync("index.html", "utf8");
+    expect(html).toContain("<title>AmiticIA - IA funcionando no seu negócio</title>");
+    expect(html).toContain('<meta property="og:title" content="AmiticIA - IA funcionando no seu negócio" />');
+    expect(html).toContain(`<meta name="description" content="${DESCRIPTION}" />`);
+    expect(html).toContain(`<meta property="og:description" content="${DESCRIPTION}" />`);
   });
 });
 
