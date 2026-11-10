@@ -215,6 +215,26 @@ describe("the retired product", () => {
   });
 });
 
+// One true date carries the message: neural networks since 2006. The 2020 clause is gone from the text.
+describe("home Quem somos text", () => {
+  const BODY =
+    "Nossa base é computação científica e de alto desempenho, e inteligência artificial não é novidade aqui: trabalhamos com redes neurais desde 2006. É isso que entregamos: soluções que funcionam, escalam e não viram dor de cabeça lá na frente.";
+
+  it("has a paragraph with exactly the new text", () => {
+    renderHome();
+    const section = document.getElementById("quem-somos") as HTMLElement;
+    const paragraphs = Array.from(section.querySelectorAll("p")).map((p) => p.textContent);
+    expect(paragraphs).toContain(BODY);
+  });
+
+  it("names no second date", () => {
+    renderHome();
+    const section = document.getElementById("quem-somos") as HTMLElement;
+    expect(section.textContent).not.toContain("desde 2020");
+    expect(section.textContent).not.toContain("projetos com IA desde");
+  });
+});
+
 describe("home Quem somos photo", () => {
   const about = () => document.getElementById("quem-somos") as HTMLElement;
   const photo = () => within(about()).getByRole("img", { name: "Foto de André" });

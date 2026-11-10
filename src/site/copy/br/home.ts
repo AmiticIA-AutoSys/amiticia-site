@@ -81,7 +81,7 @@ export const home: HomeCopy = {
     eyebrow: "Quem somos",
     title: "Engenharia de verdade por trás da IA",
     lead: "A AmiticIA nasceu de uma convicção simples: inteligência artificial só entrega valor quando é construída com arquitetura e engenharia corretas desde o primeiro dia.",
-    body: "Nossa base é computação científica e de alto desempenho, e inteligência artificial não é novidade aqui: trabalhamos com redes neurais desde 2006 e desenvolvemos projetos com IA desde 2020, bem antes do ChatGPT. É isso que entregamos: soluções que funcionam, escalam e não viram dor de cabeça lá na frente.",
+    body: "Nossa base é computação científica e de alto desempenho, e inteligência artificial não é novidade aqui: trabalhamos com redes neurais desde 2006. É isso que entregamos: soluções que funcionam, escalam e não viram dor de cabeça lá na frente.",
     highlights: [
       { value: "+20 anos", label: "desenvolvendo software" },
       { value: "IA desde 2006", label: "antes do hype" },
