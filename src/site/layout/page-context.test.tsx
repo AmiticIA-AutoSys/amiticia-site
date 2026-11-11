@@ -21,13 +21,13 @@ describe("?ref= attribution", () => {
   it("adds the partner to the BR WhatsApp message", () => {
     const href = renderAt("br", "?ref=magno");
     expect(href).toBe(
-      `https://wa.me/5531988963436?text=${encodeURIComponent("Olá! Vi o WaHub no site da AmiticIA e gostaria de saber mais. (indicação de Magno)")}`,
+      `https://wa.me/5531998121645?text=${encodeURIComponent("Olá! Vi o WaHub no site da AmiticIA e gostaria de saber mais. (indicação de Magno)")}`,
     );
   });
 
   it("leaves the link unchanged without ref", () => {
     expect(renderAt("br", "")).toBe(
-      `https://wa.me/5531988963436?text=${encodeURIComponent("Olá! Vi o WaHub no site da AmiticIA e gostaria de saber mais.")}`,
+      `https://wa.me/5531998121645?text=${encodeURIComponent("Olá! Vi o WaHub no site da AmiticIA e gostaria de saber mais.")}`,
     );
   });
 
