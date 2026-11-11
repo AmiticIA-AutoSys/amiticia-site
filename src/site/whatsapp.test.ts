@@ -4,12 +4,12 @@ import { markets } from "./markets";
 import { brCopy } from "./copy/br";
 import { WHATSAPP_URL } from "@/lib/constants";
 
-const BR_NUMBER = "5531998121645";
+const BR_NUMBER = "553198121645";
 
 describe("whatsappHref", () => {
   it("builds a wa.me link with the number and the URL-encoded text", () => {
     expect(whatsappHref(BR_NUMBER, "Olá! Tudo bem?")).toBe(
-      "https://wa.me/5531998121645?text=Ol%C3%A1!%20Tudo%20bem%3F",
+      "https://wa.me/553198121645?text=Ol%C3%A1!%20Tudo%20bem%3F",
     );
   });
 

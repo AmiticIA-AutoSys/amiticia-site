@@ -30,7 +30,8 @@ export const markets: Record<MarketId, Market> = {
     origin: "https://amiticia.com.br",
     basePath: "",
     label: "Português",
-    whatsappNumber: "5531998121645",
+    // Use the registered WhatsApp ID (12 digits); the 13-digit form relies on normalisation that was not verified for this number (2026-11-11).
+    whatsappNumber: "553198121645",
     live: true,
   },
   it: {

@@ -1,7 +1,8 @@
 import type { APIRequestContext } from "@playwright/test";
 
 /** Expected values, written out by hand so the E2E suite is an independent oracle of the copy. */
-export const BR_NUMBER = "5531998121645";
+// Use the registered WhatsApp ID (12 digits); the 13-digit form relies on normalisation that was not verified for this number (2026-11-11).
+export const BR_NUMBER = "553198121645";
 export const IT_NUMBER = "393926044070";
 
 /** The two production hostnames. The suite reaches both on the one container (see playwright.config.ts). */
