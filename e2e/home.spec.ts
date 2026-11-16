@@ -256,6 +256,12 @@ test.describe("Saiu no DOU on the Brazilian home", () => {
     await expect(items.nth(0)).toHaveAccessibleName("WaHub");
     await expect(items.nth(1)).toHaveAccessibleName("Saiu no DOU (abre em nova aba)");
     await expectNewTab(items.nth(1));
+    // The menu opens with a zoom from 95 % (tailwindcss-animate `zoom-in-95`), and a box read during
+    // it is scaled down (41.8 to 43.98 px) although the item's layout height is 44 (`min-h-11`).
+    // Measure once the menu's open animation has finished (#6).
+    await items
+      .nth(1)
+      .evaluate((el) => Promise.all(el.closest('[role="menu"]')!.getAnimations({ subtree: true }).map((a) => a.finished)));
     expect((await items.nth(1).boundingBox())!.height).toBeGreaterThanOrEqual(44);
   });
 
