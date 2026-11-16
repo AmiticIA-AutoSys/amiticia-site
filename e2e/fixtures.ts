@@ -46,7 +46,7 @@ export const brPages: MarketPage[] = [
     number: BR_NUMBER,
     title: "AmiticIA - IA funcionando no seu negócio",
     h1: "IA funcionando no seu negócio.",
-    message: "Olá! Vim pelo site da AmiticIA e gostaria de conversar sobre um projeto.",
+    message: "Olá! Vim pelo site da AmiticIA e quero marcar a conversa de 30 minutos.",
   },
   {
     host: BR_HOST,

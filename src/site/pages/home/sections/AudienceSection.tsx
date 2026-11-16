@@ -2,13 +2,10 @@ import { Building2, Users } from "lucide-react";
 import type { HomeCopy } from "../../../copy/types";
 import { Reveal, Section } from "../../../layout/primitives";
 import { IconTile } from "./IconTile";
+import { brandBorder } from "./recipes";
 
 const icons = [Building2, Users];
 const tones = ["cyan", "violet"] as const;
-
-/** Subtle brand border: a faint cyan→violet gradient on the border box under a solid surface. */
-const brandBorder =
-  "border border-transparent [background:linear-gradient(hsl(var(--surface)),hsl(var(--surface)))_padding-box,linear-gradient(120deg,hsl(var(--brand-cyan)/0.45),hsl(var(--border))_45%,hsl(var(--brand-violet)/0.45))_border-box]";
 
 export const AudienceSection = ({ copy }: { copy: HomeCopy["audience"] }) => (
   <Section className="border-t border-border/60">

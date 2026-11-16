@@ -14,9 +14,9 @@ export const common: CommonCopy = {
       ],
     },
     links: [
-      { label: "Sob medida", to: "/#sob-medida" },
       { label: "Como trabalhamos", to: "/#como-trabalhamos" },
       { label: "Quem somos", to: "/#quem-somos" },
+      { label: "Para quem é", to: "/#para-quem-e" },
     ],
   },
   headerCta: "Fale conosco",

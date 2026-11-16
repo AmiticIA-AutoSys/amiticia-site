@@ -23,7 +23,7 @@ describe("whatsappHref", () => {
   });
 
   it.each([
-    ["home", "Olá! Vim pelo site da AmiticIA e gostaria de conversar sobre um projeto."],
+    ["home", "Olá! Vim pelo site da AmiticIA e quero marcar a conversa de 30 minutos."],
     ["wahub", "Olá! Vi o WaHub no site da AmiticIA e gostaria de saber mais."],
   ] as const)("carries the approved %s message", (page, text) => {
     expect(brCopy[page].whatsappMessage).toBe(text);

@@ -65,7 +65,7 @@ export const HomeHero = ({ market, copy }: { market: MarketId; copy: HomeCopy["h
             <WhatsAppButton placement="hero" size="lg">
               {copy.primaryCta}
             </WhatsAppButton>
-            <a href="#produtos" className={secondaryButtonClass}>
+            <a href={copy.secondaryHref ?? "#produtos"} className={secondaryButtonClass}>
               {copy.secondaryCta}
               <ArrowDown className="h-4 w-4" aria-hidden="true" />
             </a>

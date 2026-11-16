@@ -1,25 +1,74 @@
 import { expect, test, type Page } from "@playwright/test";
 import { BR_HOST, IT_HOST, brUrl, getAs, itUrl } from "./fixtures";
 
-/** Section headings of the /br copy, written out by hand (HTML-escaped as nginx serves them). */
+/** Section headings of the /br copy, in page order, written out by hand (as nginx serves them). */
 const sectionHeadings = [
-  "Nossos produtos",
-  "O que você ganha",
-  "Projetos sob medida",
-  "Stack &amp; Infra que não te deixa na mão",
-  "Como trabalhamos",
-  "Engenharia de verdade por trás da IA",
-  "Para quem é",
+  "Uma rotina funcionando em duas semanas",
+  "O que já instalamos",
+  "Quem vai até a sua empresa",
+  "É para a sua empresa?",
   "Vamos começar?",
 ];
 
 test.describe("/br home", () => {
-  test("the prerendered HTML carries every section heading", async ({ request, isMobile }) => {
+  test("the prerendered HTML carries every section heading, in order", async ({ request, isMobile }) => {
     test.skip(!isMobile, "HTML is viewport-independent: run once");
     const html = await (await getAs(request, BR_HOST, "/")).text();
-    for (const heading of sectionHeadings) {
-      expect(html).toMatch(new RegExp(`<h[23][^>]*>${heading.replace(/[?]/g, "\\$&")}</h[23]>`));
+    const found = [...html.matchAll(/<h2[^>]*>([^<]*)<\/h2>/g)].map((m) => m[1]);
+    expect(found).toEqual(sectionHeadings);
+  });
+
+  test("the prerendered HTML has no stack list, no Power BI, no price and no CNPJ", async ({ request, isMobile }) => {
+    test.skip(!isMobile, "HTML is viewport-independent: run once");
+    const html = await (await getAs(request, BR_HOST, "/")).text();
+    for (const gone of ["Power BI", "Stack &amp;", "Projetos sob medida", "O que você ganha", "R$", "CNPJ"]) {
+      expect(html).not.toContain(gone);
     }
+  });
+
+  test("how it works shows three steps, each with its duration and what the client receives", async ({ page }) => {
+    await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+    const steps = page.locator("#como-trabalhamos ol > li");
+    await expect(steps).toHaveCount(3);
+    await expect(steps.nth(0)).toContainText("30 minutos, por telefone");
+    await expect(steps.nth(0)).toContainText("Grátis");
+    await expect(steps.nth(1)).toContainText("Semana 1");
+    await expect(steps.nth(2)).toContainText("Semana 2");
+    for (let i = 0; i < 3; i++) await expect(steps.nth(i)).toContainText("Você recebe");
+    await expect(page.locator("#como-trabalhamos")).toContainText("Acompanhamento mensal");
+  });
+
+  test("on desktop the three steps sit side by side, their 'você recebe' boxes level", async ({ page, isMobile }) => {
+    test.skip(isMobile, "three columns from lg up");
+    for (const width of [1280, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+      const boxes = page.locator("#como-trabalhamos ol > li").getByText("Você recebe");
+      await page.locator("#como-trabalhamos ol").scrollIntoViewIfNeeded();
+      // Wait for the reveal to settle: a step mid-reveal is still shifted down.
+      let last = "";
+      await expect
+        .poll(async () => {
+          const now = JSON.stringify(await Promise.all([0, 1, 2].map((i) => boxes.nth(i).boundingBox())));
+          const stable = now === last;
+          last = now;
+          return stable;
+        })
+        .toBe(true);
+      const [a, b, c] = JSON.parse(last) as Array<{ x: number; y: number }>;
+      expect(a.x).toBeLessThan(b.x);
+      expect(b.x).toBeLessThan(c.x);
+      expect(Math.abs(a.y - b.y)).toBeLessThanOrEqual(1);
+      expect(Math.abs(b.y - c.y)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  test("every header link lands on a section of the home", async ({ page }) => {
+    await page.goto(brUrl("/"), { waitUntil: "networkidle" });
+    for (const id of ["como-trabalhamos", "quem-somos", "para-quem-e"]) {
+      await expect(page.locator(`#${id}`)).toHaveCount(1);
+    }
+    await expect(page.locator("#sob-medida")).toHaveCount(0);
   });
 
   test("with reduced motion the hero shows the chat's last line and the lead card, and only that flow", async ({ page }) => {
@@ -83,11 +132,10 @@ test.describe("raw HTML of the market pages", () => {
 });
 
 test.describe("the hero lead on the Brazilian home", () => {
-  const HIGHLIGHT = "Colocamos a inteligência artificial para trabalhar";
-  const REST =
-    " dentro da sua empresa: atendendo clientes no WhatsApp, lendo documentos e preenchendo planilhas. Do diagnóstico à operação rodando.";
-  const TAGLINE = "Mais de 20 anos de software. IA desde 2006, bem antes do ChatGPT.";
-  const DESCRIPTION_START = `${HIGHLIGHT} dentro da sua empresa`;
+  const HIGHLIGHT = "Vamos até a sua empresa";
+  const REST = ", achamos a rotina que mais pesa e a deixamos funcionando em duas semanas.";
+  const TAGLINE = "A primeira conversa é grátis: 30 minutos, por telefone.";
+  const DESCRIPTION_START = `${HIGHLIGHT}${REST}`;
   const literal = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
   test("says what the company does in the lead and in every description tag of the raw HTML", async ({ request, isMobile }) => {
@@ -106,7 +154,7 @@ test.describe("the hero lead on the Brazilian home", () => {
   test("leaves nothing of the old first screen in the raw HTML", async ({ request, isMobile }) => {
     test.skip(!isMobile, "HTML is viewport-independent: run once");
     const html = await (await getAs(request, BR_HOST, "/")).text();
-    for (const gone of ["que Escala", "Temos um produto pronto", "produtos prontos", "para sua dor"]) {
+    for (const gone of ["que Escala", "Temos um produto pronto", "produtos prontos", "para sua dor", "Colocamos a inteligência"]) {
       expect(html).not.toContain(gone);
     }
     // "&" is served escaped in text and attributes: look for both spellings.
@@ -258,12 +306,12 @@ test.describe("Saiu no DOU on the Brazilian home", () => {
   });
 });
 
-test.describe("the first step of how we work", () => {
+test.describe("the diagnosis step of how it works", () => {
   test.skip(({ isMobile }) => !isMobile, "HTML is viewport-independent: run once");
 
   test('reads "Diagnóstico" on the Brazilian pages, never "Diagnóstico Rápido"', async ({ request }) => {
     const home = await (await getAs(request, BR_HOST, "/")).text();
-    expect(home).toMatch(/<h4[^>]*>Diagnóstico<\/h4>/);
+    expect(home).toMatch(/<h3[^>]*>Diagnóstico<\/h3>/);
     for (const path of ["/", "/wahub"]) {
       expect(await (await getAs(request, BR_HOST, path)).text()).not.toContain("Diagnóstico Rápido");
     }
@@ -306,7 +354,8 @@ test.describe("André's photo in Quem somos", () => {
   test("on desktop sits below the first tile, to the left of the other two", async ({ page, isMobile }) => {
     test.skip(isMobile, "two columns from sm up");
     const tile = (text: string) => page.locator("#quem-somos li").filter({ hasText: text }).boundingBox();
-    const boxes = () => Promise.all(["André", "desenvolvendo software", "antes do hype", "alto desempenho"].map(tile));
+    const boxes = () =>
+      Promise.all(["André", "um cliente pagante usa o WaHub", "bem antes do ChatGPT", "desenvolvendo software"].map(tile));
     for (const width of [1280, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(brUrl("/"), { waitUntil: "networkidle" });
