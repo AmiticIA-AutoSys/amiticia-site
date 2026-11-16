@@ -2,11 +2,10 @@ import { BrainCircuit, Database, Server } from "lucide-react";
 import type { HomeCopy } from "../../../copy/types";
 import { Eyebrow, Reveal, Section } from "../../../layout/primitives";
 import { IconTile } from "./IconTile";
+import { brandLine, stepDiscClass, stepRingClass } from "./recipes";
 
 const stackIcons = [Server, Database, BrainCircuit];
 const stackTones = ["cyan", "violet", "cyan"] as const;
-
-const brandLine = "linear-gradient(var(--line-dir), hsl(var(--brand-cyan)), hsl(var(--brand-violet)))";
 
 export const CustomSection = ({ copy }: { copy: HomeCopy["custom"] }) => {
   const last = copy.stack.categories.length - 1;
@@ -77,10 +76,8 @@ export const CustomSection = ({ copy }: { copy: HomeCopy["custom"] }) => {
                   style={{ background: brandLine }}
                 />
               )}
-              <span className="relative z-10 inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[conic-gradient(from_120deg,hsl(var(--brand-cyan)),hsl(var(--brand-violet)),hsl(var(--brand-cyan)))] p-px">
-                <span className="inline-flex h-full w-full items-center justify-center rounded-full bg-background text-base font-extrabold tabular-nums text-foreground">
-                  {step.number}
-                </span>
+              <span className={stepRingClass}>
+                <span className={stepDiscClass}>{step.number}</span>
               </span>
               <div className="pt-1 md:pt-0">
                 <h4 className="text-lg font-bold md:text-xl">{step.title}</h4>

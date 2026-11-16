@@ -62,31 +62,42 @@ export interface ClosingCopy {
   cta: string;
 }
 
+export interface HomeHeroCopy {
+  title: string;
+  leadHighlight: string;
+  leadRest: string;
+  tagline: string;
+  primaryCta: string;
+  secondaryCta: string;
+  /** In-page anchor of the secondary button. Not set: the products section (#produtos). */
+  secondaryHref?: string;
+}
+
+export interface HomeProductsCopy {
+  title: string;
+  /** Set: one paragraph under the title. */
+  lead?: string;
+  cards: Array<{
+    productId: "wahub" | "saiunodou";
+    name: string;
+    title: string;
+    body: string;
+    cta: string;
+    /** Set: the product lives on its own site, and the card opens it in a new tab. */
+    href?: string;
+  }>;
+}
+
+/** The product-first home (Italy): products, benefits, custom projects, about, audience. */
 export interface HomeCopy {
+  /** Not set: this layout. The consulting layout sets "consulting" (ConsultingHomeCopy). */
+  layout?: "products";
   meta: MetaCopy;
   whatsappMessage: string;
   /** Label of the mobile sticky WhatsApp bar on this page. */
   stickyCta: string;
-  hero: {
-    title: string;
-    leadHighlight: string;
-    leadRest: string;
-    tagline: string;
-    primaryCta: string;
-    secondaryCta: string;
-  };
-  products: {
-    title: string;
-    cards: Array<{
-      productId: "wahub" | "saiunodou";
-      name: string;
-      title: string;
-      body: string;
-      cta: string;
-      /** Set: the product lives on its own site, and the card opens it in a new tab. */
-      href?: string;
-    }>;
-  };
+  hero: HomeHeroCopy;
+  products: HomeProductsCopy;
   benefits: {
     title: string;
     items: string[];
@@ -117,6 +128,54 @@ export interface HomeCopy {
   audience: {
     title: string;
     items: string[];
+  };
+  closing: ClosingCopy;
+}
+
+/** One step of the consulting offer: how long it takes and what the client receives. */
+export interface ConsultingStep {
+  /** Duration or moment: "30 minutos, por telefone", "Semana 1". */
+  when: string;
+  /** Set: a small tag beside the duration ("Grátis"). */
+  badge?: string;
+  title: string;
+  body: string;
+  receives: string;
+}
+
+/**
+ * The consulting-first home (Brazil, 14/11): method first, then what is already installed, the
+ * proof, who it is for and who it is not for. The products only move down.
+ */
+export interface ConsultingHomeCopy {
+  layout: "consulting";
+  meta: MetaCopy;
+  whatsappMessage: string;
+  stickyCta: string;
+  hero: HomeHeroCopy;
+  howItWorks: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    /** Label of the "what you receive" box in each step. */
+    receivesLabel: string;
+    steps: ConsultingStep[];
+    /** The optional step after the steps. */
+    followUp: { when: string; title: string; body: string };
+    /**
+     * ⏸ The price is the product owner's call (16/11, not decided). While `claim.value` is null the
+     * fallback line renders, with no number; once set, the filled template replaces it.
+     */
+    price: { claim: PendingClaim; fallback: string };
+  };
+  products: HomeProductsCopy;
+  about: HomeCopy["about"];
+  fit: {
+    title: string;
+    forTitle: string;
+    forItems: string[];
+    notForTitle: string;
+    notForItems: string[];
   };
   closing: ClosingCopy;
 }
@@ -189,7 +248,7 @@ export interface UnavailableCopy {
 
 export interface MarketCopy {
   common: CommonCopy;
-  home: HomeCopy;
+  home: HomeCopy | ConsultingHomeCopy;
   wahub: WahubCopy;
   unavailable: UnavailableCopy;
 }

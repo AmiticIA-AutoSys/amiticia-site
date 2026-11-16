@@ -97,7 +97,8 @@ describe("Brazilian links carry no /br prefix", () => {
       const hrefs = screen.getAllByRole("link").map((a) => a.getAttribute("href") ?? "");
       expect(hrefs.filter((h) => /^\/br(\/|#|$)/.test(h))).toEqual([]);
       expect(hrefs).toContain("/wahub");
-      expect(hrefs).toContain("/#sob-medida");
+      expect(hrefs).toContain("/#como-trabalhamos");
+      expect(hrefs).not.toContain("/#sob-medida");
     });
   }
 });

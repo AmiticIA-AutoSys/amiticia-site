@@ -35,7 +35,8 @@ const pages = [
       lang: "pt-BR",
       h1: brHome.hero.title,
       eyebrow: brHome.hero.leadHighlight,
-      chips: [chip.wahub],
+      // The Brazilian home leads with the consulting offer (14/11), so its share image names no product.
+      chips: [],
     }),
   },
   {

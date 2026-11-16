@@ -15,7 +15,7 @@ Traefik on the Hostinger VPS.
   hydrated in the browser. Canonical, `og:url` and `og:image` use the market's own origin; the language
   switcher is a plain `<a>` to the same page on the other domain. Design rules and tokens are in
   `DESIGN.md`, with tokens scoped to `.site-v2`. Copy lives in `src/site/copy/<market>/` and changes
-  only with the product owner's approval (Brazilian links are clean paths: `/wahub`, `/#sob-medida`).
+  only with the product owner's approval (Brazilian links are clean paths: `/wahub`, `/#como-trabalhamos`).
 - **nginx picks the market by `Host`** (`nginx.conf`, two `server` blocks). `amiticia.com.br` (and
   `www`) serves Brazil from the prerendered `dist/br/…` files through `try_files`, so `/br` never shows;
   `/br…` → 301 to the clean path, `/it…` and `/k…` → 301 to `https://amiticia.cc` (no `/k` proxy here:

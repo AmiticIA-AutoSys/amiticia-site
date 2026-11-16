@@ -74,17 +74,20 @@ const cardClass =
 export const ProductsSection = ({
   copy,
   market,
+  className,
 }: {
   copy: HomeCopy["products"];
   market: MarketId;
+  className?: string;
 }) => {
   const { opensInNewTab } = useSitePage().copy.common;
   return (
-    <Section id="produtos" aria-labelledby="produtos-titulo">
-      <Reveal>
+    <Section id="produtos" aria-labelledby="produtos-titulo" className={className}>
+      <Reveal className={copy.lead ? "max-w-3xl" : undefined}>
         <h2 id="produtos-titulo" className="v2-h2">
           {copy.title}
         </h2>
+        {copy.lead && <p className="v2-lead mt-5">{copy.lead}</p>}
       </Reveal>
       <div className="mt-10 grid gap-5 md:mt-14 md:grid-cols-2 md:gap-6">
         {copy.cards.map((card, i) => {
