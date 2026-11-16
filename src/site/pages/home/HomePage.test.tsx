@@ -28,7 +28,7 @@ const renderSite = (path = "/") =>
 const h2s = () => screen.getAllByRole("heading", { level: 2 }).map((h) => h.textContent);
 
 // 14/11: the company's main work is consulting. The Brazilian home leads with the method and moves
-// the products down; the order is the spec in business/estrategia/2026-11-14 §4.
+// the products down, in the order the product owner agreed.
 describe("Brazilian home, consulting first", () => {
   it("shows the sections in the agreed order", () => {
     renderHome();
