@@ -59,8 +59,8 @@ export const home: ConsultingHomeCopy = {
     },
   },
   products: {
-    title: "O que já instalamos",
-    lead: "Duas ferramentas nossas, já no ar. Quando uma delas resolve a rotina da sua empresa, começamos por ela.",
+    title: "O que já construímos",
+    lead: "Duas ferramentas nossas, já no ar. Quando o WaHub resolve a rotina da sua empresa, começamos por ele.",
     cards: [
       {
         productId: "wahub",

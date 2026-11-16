@@ -34,7 +34,7 @@ describe("Brazilian home, consulting first", () => {
     renderHome();
     expect(h2s()).toEqual([
       "Uma rotina funcionando em duas semanas",
-      "O que já instalamos",
+      "O que já construímos",
       "Quem vai até a sua empresa",
       "É para a sua empresa?",
       "Vamos começar?",
@@ -177,8 +177,8 @@ describe("how it works", () => {
   });
 });
 
-describe("what we have already installed", () => {
-  const productsSection = () => screen.getByRole("region", { name: "O que já instalamos" });
+describe("what we have already built", () => {
+  const productsSection = () => screen.getByRole("region", { name: "O que já construímos" });
 
   const saiuCard = () =>
     within(productsSection()).getByRole("link", { name: "Conhecer o Saiu no DOU (abre em nova aba)" });
@@ -188,7 +188,7 @@ describe("what we have already installed", () => {
     const how = document.getElementById("como-trabalhamos")!;
     expect(how.compareDocumentPosition(productsSection()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(productsSection()).toHaveTextContent(
-      "Duas ferramentas nossas, já no ar. Quando uma delas resolve a rotina da sua empresa, começamos por ela.",
+      "Duas ferramentas nossas, já no ar. Quando o WaHub resolve a rotina da sua empresa, começamos por ele.",
     );
   });
 

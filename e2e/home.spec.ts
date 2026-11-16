@@ -4,7 +4,7 @@ import { BR_HOST, IT_HOST, brUrl, getAs, itUrl } from "./fixtures";
 /** Section headings of the /br copy, in page order, written out by hand (as nginx serves them). */
 const sectionHeadings = [
   "Uma rotina funcionando em duas semanas",
-  "O que já instalamos",
+  "O que já construímos",
   "Quem vai até a sua empresa",
   "É para a sua empresa?",
   "Vamos começar?",
