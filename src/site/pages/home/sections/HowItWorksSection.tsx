@@ -1,14 +1,29 @@
-import { Clock, Repeat } from "lucide-react";
+import { Clock, Layers, Repeat, type LucideIcon } from "lucide-react";
 import type { ConsultingHomeCopy } from "../../../copy/types";
 import { fillClaim } from "../../../copy";
 import { Eyebrow, Reveal, Section } from "../../../layout/primitives";
 import { IconTile } from "./IconTile";
 import { brandLine, cardClass, labelClass, stepDiscClass, stepRingClass } from "./recipes";
 
+type Note = ConsultingHomeCopy["howItWorks"]["followUp"];
+
+/** A full-width card under the steps: a label, a title and one paragraph beside an icon. */
+const NoteCard = ({ note, icon, tone, className }: { note: Note; icon: LucideIcon; tone: "cyan" | "violet"; className: string }) => (
+  <Reveal className={`flex flex-col gap-5 p-6 sm:flex-row sm:items-start sm:gap-6 md:p-8 ${cardClass} ${className}`}>
+    <IconTile icon={icon} tone={tone} size="lg" />
+    <div>
+      <p className={`text-muted-foreground ${labelClass}`}>{note.when}</p>
+      <h3 className="mt-1.5 text-lg font-bold md:text-xl">{note.title}</h3>
+      <p className="mt-2 max-w-3xl text-muted-foreground">{note.body}</p>
+    </div>
+  </Reveal>
+);
+
 /**
  * "Como funciona" of the consulting home: numbered steps joined by the brand line (the same ring
  * and line as the product home's "Como trabalhamos"), each with its duration and what the client
- * receives; then the optional monthly follow-up and the price line. Takes the anchor the header's
+ * receives; then what happens when the job is bigger than one stage, the monthly follow-up and the
+ * price line. Takes the anchor the header's
  * "Como trabalhamos" link already points at.
  */
 export const HowItWorksSection = ({ copy }: { copy: ConsultingHomeCopy["howItWorks"] }) => {
@@ -75,14 +90,8 @@ export const HowItWorksSection = ({ copy }: { copy: ConsultingHomeCopy["howItWor
         ))}
       </ol>
 
-      <Reveal className={`mt-10 flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:gap-6 md:mt-14 md:p-8 ${cardClass}`}>
-        <IconTile icon={Repeat} tone="violet" size="lg" />
-        <div>
-          <p className={`text-muted-foreground ${labelClass}`}>{copy.followUp.when}</p>
-          <h3 className="mt-1.5 text-lg font-bold md:text-xl">{copy.followUp.title}</h3>
-          <p className="mt-2 text-muted-foreground">{copy.followUp.body}</p>
-        </div>
-      </Reveal>
+      <NoteCard note={copy.larger} icon={Layers} tone="cyan" className="mt-10 md:mt-14" />
+      <NoteCard note={copy.followUp} icon={Repeat} tone="violet" className="mt-4 md:mt-5" />
 
       <Reveal>
         <p className="mt-6 text-muted-foreground md:mt-8">{price}</p>

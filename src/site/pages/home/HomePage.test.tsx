@@ -33,11 +33,12 @@ describe("Brazilian home, consulting first", () => {
   it("shows the sections in the agreed order", () => {
     renderHome();
     expect(h2s()).toEqual([
-      "Uma rotina funcionando em duas semanas",
+      "Sua equipe faz algum destes serviços toda semana?",
+      "Você decide a cada passo",
       "O que já construímos",
       "Quem vai até a sua empresa",
       "É para a sua empresa?",
-      "Vamos começar?",
+      "Vamos conversar?",
     ]);
   });
 
@@ -66,8 +67,8 @@ describe("Brazilian home, consulting first", () => {
 describe("home hero lead", () => {
   const TITLE = "IA funcionando no seu negócio.";
   const HIGHLIGHT = "Vamos até a sua empresa";
-  const LEAD = `${HIGHLIGHT}, achamos a rotina que mais pesa e a deixamos funcionando em duas semanas.`;
-  const TAGLINE = "A primeira conversa é grátis: 30 minutos, por telefone.";
+  const LEAD = `${HIGHLIGHT}, encontramos o serviço repetitivo que mais toma tempo da sua equipe e colocamos a IA para trabalhar nele.`;
+  const TAGLINE = "A primeira conversa é grátis: 30 minutos, por telefone. Depois, uma semana de diagnóstico diz o que fazer e quanto custa.";
   const DESCRIPTION = `${LEAD} A primeira conversa é grátis.`;
 
   const hero = () => screen.getByRole("heading", { level: 1 }).closest("section")!;
@@ -126,30 +127,72 @@ describe("home hero lead", () => {
   });
 });
 
+// 17/11: many owners do not know what can be automated. Concrete examples come before the method.
+describe("examples of where the work starts", () => {
+  const section = () => document.getElementById("onde-ajuda") as HTMLElement;
+
+  it("comes between the hero and how it works, with six examples", () => {
+    renderHome();
+    const hero = screen.getByRole("heading", { level: 1 }).closest("section")!;
+    const how = document.getElementById("como-trabalhamos")!;
+    expect(hero.compareDocumentPosition(section()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(section().compareDocumentPosition(how) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(section()).getByRole("heading", { level: 2 })).toHaveTextContent("Sua equipe faz algum destes serviços toda semana?");
+    expect(within(section()).getAllByRole("listitem")).toHaveLength(6);
+  });
+
+  it("tells the reader he does not need to know what AI does", () => {
+    renderHome();
+    expect(section()).toHaveTextContent("Você não precisa saber o que a IA faz.");
+    expect(within(section()).getAllByRole("listitem")[0]).toHaveTextContent("Digitar no sistema o que chegou por WhatsApp, e-mail ou PDF.");
+  });
+
+  it("says the work starts with one and the others come one at a time", () => {
+    renderHome();
+    expect(section().textContent).toContain("Começamos por um deles. Os outros ficam para depois, um de cada vez, se você quiser.");
+    expect(section().textContent).not.toContain("Não se viu na lista");
+  });
+});
+
+// 17/11: no sentence promises a finished job in a fixed time. "Duas semanas" only appears as the
+// size of a stage, and the first screen and the description carry no duration for the build.
+describe("no promise a client could throw back", () => {
+  it("keeps 'duas semanas' out of the first screen and the description", () => {
+    renderHome();
+    const hero = screen.getByRole("heading", { level: 1 }).closest("section")!;
+    expect(hero.textContent).not.toContain("duas semanas");
+    expect(brCopy.home.meta.description).not.toContain("duas semanas");
+  });
+
+  it("never says a routine is working in two weeks", () => {
+    expect(JSON.stringify(brCopy.home)).not.toMatch(/funcionando em duas semanas|fim da segunda semana|Semana 2/);
+  });
+});
+
 describe("how it works", () => {
   const section = () => document.getElementById("como-trabalhamos") as HTMLElement;
   const steps = () => within(section()).getAllByRole("listitem").filter((li) => li.parentElement?.tagName === "OL");
 
-  it("has three numbered steps: the conversation, the diagnosis, the routine working", () => {
+  it("has three numbered steps: the conversation, the diagnosis, the construction", () => {
     renderHome();
-    expect(within(section()).getByRole("heading", { level: 2 })).toHaveTextContent("Uma rotina funcionando em duas semanas");
+    expect(within(section()).getByRole("heading", { level: 2 })).toHaveTextContent("Você decide a cada passo");
     expect(steps()).toHaveLength(3);
     expect(steps().map((li) => within(li).getByRole("heading", { level: 3 }).textContent)).toEqual([
       "Conversa",
       "Diagnóstico",
-      "Rotina funcionando",
+      "Construção",
     ]);
   });
 
   it("says how long each step takes, and that the conversation is free and by phone", () => {
     renderHome();
-    const [talk, diagnosis, routine] = steps();
+    const [talk, diagnosis, build] = steps();
     expect(talk).toHaveTextContent("30 minutos, por telefone");
     expect(talk).toHaveTextContent("Grátis");
-    expect(diagnosis).toHaveTextContent("Semana 1");
-    expect(routine).toHaveTextContent("Semana 2");
+    expect(diagnosis).toHaveTextContent("Uma semana, na sua empresa");
+    expect(build).toHaveTextContent("Em etapas de até duas semanas");
     expect(diagnosis).not.toHaveTextContent("Grátis");
-    expect(routine).not.toHaveTextContent("Grátis");
+    expect(build).not.toHaveTextContent("Grátis");
   });
 
   it("says what the client receives at each step", () => {
@@ -157,22 +200,50 @@ describe("how it works", () => {
     for (const li of steps()) {
       expect(li).toHaveTextContent("Você recebe");
     }
-    expect(steps()[2]).toHaveTextContent("A primeira rotina funcionando até o fim da segunda semana");
+    expect(steps()[1]).toHaveTextContent("em quantas etapas dá para fazer, com o prazo e o preço de cada uma");
+    expect(steps()[2]).toHaveTextContent("No fim de cada etapa: o que foi combinado por escrito, funcionando na sua empresa.");
   });
 
-  it("offers the monthly follow-up as optional, after the three steps", () => {
+  // 17/11: the fear is a client saying "you promised two weeks". The page says what happens when
+  // the job is bigger, in plain words, right after the steps.
+  it("says what happens when the job does not fit one stage", () => {
+    renderHome();
+    const larger = within(section()).getByRole("heading", { level: 3, name: "Nem tudo cabe em duas semanas" }).closest("div")!;
+    expect(section().querySelector("ol")!.compareDocumentPosition(larger) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(section()).toHaveTextContent("Quando o trabalho é maior");
+    expect(larger).toHaveTextContent("O diagnóstico mostra isso antes de você contratar a construção. O trabalho maior vem dividido em etapas, cada uma com entrega, prazo e preço por escrito, e você decide a cada uma se segue.");
+  });
+
+  it("uses 'passo' for the three steps and 'etapa' only for the slices of the construction", () => {
+    renderHome();
+    const [talk, diagnosis] = steps();
+    expect(within(section()).getByRole("heading", { level: 2 }).textContent).toContain("passo");
+    expect(talk).not.toHaveTextContent(/etapa/i);
+    expect(diagnosis).not.toHaveTextContent(/passo/i);
+  });
+
+  // 17/11, the product owner: the site stays clean. Contract terms for edge cases (a change of
+  // scope, a client's delay, the monthly fee, training) belong in the written proposal, not here.
+  it("keeps the contract terms for edge cases off the page", () => {
+    expect(JSON.stringify(brCopy.home)).not.toMatch(/mensalidade|vira outra etapa|acessos, documentos|chega a tempo|treinad|hospedagem/i);
+  });
+
+  it("offers the monthly follow-up after the steps and the bigger-job card", () => {
     renderHome();
     const followUp = within(section()).getByRole("heading", { level: 3, name: "Acompanhamento mensal" }).closest("div")!;
     expect(section().querySelector("ol")!.compareDocumentPosition(followUp) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(section()).toHaveTextContent("Depois, se você quiser");
+    expect(section()).toHaveTextContent("Depois da entrega");
+    expect(followUp).toHaveTextContent("Acompanhamos o que ficou funcionando, ajustamos o que for preciso e, quando você quiser, partimos para o próximo serviço.");
+    const larger = within(section()).getByRole("heading", { level: 3, name: "Nem tudo cabe em duas semanas" });
+    expect(larger.compareDocumentPosition(followUp) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   // Whether a price appears on the site is Andre's call, not decided: no number until he says so.
-  it("says the price is fixed and told in the conversation, with no number", () => {
+  it("says when each price is known, with no number", () => {
     renderHome();
     expect(brCopy.home.layout === "consulting" && brCopy.home.howItWorks.price.claim.value).toBeNull();
     expect(section()).toHaveTextContent(
-      "O preço das duas semanas é fechado. Você fica sabendo na conversa, antes de decidir qualquer coisa.",
+      "O preço do diagnóstico você fica sabendo na conversa. O de cada etapa vem fechado no diagnóstico, antes de você contratar.",
     );
   });
 });
@@ -188,7 +259,7 @@ describe("what we have already built", () => {
     const how = document.getElementById("como-trabalhamos")!;
     expect(how.compareDocumentPosition(productsSection()) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(productsSection()).toHaveTextContent(
-      "Duas ferramentas nossas, já no ar. Quando o WaHub resolve a rotina da sua empresa, começamos por ele.",
+      "Duas ferramentas nossas, já no ar. Quando o WaHub resolve o seu caso, começamos por ele, sem construir do zero.",
     );
   });
 
@@ -295,22 +366,26 @@ describe("the Brazilian menu", () => {
 describe("the proof: who comes to your company", () => {
   const about = () => document.getElementById("quem-somos") as HTMLElement;
   const BODY =
-    "Nossa base é computação científica e de alto desempenho, e inteligência artificial não é novidade aqui: trabalhamos com redes neurais desde 2006. É isso que entregamos: soluções que funcionam, escalam e não viram dor de cabeça lá na frente.";
+    "A base dele é a computação científica, onde o programa precisa dar a resposta certa. É com esse cuidado que a solução é construída: para funcionar no dia a dia da sua empresa e não virar dor de cabeça lá na frente.";
 
-  it("says a paying client uses WaHub in production, naming no client and no amount", () => {
+  // 17/11: "um cliente pagante" told the reader how many clients there are. The tile says the
+  // product is in use and counts nothing.
+  it("says WaHub is in daily use, counting no clients and naming no client or amount", () => {
     renderHome();
-    const tile = within(about()).getByText("um cliente pagante usa o WaHub").closest("li")!;
-    expect(tile).toHaveTextContent("Em produção");
+    const tile = within(about()).getByText("o WaHub, atendendo pelo WhatsApp no dia a dia").closest("li")!;
+    expect(tile).toHaveTextContent("Em uso");
+    expect(JSON.stringify(brCopy.home)).not.toMatch(/pagante|um cliente|\bclientes\b/i);
     expect(about().textContent).not.toMatch(/R\$|\bPRV\b|por mês/i);
   });
 
-  it("says who comes, keeps the approved bio and its one date", () => {
+  it("says who comes, speaks of his history in his name, and repeats no date from the tiles", () => {
     renderHome();
     expect(within(about()).getByRole("heading", { level: 2 })).toHaveTextContent("Quem vai até a sua empresa");
-    expect(about()).toHaveTextContent("É o André quem faz a conversa, vai até a sua empresa e constrói a solução.");
+    expect(about()).toHaveTextContent("É o André quem conversa com você, vai até a sua empresa e constrói a solução. Do começo ao fim, a mesma pessoa.");
     const paragraphs = Array.from(about().querySelectorAll("p")).map((p) => p.textContent);
     expect(paragraphs).toContain(BODY);
     expect(about().textContent).not.toContain("desde 2020");
+    expect(BODY).not.toMatch(/2006|[Nn]ossa base|trabalhamos/);
   });
 
   it("keeps the experience tiles, without the HPC jargon", () => {
@@ -380,7 +455,11 @@ describe("who it is for, and who it is not for", () => {
   it("names small businesses and the team's time, and turns away a plain site or app", () => {
     renderHome();
     expect(list("Para quem é")[0]).toHaveTextContent(
-      "Empresas pequenas e médias com uma rotina que toma horas da equipe toda semana.",
+      "Empresas pequenas e médias em que a equipe gasta horas, toda semana, com serviço repetitivo.",
+    );
+    expect(list("Para quem é")[2]).toHaveTextContent("liberar algumas horas da equipe");
+    expect(list("Para quem não é")[1]).toHaveTextContent(
+      "Quem quer o preço de um projeto grande antes de alguém olhar como o serviço é feito.",
     );
     expect(list("Para quem não é")[0]).toHaveTextContent("Quem procura só um site, um aplicativo ou uma loja virtual.");
   });
@@ -389,8 +468,8 @@ describe("who it is for, and who it is not for", () => {
 describe("home closing", () => {
   it("asks for the free conversation on WhatsApp", () => {
     renderHome();
-    const closing = screen.getByRole("heading", { level: 2, name: "Vamos começar?" }).parentElement!;
-    expect(closing).toHaveTextContent("Marque a conversa de 30 minutos pelo WhatsApp. É grátis, e no fim você sabe se vale seguir.");
+    const closing = screen.getByRole("heading", { level: 2, name: "Vamos conversar?" }).parentElement!;
+    expect(closing).toHaveTextContent("Você marca pelo WhatsApp e a conversa é por telefone: 30 minutos, sem custo. No fim você sabe se vale olhar mais de perto e por onde começar.");
     expect(within(closing).getByRole("link", { name: /Marcar a conversa/ })).toHaveAttribute(
       "href",
       expect.stringContaining("https://wa.me/"),

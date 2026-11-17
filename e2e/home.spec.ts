@@ -3,11 +3,12 @@ import { BR_HOST, IT_HOST, brUrl, getAs, itUrl } from "./fixtures";
 
 /** Section headings of the /br copy, in page order, written out by hand (as nginx serves them). */
 const sectionHeadings = [
-  "Uma rotina funcionando em duas semanas",
+  "Sua equipe faz algum destes serviços toda semana?",
+  "Você decide a cada passo",
   "O que já construímos",
   "Quem vai até a sua empresa",
   "É para a sua empresa?",
-  "Vamos começar?",
+  "Vamos conversar?",
 ];
 
 test.describe("/br home", () => {
@@ -32,9 +33,10 @@ test.describe("/br home", () => {
     await expect(steps).toHaveCount(3);
     await expect(steps.nth(0)).toContainText("30 minutos, por telefone");
     await expect(steps.nth(0)).toContainText("Grátis");
-    await expect(steps.nth(1)).toContainText("Semana 1");
-    await expect(steps.nth(2)).toContainText("Semana 2");
+    await expect(steps.nth(1)).toContainText("Uma semana, na sua empresa");
+    await expect(steps.nth(2)).toContainText("Em etapas de até duas semanas");
     for (let i = 0; i < 3; i++) await expect(steps.nth(i)).toContainText("Você recebe");
+    await expect(page.locator("#como-trabalhamos")).toContainText("Nem tudo cabe em duas semanas");
     await expect(page.locator("#como-trabalhamos")).toContainText("Acompanhamento mensal");
   });
 
@@ -133,8 +135,8 @@ test.describe("raw HTML of the market pages", () => {
 
 test.describe("the hero lead on the Brazilian home", () => {
   const HIGHLIGHT = "Vamos até a sua empresa";
-  const REST = ", achamos a rotina que mais pesa e a deixamos funcionando em duas semanas.";
-  const TAGLINE = "A primeira conversa é grátis: 30 minutos, por telefone.";
+  const REST = ", encontramos o serviço repetitivo que mais toma tempo da sua equipe e colocamos a IA para trabalhar nele.";
+  const TAGLINE = "A primeira conversa é grátis: 30 minutos, por telefone. Depois, uma semana de diagnóstico diz o que fazer e quanto custa.";
   const DESCRIPTION_START = `${HIGHLIGHT}${REST}`;
   const literal = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -327,9 +329,10 @@ test.describe("the diagnosis step of how it works", () => {
 test.describe("the Quem somos text on the Brazilian home", () => {
   test.skip(({ isMobile }) => !isMobile, "HTML is viewport-independent: run once");
 
-  test("carries one date, 2006, in the prerendered HTML", async ({ request }) => {
+  test("carries one date, 2006, in the prerendered HTML, in the tile and not in the text", async ({ request }) => {
     const html = await (await getAs(request, BR_HOST, "/")).text();
-    expect(html).toContain("trabalhamos com redes neurais desde 2006. É isso que entregamos");
+    expect(html).toContain("A base dele é a computação científica, onde o programa precisa dar a resposta certa.");
+    expect(html.match(/2006/g)).toHaveLength(1);
     expect(html).not.toContain("desde 2020");
   });
 });
@@ -361,7 +364,7 @@ test.describe("André's photo in Quem somos", () => {
     test.skip(isMobile, "two columns from sm up");
     const tile = (text: string) => page.locator("#quem-somos li").filter({ hasText: text }).boundingBox();
     const boxes = () =>
-      Promise.all(["André", "um cliente pagante usa o WaHub", "bem antes do ChatGPT", "desenvolvendo software"].map(tile));
+      Promise.all(["André", "atendendo pelo WhatsApp no dia a dia", "bem antes do ChatGPT", "desenvolvendo software"].map(tile));
     for (const width of [1280, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(brUrl("/"), { waitUntil: "networkidle" });
