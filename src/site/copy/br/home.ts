@@ -2,7 +2,8 @@ import type { ConsultingHomeCopy } from "../types";
 
 // Consulting first (decision of 14/11): the method leads, the products move down. Reworded on 17/11
 // so that no line counts clients, none promises a finished job in a fixed time, and a reader who
-// does not know what can be automated finds examples before the method. Vocabulary: "serviço" is
+// does not know what can be automated finds examples before the method. The page stays clean:
+// contract terms for edge cases belong in the written proposal, not here. Vocabulary: "serviço" is
 // the client's own task, "trabalho" is ours; "passo" is one of the three steps, "etapa" is one
 // slice of the construction. Three things are the product owner's and not decided: a price on the
 // site (see howItWorks.price), which CNPJ appears, and whether the city appears (see about.lead).
@@ -37,7 +38,7 @@ export const home: ConsultingHomeCopy = {
       "Fechar o mês juntando dados de várias planilhas e sistemas.",
       "Confirmar consulta, visita ou entrega, mensagem por mensagem.",
     ],
-    note: "Começamos por um deles. Os outros ficam para depois, um de cada vez, se você quiser. Não se viu na lista? É comum: a conversa serve para descobrir.",
+    note: "Começamos por um deles. Os outros ficam para depois, um de cada vez, se você quiser.",
   },
   howItWorks: {
     eyebrow: "Como funciona",
@@ -63,18 +64,18 @@ export const home: ConsultingHomeCopy = {
         when: "Em etapas de até duas semanas",
         title: "Construção",
         body: "Construímos e colocamos para funcionar dentro da sua empresa, junto com a sua equipe. Se o diagnóstico mostrar um trabalho pequeno, uma etapa basta.",
-        receives: "No fim de cada etapa: o que foi combinado por escrito, funcionando, e a sua equipe treinada para usar.",
+        receives: "No fim de cada etapa: o que foi combinado por escrito, funcionando na sua empresa.",
       },
     ],
     larger: {
       when: "Quando o trabalho é maior",
       title: "Nem tudo cabe em duas semanas",
-      body: "O diagnóstico mostra isso antes de você contratar a construção. O trabalho vem dividido em etapas, cada uma com entrega, prazo e preço por escrito. Terminada uma, você decide se segue para a próxima. Se algo mudar no caminho, vira outra etapa, combinada antes. O prazo vale quando o que depende de você (acessos, documentos, gente disponível) chega a tempo.",
+      body: "O diagnóstico mostra isso antes de você contratar a construção. O trabalho maior vem dividido em etapas, cada uma com entrega, prazo e preço por escrito, e você decide a cada uma se segue.",
     },
     followUp: {
       when: "Depois da entrega",
       title: "Acompanhamento mensal",
-      body: "O que continua funcionando tem uma mensalidade, dita antes de construir. Ela cobre a hospedagem, o uso da IA e os ajustes do dia a dia. Quando você quiser, partimos para o próximo serviço.",
+      body: "Acompanhamos o que ficou funcionando, ajustamos o que for preciso e, quando você quiser, partimos para o próximo serviço.",
     },
     price: {
       // ⏸ null until the product owner decides to show the price on the site.

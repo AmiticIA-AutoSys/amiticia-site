@@ -149,7 +149,8 @@ describe("examples of where the work starts", () => {
 
   it("says the work starts with one and the others come one at a time", () => {
     renderHome();
-    expect(section()).toHaveTextContent("Começamos por um deles. Os outros ficam para depois, um de cada vez, se você quiser.");
+    expect(section().textContent).toContain("Começamos por um deles. Os outros ficam para depois, um de cada vez, se você quiser.");
+    expect(section().textContent).not.toContain("Não se viu na lista");
   });
 });
 
@@ -200,7 +201,7 @@ describe("how it works", () => {
       expect(li).toHaveTextContent("Você recebe");
     }
     expect(steps()[1]).toHaveTextContent("em quantas etapas dá para fazer, com o prazo e o preço de cada uma");
-    expect(steps()[2]).toHaveTextContent("o que foi combinado por escrito, funcionando, e a sua equipe treinada para usar");
+    expect(steps()[2]).toHaveTextContent("No fim de cada etapa: o que foi combinado por escrito, funcionando na sua empresa.");
   });
 
   // 17/11: the fear is a client saying "you promised two weeks". The page says what happens when
@@ -210,9 +211,7 @@ describe("how it works", () => {
     const larger = within(section()).getByRole("heading", { level: 3, name: "Nem tudo cabe em duas semanas" }).closest("div")!;
     expect(section().querySelector("ol")!.compareDocumentPosition(larger) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(section()).toHaveTextContent("Quando o trabalho é maior");
-    expect(larger).toHaveTextContent("O diagnóstico mostra isso antes de você contratar a construção.");
-    expect(larger).toHaveTextContent("Terminada uma, você decide se segue para a próxima.");
-    expect(larger).toHaveTextContent("O prazo vale quando o que depende de você (acessos, documentos, gente disponível) chega a tempo.");
+    expect(larger).toHaveTextContent("O diagnóstico mostra isso antes de você contratar a construção. O trabalho maior vem dividido em etapas, cada uma com entrega, prazo e preço por escrito, e você decide a cada uma se segue.");
   });
 
   it("uses 'passo' for the three steps and 'etapa' only for the slices of the construction", () => {
@@ -223,12 +222,18 @@ describe("how it works", () => {
     expect(diagnosis).not.toHaveTextContent(/passo/i);
   });
 
-  it("says the monthly fee exists, after the steps and the bigger-job card", () => {
+  // 17/11, the product owner: the site stays clean. Contract terms for edge cases (a change of
+  // scope, a client's delay, the monthly fee, training) belong in the written proposal, not here.
+  it("keeps the contract terms for edge cases off the page", () => {
+    expect(JSON.stringify(brCopy.home)).not.toMatch(/mensalidade|vira outra etapa|acessos, documentos|chega a tempo|treinad|hospedagem/i);
+  });
+
+  it("offers the monthly follow-up after the steps and the bigger-job card", () => {
     renderHome();
     const followUp = within(section()).getByRole("heading", { level: 3, name: "Acompanhamento mensal" }).closest("div")!;
     expect(section().querySelector("ol")!.compareDocumentPosition(followUp) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(section()).toHaveTextContent("Depois da entrega");
-    expect(followUp).toHaveTextContent("O que continua funcionando tem uma mensalidade, dita antes de construir.");
+    expect(followUp).toHaveTextContent("Acompanhamos o que ficou funcionando, ajustamos o que for preciso e, quando você quiser, partimos para o próximo serviço.");
     const larger = within(section()).getByRole("heading", { level: 3, name: "Nem tudo cabe em duas semanas" });
     expect(larger.compareDocumentPosition(followUp) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
