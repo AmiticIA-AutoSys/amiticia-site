@@ -144,7 +144,7 @@ export interface ConsultingStep {
 }
 
 /**
- * The consulting-first home (Brazil, 14/11): method first, then what is already installed, the
+ * The consulting-first home (Brazil, 14/11): examples, method, then what is already installed, the
  * proof, who it is for and who it is not for. The products only move down.
  */
 export interface ConsultingHomeCopy {
@@ -153,6 +153,14 @@ export interface ConsultingHomeCopy {
   whatsappMessage: string;
   stickyCta: string;
   hero: HomeHeroCopy;
+  /** Everyday manual jobs the reader may recognise, before the method; `note` says it starts with one. */
+  examples: {
+    eyebrow: string;
+    title: string;
+    lead: string;
+    items: string[];
+    note: string;
+  };
   howItWorks: {
     eyebrow: string;
     title: string;
@@ -160,7 +168,9 @@ export interface ConsultingHomeCopy {
     /** Label of the "what you receive" box in each step. */
     receivesLabel: string;
     steps: ConsultingStep[];
-    /** The optional step after the steps. */
+    /** What happens when the job does not fit one stage: the card right after the steps. */
+    larger: { when: string; title: string; body: string };
+    /** What stays running after the delivery: the monthly follow-up. */
     followUp: { when: string; title: string; body: string };
     /**
      * ⏸ The price is the product owner's call (16/11, not decided). While `claim.value` is null the

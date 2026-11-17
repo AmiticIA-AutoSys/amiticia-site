@@ -9,10 +9,11 @@ import { AudienceSection } from "./sections/AudienceSection";
 import { ClosingSection } from "./sections/ClosingSection";
 import { HowItWorksSection } from "./sections/HowItWorksSection";
 import { FitSection } from "./sections/FitSection";
+import { ExamplesSection } from "./sections/ExamplesSection";
 
 /**
- * The market's home. Its copy picks the layout: consulting first (Brazil, since 14/11: method,
- * what is already installed, proof, who it is for) or product first (Italy).
+ * The market's home. Its copy picks the layout: consulting first (Brazil, since 14/11: examples,
+ * method, what is already installed, proof, who it is for) or product first (Italy).
  */
 export const HomePage = ({ copy: injected }: { copy?: MarketCopy["home"] }) => {
   const { market, copy: marketCopy } = useSitePage();
@@ -21,6 +22,7 @@ export const HomePage = ({ copy: injected }: { copy?: MarketCopy["home"] }) => {
     return (
       <>
         <HomeHero market={market} copy={copy.hero} />
+        <ExamplesSection copy={copy.examples} />
         <HowItWorksSection copy={copy.howItWorks} />
         <ProductsSection copy={copy.products} market={market} className="border-t border-border/60" />
         <AboutSection copy={copy.about} />
