@@ -329,9 +329,10 @@ test.describe("the diagnosis step of how it works", () => {
 test.describe("the Quem somos text on the Brazilian home", () => {
   test.skip(({ isMobile }) => !isMobile, "HTML is viewport-independent: run once");
 
-  test("carries one date, 2006, in the prerendered HTML", async ({ request }) => {
+  test("carries one date, 2006, in the prerendered HTML, in the tile and not in the text", async ({ request }) => {
     const html = await (await getAs(request, BR_HOST, "/")).text();
-    expect(html).toContain("trabalhamos com redes neurais desde 2006. É isso que entregamos");
+    expect(html).toContain("A base dele é a computação científica, onde o programa precisa dar a resposta certa.");
+    expect(html.match(/2006/g)).toHaveLength(1);
     expect(html).not.toContain("desde 2020");
   });
 });
