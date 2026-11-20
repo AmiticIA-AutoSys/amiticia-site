@@ -1,19 +1,20 @@
 #!/usr/bin/env bash
-# Starts ONLY the Cloudflare quick tunnel of the preview stack on the VPS and prints its public
+# Starts ONLY the Cloudflare quick tunnel of the preview stack on $PREVIEW_HOST and prints its public
 # https://*.trycloudflare.com URL (polls the tunnel logs for up to 60 s). If the tunnel already runs,
 # it just prints the current URL. Independent of scripts/preview-deploy.sh. Touches only /opt/amiticia/amiticia-site-preview and the
 # `amiticia-site-preview` compose project. See deploy/preview/docker-compose.yaml for the whole picture.
 set -euo pipefail
 
 REMOTE_DIR=/opt/amiticia/amiticia-site-preview
+PREVIEW_HOST="${PREVIEW_HOST:-oracle}"   # the second app host since 2026-11-20 (arm64)
 cd "$(dirname "$0")/.."
 
-echo "preview-tunnel: syncing the VPS checkout with the local v2-br"
+echo "preview-tunnel: syncing the preview checkout with the checked-out branch"
 bash scripts/preview-sync.sh
 
 echo "preview-tunnel: starting the tunnel service (compose project amiticia-site-preview)"
 echo "preview-tunnel: waiting up to 60 s for the tunnel URL"
-ssh hostinger bash -s -- "$REMOTE_DIR" <<'REMOTE'
+ssh "$PREVIEW_HOST" bash -s -- "$REMOTE_DIR" <<'REMOTE'
 set -euo pipefail
 cd "$1/deploy/preview"
 # --no-deps: the web service may not exist yet (its image is shipped by preview-deploy.sh).

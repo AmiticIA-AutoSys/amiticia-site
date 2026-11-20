@@ -1,10 +1,10 @@
 # Preview stack for amiticia.cc: a throwaway copy of the site that the product owners open on their
-# phones BEFORE anything changes on amiticia.cc. Lives on the Hostinger VPS in
-# /opt/amiticia/amiticia-site-preview (a checkout of this repo, branch v2-br), compose project
-# `amiticia-site-preview`.
+# phones BEFORE anything changes on amiticia.cc. Lives on the second app host (`ssh oracle`, arm64,
+# since 2026-11-20; Hostinger before) in /opt/amiticia/amiticia-site-preview (a checkout of this
+# repo at the branch being previewed), compose project `amiticia-site-preview`. Started on demand.
 #
 # What it is
-#   web     nginx serving the site image built locally with SITE_NOINDEX=1 (every page noindex).
+#   web     nginx serving the site image built on the host with SITE_NOINDEX=1 (every page noindex).
 #           nginx.preview.conf rewrites the baked https://amiticia.cc origin to the requested host,
 #           so canonical/og URLs follow whatever tunnel URL is current, with no rebuild.
 #           No ports published, no Traefik labels, NOT on network_public: production cannot see
@@ -12,12 +12,12 @@
 #   tunnel  a Cloudflare quick tunnel (random https://*.trycloudflare.com URL, no account, no DNS
 #           change, no Traefik router). The URL changes every time the tunnel starts.
 #
-# How to run it (the coordinator runs these; the scripts print each step). Both first sync the VPS
-# checkout with the local v2-br commit through a git bundle (scripts/preview-sync.sh): no GitHub push.
+# How to run it (the coordinator runs these; the scripts print each step). Both first sync the host's
+# checkout with the checked-out branch's commit through a git bundle (scripts/preview-sync.sh): no GitHub push.
 #   scripts/preview-deploy.sh   builds the image, ships it, starts `web` (rerun after each commit)
 #   scripts/preview-tunnel.sh   starts `tunnel` if needed and prints its current URL
-#   Any order. A tunnel restart (or a VPS reboot) gives a new URL: rerun preview-tunnel.sh to read it.
-#   Tear down:  ssh hostinger 'cd /opt/amiticia/amiticia-site-preview/deploy/preview && docker compose down'
+#   Any order. A tunnel restart (or a host reboot) gives a new URL: rerun preview-tunnel.sh to read it.
+#   Tear down:  ssh oracle 'cd /opt/amiticia/amiticia-site-preview/deploy/preview && docker compose down'
 #
 # Why a quick tunnel: it needs no DNS or Traefik change, so nothing near production is touched,
 # and `down` removes every trace. The link is public to anyone holding the URL: it is

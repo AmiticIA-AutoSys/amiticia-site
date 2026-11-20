@@ -152,11 +152,11 @@ Run them at the merge/release boundary, not in the commit gate. ⚠️ Probe `am
 
 ### Preview stack (phones see a branch before it merges)
 
-The preview stack is a throwaway copy of the site for phones. It runs on the same VPS, isolated
-from production:
+The preview stack is a throwaway copy of the site for phones, started on demand. It runs on the
+second app host (`ssh oracle`, arm64; set `PREVIEW_HOST` to use another), isolated from production:
 
 - **Where:** compose project `amiticia-site-preview` in `/opt/amiticia/amiticia-site-preview`, a
-  checkout of this repo on `v2-br`. Its files are in `deploy/preview/`.
+  checkout of this repo at the branch being previewed. Its files are in `deploy/preview/`.
 - **Isolation:** no Traefik labels, no `network_public`, no published ports, no DNS.
 - **URL:** a Cloudflare quick tunnel gives a random `https://*.trycloudflare.com` address. Anyone
   holding it can open the site; it is unguessable but not a secret.
@@ -168,20 +168,20 @@ from production:
 
 To bring it up:
 
-1. Commit on `v2-br`. No GitHub push is needed: both scripts call `scripts/preview-sync.sh`,
-   which ships the local `v2-br` to the VPS checkout as a git bundle over ssh.
-2. Run `scripts/preview-deploy.sh`. It builds the image locally with noindex, ships it with
-   `docker save | ssh … docker load`, and starts `web`. Rerun it after each commit.
+1. Commit on the branch to preview. No GitHub push is needed: both scripts call
+   `scripts/preview-sync.sh`, which ships that branch to the host's checkout as a git bundle over ssh.
+2. Run `scripts/preview-deploy.sh`. It builds the image on the host with noindex (arm64, so no
+   local build and no emulation) and starts `web`. Rerun it after each commit.
 3. Run `scripts/preview-tunnel.sh`. It starts the tunnel if needed and prints its current URL.
 
-The URL changes whenever the tunnel container restarts, including after a VPS reboot: rerun
+The URL changes whenever the tunnel container restarts, including after a host reboot: rerun
 `scripts/preview-tunnel.sh` to read the new one. Nothing needs a rebuild, because
 `nginx.preview.conf` rewrites both baked origins (`https://amiticia.cc` and `https://amiticia.com.br`)
 in HTML to the requested host, so canonical, og URLs and the language-switcher links follow the
 current tunnel.
 
 Tear down with
-`ssh hostinger 'cd /opt/amiticia/amiticia-site-preview/deploy/preview && docker compose down'`.
+`ssh oracle 'cd /opt/amiticia/amiticia-site-preview/deploy/preview && docker compose down'`.
 
 ### Gotchas
 
