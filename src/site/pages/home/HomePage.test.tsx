@@ -36,7 +36,7 @@ describe("Brazilian home, consulting first", () => {
       "Sua equipe faz algum destes serviços toda semana?",
       "Você decide a cada passo",
       "O que já construímos",
-      "Quem vai até a sua empresa",
+      "Quem cuida do seu projeto",
       "É para a sua empresa?",
       "Vamos conversar?",
     ]);
@@ -366,7 +366,7 @@ describe("the Brazilian menu", () => {
 describe("the proof: who comes to your company", () => {
   const about = () => document.getElementById("quem-somos") as HTMLElement;
   const BODY =
-    "A base dele é a computação científica, onde o programa precisa dar a resposta certa. É com esse cuidado que a solução é construída: para funcionar no dia a dia da sua empresa e não virar dor de cabeça lá na frente.";
+    "A nossa base é a computação científica, onde o programa precisa dar a resposta certa. É com esse cuidado que a solução é construída: para funcionar no dia a dia da sua empresa e não virar dor de cabeça lá na frente.";
 
   // 17/11: "um cliente pagante" told the reader how many clients there are. The tile says the
   // product is in use and counts nothing.
@@ -378,64 +378,46 @@ describe("the proof: who comes to your company", () => {
     expect(about().textContent).not.toMatch(/R\$|\bPRV\b|por mês/i);
   });
 
-  it("says who comes, speaks of his history in his name, and repeats no date from the tiles", () => {
+  it("says who takes care of the project, speaking as the company, and repeats no date from the tiles", () => {
     renderHome();
-    expect(within(about()).getByRole("heading", { level: 2 })).toHaveTextContent("Quem vai até a sua empresa");
-    expect(about()).toHaveTextContent("É o André quem conversa com você, vai até a sua empresa e constrói a solução. Do começo ao fim, a mesma pessoa.");
+    expect(within(about()).getByRole("heading", { level: 2 })).toHaveTextContent("Quem cuida do seu projeto");
+    expect(about()).toHaveTextContent(
+      "A mesma equipe conversa com você, entende como a sua empresa funciona e constrói a solução. Do começo ao fim.",
+    );
     const paragraphs = Array.from(about().querySelectorAll("p")).map((p) => p.textContent);
     expect(paragraphs).toContain(BODY);
     expect(about().textContent).not.toContain("desde 2020");
-    expect(BODY).not.toMatch(/2006|[Nn]ossa base|trabalhamos/);
+    expect(BODY).not.toMatch(/2006|trabalhamos/);
   });
 
-  it("keeps the experience tiles, without the HPC jargon", () => {
+  it("keeps the experience tiles, told as the team's, without the HPC jargon", () => {
     renderHome();
-    expect(about()).toHaveTextContent("redes neurais, bem antes do ChatGPT");
-    expect(about()).toHaveTextContent("desenvolvendo software");
+    expect(about()).toHaveTextContent("redes neurais na equipe, bem antes do ChatGPT");
+    expect(about()).toHaveTextContent("de experiência da equipe em desenvolvimento de software");
     expect(about().textContent).not.toContain("HPC");
+  });
+
+  it("lays the three tiles out as the Italian home does: the first spans both columns", () => {
+    renderHome();
+    const tiles = within(about()).getAllByRole("listitem");
+    expect(tiles).toHaveLength(3);
+    expect(tiles[0]).toHaveClass("sm:col-span-2");
+    expect(tiles[1]).not.toHaveClass("sm:col-span-2");
+    expect(tiles[2]).not.toHaveClass("sm:col-span-2");
   });
 });
 
-describe("home Quem somos photo", () => {
-  const about = () => document.getElementById("quem-somos") as HTMLElement;
-  const photo = () => within(about()).getByRole("img", { name: "Foto de André" });
-
-  it("shows André's photo, captioned with his name and nothing else", () => {
-    renderHome();
-    expect(photo().closest("figure")?.querySelector("figcaption")?.textContent).toBe("André");
+describe("the Brazilian home names and shows no person", () => {
+  it("has no image of a person, no figure and no André in the page", () => {
+    const { container } = renderHome();
+    expect(container.querySelector("#quem-somos img, #quem-somos figure, #quem-somos figcaption")).toBeNull();
+    expect(container.innerHTML).not.toMatch(/\bandr[eé](?![\p{L}])/iu);
+    expect(container.querySelectorAll("img[alt*='Foto' i], img[src*='andre']")).toHaveLength(0);
   });
 
-  it("describes him as neither founder nor owner", () => {
-    renderHome();
-    expect(about().textContent).not.toMatch(/fundador|fundou|founder|dono|propriet|s[oó]cio|CEO/i);
-  });
-
-  it("reserves its space, loads lazily and offers both sizes", () => {
-    renderHome();
-    expect(photo()).toHaveAttribute("width", "540");
-    expect(photo()).toHaveAttribute("height", "675");
-    expect(photo()).toHaveAttribute("loading", "lazy");
-    expect(photo().getAttribute("srcset")).toMatch(/270w.*540w/);
-    expect(photo().getAttribute("sizes")).toBeTruthy();
-  });
-
-  it("shares the highlight tiles' card: same radius, border and surface", () => {
-    renderHome();
-    const card = photo().closest("li") as HTMLElement;
-    const tile = within(about()).getByText("desenvolvendo software").closest("li") as HTMLElement;
-    for (const name of ["rounded-[20px]", "border", "border-border", "bg-surface"]) {
-      expect(card).toHaveClass(name);
-      expect(tile).toHaveClass(name);
-    }
-  });
-
-  it.each(["andre-270.webp", "andre-540.webp"])("%s is a small WebP with no metadata", (name) => {
-    const bytes = readFileSync(`src/site/assets/${name}`);
-    expect(bytes.subarray(0, 4).toString("latin1")).toBe("RIFF");
-    expect(bytes.subarray(8, 12).toString("latin1")).toBe("WEBP");
-    expect(bytes.includes("EXIF")).toBe(false);
-    expect(bytes.includes("XMP ")).toBe(false);
-    expect(bytes.length).toBeLessThanOrEqual(60 * 1024);
+  it("carries no person in the copy", () => {
+    expect(JSON.stringify(brCopy.home)).not.toMatch(/\bandr[eé](?![\p{L}])/iu);
+    expect("photo" in brCopy.home.about).toBe(false);
   });
 });
 

@@ -6,7 +6,7 @@ const sectionHeadings = [
   "Sua equipe faz algum destes serviços toda semana?",
   "Você decide a cada passo",
   "O que já construímos",
-  "Quem vai até a sua empresa",
+  "Quem cuida do seu projeto",
   "É para a sua empresa?",
   "Vamos conversar?",
 ];
@@ -326,45 +326,29 @@ test.describe("the diagnosis step of how it works", () => {
   });
 });
 
-test.describe("the Quem somos text on the Brazilian home", () => {
-  test.skip(({ isMobile }) => !isMobile, "HTML is viewport-independent: run once");
-
-  test("carries one date, 2006, in the prerendered HTML, in the tile and not in the text", async ({ request }) => {
+test.describe("the Quem somos section on the Brazilian home", () => {
+  test("carries one date, 2006, in the prerendered HTML, in the tile and not in the text", async ({ request, isMobile }) => {
+    test.skip(!isMobile, "HTML is viewport-independent: run once");
     const html = await (await getAs(request, BR_HOST, "/")).text();
-    expect(html).toContain("A base dele é a computação científica, onde o programa precisa dar a resposta certa.");
+    expect(html).toContain("A nossa base é a computação científica, onde o programa precisa dar a resposta certa.");
     expect(html.match(/2006/g)).toHaveLength(1);
     expect(html).not.toContain("desde 2020");
   });
-});
 
-test.describe("André's photo in Quem somos", () => {
-  const photo = (page: Page) => page.locator("#quem-somos").getByRole("img", { name: "Foto de André" });
-
-  test("is in the prerendered Brazilian HTML, captioned only with his name, its size reserved", async ({ request, isMobile }) => {
+  test("names and shows no person: no André, no image and no figure in the prerendered HTML", async ({ request, isMobile }) => {
     test.skip(!isMobile, "HTML is viewport-independent: run once");
-    const home = await (await getAs(request, BR_HOST, "/")).text();
-    const img = home.match(/<img[^>]*alt="Foto de André"[^>]*>/)?.[0] ?? "";
-    expect(img).toContain('width="540"');
-    expect(img).toContain('height="675"');
-    expect(img).toContain('loading="lazy"');
-    expect(home).toMatch(/<figcaption[^>]*>André<\/figcaption>/);
+    const html = await (await getAs(request, BR_HOST, "/")).text();
+    const section = html.match(/<section[^>]*id="quem-somos"[\s\S]*?<\/section>/)?.[0] ?? "";
+    expect(section).toContain("Quem cuida do seu projeto");
+    expect(section).toContain("A mesma equipe conversa com você");
+    expect(section).not.toMatch(/<img|<figure|<figcaption/);
+    expect(html).not.toMatch(/\bandr[eé](?![\p{L}])/iu);
   });
 
-  test("loads as a real image with its caption", async ({ page }) => {
-    await page.goto(brUrl("/"), { waitUntil: "networkidle" });
-    await photo(page).scrollIntoViewIfNeeded();
-    await expect(photo(page)).toBeVisible();
-    await expect
-      .poll(() => photo(page).evaluate((img: HTMLImageElement) => (img.complete ? img.naturalWidth : 0)))
-      .toBeGreaterThan(0);
-    await expect(page.locator("#quem-somos figcaption")).toHaveText("André");
-  });
-
-  test("on desktop sits below the first tile, to the left of the other two", async ({ page, isMobile }) => {
+  test("lays the three tiles out like Italy: the first spans both columns, the other two sit side by side", async ({ page, isMobile }) => {
     test.skip(isMobile, "two columns from sm up");
     const tile = (text: string) => page.locator("#quem-somos li").filter({ hasText: text }).boundingBox();
-    const boxes = () =>
-      Promise.all(["André", "atendendo pelo WhatsApp no dia a dia", "bem antes do ChatGPT", "desenvolvendo software"].map(tile));
+    const boxes = () => Promise.all(["atendendo pelo WhatsApp no dia a dia", "bem antes do ChatGPT", "de experiência da equipe"].map(tile));
     for (const width of [1280, 1440]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto(brUrl("/"), { waitUntil: "networkidle" });
@@ -379,34 +363,38 @@ test.describe("André's photo in Quem somos", () => {
           return stable;
         })
         .toBe(true);
-      const [card, first, second, third] = JSON.parse(last) as Array<{ x: number; y: number; width: number; height: number }>;
-      expect(card.y).toBeGreaterThanOrEqual(first.y + first.height);
-      expect(card.x + card.width).toBeLessThanOrEqual(second.x);
-      expect(Math.abs(card.y - second.y)).toBeLessThanOrEqual(1);
-      expect(Math.abs(card.y + card.height - (third.y + third.height))).toBeLessThanOrEqual(1);
+      const [first, second, third] = JSON.parse(last) as Array<{ x: number; y: number; width: number; height: number }>;
+      expect(second.y).toBeGreaterThanOrEqual(first.y + first.height);
+      expect(second.x + second.width).toBeLessThanOrEqual(third.x);
+      expect(Math.abs(second.y - third.y)).toBeLessThanOrEqual(1);
+      expect(second.x).toBeLessThanOrEqual(first.x + 1);
+      expect(Math.abs(first.x + first.width - (third.x + third.width))).toBeLessThanOrEqual(1);
     }
   });
 
-  test("on a phone stacks first, inside the viewport, with no horizontal scroll", async ({ page, isMobile }) => {
+  test("on a phone stacks the tiles inside the viewport, with no horizontal scroll", async ({ page, isMobile }) => {
     test.skip(!isMobile, "one column below sm");
     for (const width of [360, 390]) {
       await page.setViewportSize({ width, height: 800 });
       await page.goto(brUrl("/"), { waitUntil: "networkidle" });
-      const card = page.locator("#quem-somos li").first();
-      await expect(card.getByRole("img", { name: "Foto de André" })).toHaveCount(1);
-      await card.scrollIntoViewIfNeeded();
-      const box = await card.boundingBox();
-      expect(box!.x).toBeGreaterThanOrEqual(0);
-      expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+      const tiles = page.locator("#quem-somos li");
+      await expect(tiles).toHaveCount(3);
+      await expect(page.locator("#quem-somos img")).toHaveCount(0);
+      await tiles.first().scrollIntoViewIfNeeded();
+      for (let i = 0; i < 3; i++) {
+        const box = await tiles.nth(i).boundingBox();
+        expect(box!.x).toBeGreaterThanOrEqual(0);
+        expect(box!.x + box!.width).toBeLessThanOrEqual(width);
+      }
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
     }
   });
 
-  test("Italy has no photo", async ({ page }) => {
+  test("Italy has no photo and no André either", async ({ page }) => {
     for (const path of ["/it", "/it/wahub"]) {
       await page.goto(itUrl(path), { waitUntil: "networkidle" });
       await expect(page.locator("#quem-somos img, #quem-somos figure")).toHaveCount(0);
-      expect(await page.content()).not.toContain("andre-");
+      expect(await page.content()).not.toMatch(/\bandr[eé](?![\p{L}])/iu);
     }
   });
 });

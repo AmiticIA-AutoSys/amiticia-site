@@ -108,20 +108,20 @@ export const home: ConsultingHomeCopy = {
       },
     ],
   },
+  // Quem somos speaks as the company ("nós", "a equipe"): no person is named or shown, in any market.
   about: {
     eyebrow: "Quem somos",
-    title: "Quem vai até a sua empresa",
+    title: "Quem cuida do seu projeto",
     // The line that would carry the city, if the product owner decides to show it.
-    lead: "É o André quem conversa com você, vai até a sua empresa e constrói a solução. Do começo ao fim, a mesma pessoa.",
-    // His history is told in his name, not the company's, and repeats no date from the tiles.
-    body: "A base dele é a computação científica, onde o programa precisa dar a resposta certa. É com esse cuidado que a solução é construída: para funcionar no dia a dia da sua empresa e não virar dor de cabeça lá na frente.",
+    lead: "A mesma equipe conversa com você, entende como a sua empresa funciona e constrói a solução. Do começo ao fim.",
+    // The team's history is told in the company's voice and repeats no date from the tiles.
+    body: "A nossa base é a computação científica, onde o programa precisa dar a resposta certa. É com esse cuidado que a solução é construída: para funcionar no dia a dia da sua empresa e não virar dor de cabeça lá na frente.",
     highlights: [
       // In use, with no count of who uses it.
       { value: "Em uso", label: "o WaHub, atendendo pelo WhatsApp no dia a dia" },
-      { value: "IA desde 2006", label: "redes neurais, bem antes do ChatGPT" },
-      { value: "+20 anos", label: "desenvolvendo software" },
+      { value: "IA desde 2006", label: "redes neurais na equipe, bem antes do ChatGPT" },
+      { value: "+20 anos", label: "de experiência da equipe em desenvolvimento de software" },
     ],
-    photo: { alt: "Foto de André", caption: "André" },
   },
   fit: {
     title: "É para a sua empresa?",
