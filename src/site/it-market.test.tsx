@@ -103,15 +103,15 @@ describe("Brazilian links carry no /br prefix", () => {
   }
 });
 
-describe("the Quem somos photo is Brazilian only", () => {
-  it.each(["/it", "/it/wahub"])("%s has no photo", (path) => {
+describe("no market shows a person in Chi siamo / Quem somos", () => {
+  it.each(["/it", "/it/wahub"])("%s has no photo and no André", (path) => {
     const { container } = renderAt(path);
     expect(container.querySelector("#quem-somos img, #quem-somos figure")).toBeNull();
     expect(container.innerHTML).not.toContain("andre-");
-    expect(container.textContent).not.toContain("André");
+    expect(container.textContent).not.toMatch(/\bandr[eé](?![\p{L}])/iu);
   });
 
   it("has no photo in its copy", () => {
-    expect(itCopy.home.about.photo).toBeUndefined();
+    expect("photo" in itCopy.home.about).toBe(false);
   });
 });
