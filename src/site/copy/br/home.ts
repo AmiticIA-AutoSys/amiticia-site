@@ -12,16 +12,16 @@ export const home: ConsultingHomeCopy = {
   meta: {
     title: "AmiticIA - IA funcionando no seu negócio",
     description:
-      "Vamos até a sua empresa, encontramos o serviço repetitivo que mais toma tempo da sua equipe e colocamos a IA para trabalhar nele. A primeira conversa é grátis.",
+      "Mapeamos o serviço repetitivo que mais toma tempo da sua equipe e colocamos a IA para trabalhar nele. A primeira conversa é grátis.",
   },
   whatsappMessage: "Olá! Vim pelo site da AmiticIA e quero marcar a conversa de 30 minutos.",
   stickyCta: "Marcar a conversa",
   hero: {
     title: "IA funcionando no seu negócio.",
-    leadHighlight: "Vamos até a sua empresa",
-    leadRest: ", encontramos o serviço repetitivo que mais toma tempo da sua equipe e colocamos a IA para trabalhar nele.",
+    leadHighlight: "Mapeamos o serviço repetitivo",
+    leadRest: " que mais toma tempo da sua equipe e colocamos a IA para trabalhar nele.",
     tagline:
-      "A primeira conversa é grátis: 30 minutos, por telefone. Depois, uma semana de diagnóstico diz o que fazer e quanto custa.",
+      "A primeira conversa é grátis: 30 minutos, por vídeo, sobre um processo, e você recebe o mapa dele no mesmo dia. Depois, a análise dos processos diz o que fazer e quanto custa.",
     primaryCta: "Marcar a conversa",
     secondaryCta: "Ver como funciona",
     secondaryHref: "#como-trabalhamos",
@@ -47,30 +47,30 @@ export const home: ConsultingHomeCopy = {
     receivesLabel: "Você recebe",
     steps: [
       {
-        when: "30 minutos, por telefone",
+        when: "30 minutos, por vídeo",
         badge: "Grátis",
-        title: "Conversa",
-        body: "Você conta como a empresa funciona hoje. Nós perguntamos onde o serviço emperra, onde se repete e onde depende de uma pessoa só.",
-        receives: "Uma resposta direta: se vale olhar mais de perto e por onde começar. Se não valer, dizemos.",
+        title: "Diagnóstico",
+        body: "Você escolhe o processo que mais pesa e conta como ele funciona hoje, a partir do último caso real. Nós perguntamos quantos casos, quanto tempo leva e quanto custa um erro.",
+        receives: "No mesmo dia, o mapa desse processo em uma página: onde trava, quanto custa por mês e até três pontos onde dá para cortar custo.",
       },
       {
-        when: "Uma semana, na sua empresa",
-        title: "Diagnóstico",
-        body: "Vamos até a empresa e acompanhamos quem faz o serviço, do começo ao fim. Juntos, escolhemos por onde começar: o que ajuda mais e é mais fácil de fazer.",
+        when: "Escopo e preço fechados antes de começar",
+        title: "Análise dos processos",
+        body: "Conferimos o processo com quem faz o serviço e medimos a IA nos seus casos antigos, antes de você depender dela. Quando o processo pede, vamos até a empresa.",
         receives:
-          "Por escrito: o que fazer primeiro, o que depende de você e em quantas etapas dá para fazer, com o prazo e o preço de cada uma.",
+          "Por escrito: o processo de hoje conferido, o processo novo, os riscos, a conta do ganho e um parecer: implantar, testar, aprofundar ou não seguir. Com o prazo e o preço de cada etapa.",
       },
       {
         when: "Em etapas de até duas semanas",
         title: "Construção",
-        body: "Construímos e colocamos para funcionar dentro da sua empresa, junto com a sua equipe. Se o diagnóstico mostrar um trabalho pequeno, uma etapa basta.",
+        body: "Construímos e colocamos para funcionar dentro da sua empresa, junto com a sua equipe. Se a análise mostrar um trabalho pequeno, uma etapa basta.",
         receives: "No fim de cada etapa: o que foi combinado por escrito, funcionando na sua empresa.",
       },
     ],
     larger: {
       when: "Quando o trabalho é maior",
       title: "Nem tudo cabe em duas semanas",
-      body: "O diagnóstico mostra isso antes de você contratar a construção. O trabalho maior vem dividido em etapas, cada uma com entrega, prazo e preço por escrito, e você decide a cada uma se segue.",
+      body: "A análise dos processos mostra isso antes de você contratar a construção. O trabalho maior vem dividido em etapas, cada uma com entrega, prazo e preço por escrito, e você decide a cada uma se segue.",
     },
     followUp: {
       when: "Depois da entrega",
@@ -81,10 +81,10 @@ export const home: ConsultingHomeCopy = {
       // ⏸ null until the product owner decides to show the price on the site.
       claim: {
         value: null,
-        template: "O diagnóstico custa {value}. O preço de cada etapa vem fechado no diagnóstico, antes de você contratar.",
+        template: "A análise dos processos custa {value}. O preço de cada etapa vem fechado na análise, antes de você contratar.",
       },
       fallback:
-        "O preço do diagnóstico você fica sabendo na conversa. O de cada etapa vem fechado no diagnóstico, antes de você contratar.",
+        "O preço da análise dos processos você fica sabendo na conversa, com o escopo fechado. O de cada etapa vem na análise, antes de você contratar.",
     },
   },
   products: {
@@ -129,7 +129,7 @@ export const home: ConsultingHomeCopy = {
     forItems: [
       "Empresas pequenas e médias em que a equipe gasta horas, toda semana, com serviço repetitivo.",
       "Quem prefere começar pequeno e ver funcionando antes de investir mais.",
-      "Quem pode nos receber na empresa e liberar algumas horas da equipe para mostrar como o serviço é feito hoje.",
+      "Quem pode separar 30 minutos para contar como o serviço é feito hoje e mostrar o último caso real.",
     ],
     notForTitle: "Para quem não é",
     notForItems: [
@@ -140,7 +140,7 @@ export const home: ConsultingHomeCopy = {
   },
   closing: {
     title: "Vamos conversar?",
-    body: "Você marca pelo WhatsApp e a conversa é por telefone: 30 minutos, sem custo. No fim você sabe se vale olhar mais de perto e por onde começar.",
+    body: "Você marca pelo WhatsApp e a conversa é por vídeo: 30 minutos, sem custo. No mesmo dia você recebe o mapa do processo em uma página.",
     cta: "Marcar a conversa",
   },
 };

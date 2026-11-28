@@ -132,7 +132,7 @@ export interface HomeCopy {
 
 /** One step of the consulting offer: how long it takes and what the client receives. */
 export interface ConsultingStep {
-  /** Duration or moment: "30 minutos, por telefone", "Semana 1". */
+  /** Duration or moment: "30 minutos, por vídeo", "Semana 1". */
   when: string;
   /** Set: a small tag beside the duration ("Grátis"). */
   badge?: string;
