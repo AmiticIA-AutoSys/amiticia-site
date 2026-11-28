@@ -436,12 +436,12 @@ describe("who it is for, and who it is not for", () => {
     expect(list("Para quem não é")).toHaveLength(3);
   });
 
-  it("names small businesses and the team's time, and turns away a plain site or app", () => {
+  it("names small businesses and a 30-minute conversation, and turns away a plain site or app", () => {
     renderHome();
     expect(list("Para quem é")[0]).toHaveTextContent(
       "Empresas pequenas e médias em que a equipe gasta horas, toda semana, com serviço repetitivo.",
     );
-    expect(list("Para quem é")[2]).toHaveTextContent("liberar algumas horas da equipe");
+    expect(list("Para quem é")[2]).toHaveTextContent("separar 30 minutos");
     expect(list("Para quem não é")[1]).toHaveTextContent(
       "Quem quer o preço de um projeto grande antes de alguém olhar como o serviço é feito.",
     );
@@ -453,7 +453,7 @@ describe("home closing", () => {
   it("asks for the free conversation on WhatsApp", () => {
     renderHome();
     const closing = screen.getByRole("heading", { level: 2, name: "Vamos conversar?" }).parentElement!;
-    expect(closing).toHaveTextContent("Você marca pelo WhatsApp e a conversa é por telefone: 30 minutos, sem custo. No fim você sabe se vale olhar mais de perto e por onde começar.");
+    expect(closing).toHaveTextContent("Você marca pelo WhatsApp e a conversa é por vídeo: 30 minutos, sem custo. No mesmo dia você recebe o mapa do processo em uma página.");
     expect(within(closing).getByRole("link", { name: /Marcar a conversa/ })).toHaveAttribute(
       "href",
       expect.stringContaining("https://wa.me/"),

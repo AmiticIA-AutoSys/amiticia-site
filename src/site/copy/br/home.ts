@@ -129,7 +129,7 @@ export const home: ConsultingHomeCopy = {
     forItems: [
       "Empresas pequenas e médias em que a equipe gasta horas, toda semana, com serviço repetitivo.",
       "Quem prefere começar pequeno e ver funcionando antes de investir mais.",
-      "Quem pode nos receber na empresa e liberar algumas horas da equipe para mostrar como o serviço é feito hoje.",
+      "Quem pode separar 30 minutos para contar como o serviço é feito hoje e mostrar o último caso real.",
     ],
     notForTitle: "Para quem não é",
     notForItems: [
@@ -140,7 +140,7 @@ export const home: ConsultingHomeCopy = {
   },
   closing: {
     title: "Vamos conversar?",
-    body: "Você marca pelo WhatsApp e a conversa é por telefone: 30 minutos, sem custo. No fim você sabe se vale olhar mais de perto e por onde começar.",
+    body: "Você marca pelo WhatsApp e a conversa é por vídeo: 30 minutos, sem custo. No mesmo dia você recebe o mapa do processo em uma página.",
     cta: "Marcar a conversa",
   },
 };
