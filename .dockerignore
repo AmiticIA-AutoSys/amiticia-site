@@ -16,3 +16,4 @@ dist-ssr
 .husky
 playwright-report
 test-results
+shots

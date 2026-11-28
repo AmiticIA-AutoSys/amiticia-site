@@ -46,12 +46,11 @@ npm run build      # client + SSR build, then prerender the market pages into di
 npm run typecheck  # tsc --noEmit -p tsconfig.app.json
 npm run lint       # ESLint
 npm test           # vitest (unit + component)
-npm run e2e        # build the Docker image, run it on 127.0.0.1:${E2E_PORT:-4310}, run Playwright (both hostnames hit that one container)
+npm run e2e        # build the Docker image, run it on 127.0.0.1:${E2E_PORT:-4310}, run Playwright (both hostnames hit that one container; parallel worktrees need distinct E2E_PORT values)
+npm run shots      # same image on E2E_PORT (default 4395): phone and desktop PNGs of each market page in shots/ (narrow with --market, --page, --device)
 npm run og         # regenerate the share images public/og/br-*.jpg (rerun and commit after an h1/eyebrow change)
 bash scripts/e2e-preview-nginx.sh   # check the preview stack's nginx: noindex, no /k, robots.txt
 ```
-
-Parallel worktrees must use different `E2E_PORT` values.
 
 `npm run build` reads one build-time variable (Docker build arg of the same name): `SITE_NOINDEX=1`,
 which marks every prerendered page noindex. Canonical and og origins come from the market registry, not
@@ -77,7 +76,7 @@ src/
   entry-server.tsx   SSR entry used by the prerender
 public/og/           share images, 1200×630 JPEG ≤ 180 KB (WhatsApp drops bigger ones)
 e2e/                 Playwright specs
-scripts/             prerender, e2e-preview, og/ (share images), preview-* (VPS preview stack)
+scripts/             prerender, e2e-preview, shots/ + shots.sh (PR screenshots), og/ (share images), preview-* (VPS preview stack)
 deploy/              production compose: the VPS checkout deploys from here
 deploy/preview/      throwaway preview stack (quick tunnel, noindex): see Preview stack
 .github/workflows/   deploy.yml: build → ghcr.io → SSH deploy (push to main only)
@@ -93,6 +92,8 @@ Red → Green → Refactor. Which test proves which kind of change:
 | Component behaviour (clicks tracked, tabs, chat final frame, reduced motion) | vitest + Testing Library |
 | Prerendered HTML, routing, nginx headers and redirects per domain, hydration, mobile overflow, CTA visibility, root redirect, axe | Playwright against the Docker image (`npm run e2e`): browsers reach `amiticia.com.br`/`amiticia.cc` through Chromium `--host-resolver-rules` (`playwright.config.ts`), `request` calls send an explicit `Host` header (`getAs` in `e2e/fixtures.ts`); `e2e/domains.spec.ts` proves both reach the right host |
 | Visual quality | build → screenshot at 360/390/768/1280/1440 → critique loop (`standards/skills/frontend-design`) |
+
+A PR that changes what a visitor sees carries `npm run shots` images of the changed screens, pushed to an orphan branch `evidence/pr-<N>` and embedded in the PR body or a comment through `raw.githubusercontent.com` links.
 
 **Pre-commit stack** (husky): `pre-commit` runs `typecheck`, `lint`, `test`; `commit-msg` runs
 commitlint (Conventional Commits); `pre-push` runs `npm run e2e`. Never `--no-verify`.
