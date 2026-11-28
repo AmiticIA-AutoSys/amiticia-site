@@ -31,9 +31,9 @@ test.describe("/br home", () => {
     await page.goto(brUrl("/"), { waitUntil: "networkidle" });
     const steps = page.locator("#como-trabalhamos ol > li");
     await expect(steps).toHaveCount(3);
-    await expect(steps.nth(0)).toContainText("30 minutos, por telefone");
+    await expect(steps.nth(0)).toContainText("30 minutos, por vídeo");
     await expect(steps.nth(0)).toContainText("Grátis");
-    await expect(steps.nth(1)).toContainText("Uma semana, na sua empresa");
+    await expect(steps.nth(1)).toContainText("Escopo e preço fechados antes de começar");
     await expect(steps.nth(2)).toContainText("Em etapas de até duas semanas");
     for (let i = 0; i < 3; i++) await expect(steps.nth(i)).toContainText("Você recebe");
     await expect(page.locator("#como-trabalhamos")).toContainText("Nem tudo cabe em duas semanas");
@@ -134,9 +134,10 @@ test.describe("raw HTML of the market pages", () => {
 });
 
 test.describe("the hero lead on the Brazilian home", () => {
-  const HIGHLIGHT = "Vamos até a sua empresa";
-  const REST = ", encontramos o serviço repetitivo que mais toma tempo da sua equipe e colocamos a IA para trabalhar nele.";
-  const TAGLINE = "A primeira conversa é grátis: 30 minutos, por telefone. Depois, uma semana de diagnóstico diz o que fazer e quanto custa.";
+  const HIGHLIGHT = "Mapeamos o serviço repetitivo";
+  const REST = " que mais toma tempo da sua equipe e colocamos a IA para trabalhar nele.";
+  const TAGLINE =
+    "A primeira conversa é grátis: 30 minutos, por vídeo, sobre um processo, e você recebe o mapa dele no mesmo dia. Depois, a análise dos processos diz o que fazer e quanto custa.";
   const DESCRIPTION_START = `${HIGHLIGHT}${REST}`;
   const literal = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -320,6 +321,7 @@ test.describe("the diagnosis step of how it works", () => {
   test('reads "Diagnóstico" on the Brazilian pages, never "Diagnóstico Rápido"', async ({ request }) => {
     const home = await (await getAs(request, BR_HOST, "/")).text();
     expect(home).toMatch(/<h3[^>]*>Diagnóstico<\/h3>/);
+    expect(home).toMatch(/<h3[^>]*>Análise dos processos<\/h3>/);
     for (const path of ["/", "/wahub"]) {
       expect(await (await getAs(request, BR_HOST, path)).text()).not.toContain("Diagnóstico Rápido");
     }

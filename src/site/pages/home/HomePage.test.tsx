@@ -66,9 +66,10 @@ describe("Brazilian home, consulting first", () => {
 
 describe("home hero lead", () => {
   const TITLE = "IA funcionando no seu negócio.";
-  const HIGHLIGHT = "Vamos até a sua empresa";
-  const LEAD = `${HIGHLIGHT}, encontramos o serviço repetitivo que mais toma tempo da sua equipe e colocamos a IA para trabalhar nele.`;
-  const TAGLINE = "A primeira conversa é grátis: 30 minutos, por telefone. Depois, uma semana de diagnóstico diz o que fazer e quanto custa.";
+  const HIGHLIGHT = "Mapeamos o serviço repetitivo";
+  const LEAD = `${HIGHLIGHT} que mais toma tempo da sua equipe e colocamos a IA para trabalhar nele.`;
+  const TAGLINE =
+    "A primeira conversa é grátis: 30 minutos, por vídeo, sobre um processo, e você recebe o mapa dele no mesmo dia. Depois, a análise dos processos diz o que fazer e quanto custa.";
   const DESCRIPTION = `${LEAD} A primeira conversa é grátis.`;
 
   const hero = () => screen.getByRole("heading", { level: 1 }).closest("section")!;
@@ -173,25 +174,25 @@ describe("how it works", () => {
   const section = () => document.getElementById("como-trabalhamos") as HTMLElement;
   const steps = () => within(section()).getAllByRole("listitem").filter((li) => li.parentElement?.tagName === "OL");
 
-  it("has three numbered steps: the conversation, the diagnosis, the construction", () => {
+  it("has three numbered steps: the diagnosis, the process analysis, the construction", () => {
     renderHome();
     expect(within(section()).getByRole("heading", { level: 2 })).toHaveTextContent("Você decide a cada passo");
     expect(steps()).toHaveLength(3);
     expect(steps().map((li) => within(li).getByRole("heading", { level: 3 }).textContent)).toEqual([
-      "Conversa",
       "Diagnóstico",
+      "Análise dos processos",
       "Construção",
     ]);
   });
 
-  it("says how long each step takes, and that the conversation is free and by phone", () => {
+  it("says how long each step takes, and that only the diagnosis is free and by video", () => {
     renderHome();
-    const [talk, diagnosis, build] = steps();
-    expect(talk).toHaveTextContent("30 minutos, por telefone");
-    expect(talk).toHaveTextContent("Grátis");
-    expect(diagnosis).toHaveTextContent("Uma semana, na sua empresa");
+    const [diagnosis, analysis, build] = steps();
+    expect(diagnosis).toHaveTextContent("30 minutos, por vídeo");
+    expect(diagnosis).toHaveTextContent("Grátis");
+    expect(analysis).toHaveTextContent("Escopo e preço fechados antes de começar");
     expect(build).toHaveTextContent("Em etapas de até duas semanas");
-    expect(diagnosis).not.toHaveTextContent("Grátis");
+    expect(analysis).not.toHaveTextContent("Grátis");
     expect(build).not.toHaveTextContent("Grátis");
   });
 
@@ -200,7 +201,8 @@ describe("how it works", () => {
     for (const li of steps()) {
       expect(li).toHaveTextContent("Você recebe");
     }
-    expect(steps()[1]).toHaveTextContent("em quantas etapas dá para fazer, com o prazo e o preço de cada uma");
+    expect(steps()[0]).toHaveTextContent("No mesmo dia, o mapa desse processo em uma página");
+    expect(steps()[1]).toHaveTextContent("um parecer: implantar, testar, aprofundar ou não seguir. Com o prazo e o preço de cada etapa.");
     expect(steps()[2]).toHaveTextContent("No fim de cada etapa: o que foi combinado por escrito, funcionando na sua empresa.");
   });
 
@@ -211,15 +213,15 @@ describe("how it works", () => {
     const larger = within(section()).getByRole("heading", { level: 3, name: "Nem tudo cabe em duas semanas" }).closest("div")!;
     expect(section().querySelector("ol")!.compareDocumentPosition(larger) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(section()).toHaveTextContent("Quando o trabalho é maior");
-    expect(larger).toHaveTextContent("O diagnóstico mostra isso antes de você contratar a construção. O trabalho maior vem dividido em etapas, cada uma com entrega, prazo e preço por escrito, e você decide a cada uma se segue.");
+    expect(larger).toHaveTextContent("A análise dos processos mostra isso antes de você contratar a construção. O trabalho maior vem dividido em etapas, cada uma com entrega, prazo e preço por escrito, e você decide a cada uma se segue.");
   });
 
   it("uses 'passo' for the three steps and 'etapa' only for the slices of the construction", () => {
     renderHome();
-    const [talk, diagnosis] = steps();
+    const [diagnosis, analysis] = steps();
     expect(within(section()).getByRole("heading", { level: 2 }).textContent).toContain("passo");
-    expect(talk).not.toHaveTextContent(/etapa/i);
-    expect(diagnosis).not.toHaveTextContent(/passo/i);
+    expect(diagnosis).not.toHaveTextContent(/etapa/i);
+    expect(analysis).not.toHaveTextContent(/passo/i);
   });
 
   // 17/11, the product owner: the site stays clean. Contract terms for edge cases (a change of
@@ -243,7 +245,7 @@ describe("how it works", () => {
     renderHome();
     expect(brCopy.home.layout === "consulting" && brCopy.home.howItWorks.price.claim.value).toBeNull();
     expect(section()).toHaveTextContent(
-      "O preço do diagnóstico você fica sabendo na conversa. O de cada etapa vem fechado no diagnóstico, antes de você contratar.",
+      "O preço da análise dos processos você fica sabendo na conversa, com o escopo fechado. O de cada etapa vem na análise, antes de você contratar.",
     );
   });
 });
